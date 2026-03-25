@@ -972,15 +972,9 @@ applySettingsButton.addEventListener('click', () => {
     
     if (isBookEnabled) {
         if (settings.pages.length === 0) {
-            alert('❌ Sách cần có trang!\n\nVui lòng thêm ít nhất 1 trang cho sách hoặc tắt tính năng sách.');
+            alert('❌ Please add at least 1 page for the book!');
             return;
         }
-    }
-    
-    const totalPages = settings.pages.length;
-    if (totalPages > 1 && totalPages % 2 === 0) {
-        alert(typeof t === 'function' ? `❌ ${t('invalidPageStructure')}` : '❌ Cấu trúc trang không hợp lệ (số trang phải là số lẻ nếu > 1)!');
-        return;
     }
 
     saveFormDataToSettings(); // Lưu toàn bộ data từ form
