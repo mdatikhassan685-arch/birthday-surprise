@@ -70,7 +70,7 @@ body {
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* যোগ করা হয়েছে */
+    background-color: rgba(0, 0, 0, 0.5);
     overflow: hidden; /* বাইরে স্ক্রল বন্ধ */
     animation: fadeIn 0.3s ease-in-out;
 }
@@ -83,12 +83,12 @@ body {
 /* Modal content */
 .modal-content {
     background-color: #ffffff;
-    margin: 5vh auto; /* মাঝে আনা হয়েছে */
+    margin: 5vh auto; 
     padding: 0;
     border: none;
     width: 90%;
     max-width: 600px;
-    height: 90vh; /* উচ্চতা বাড়ানো হয়েছে */
+    height: 90vh; /* উচ্চতা */
     border-radius: 12px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
     display: flex;
@@ -109,7 +109,7 @@ body {
 .modal-header h2 {
     margin: 0;
     color: white;
-    font-size: 24px;
+    font-size: 20px;
     font-weight: 600;
 }
 
@@ -128,7 +128,7 @@ body {
 /* Modal body - This is the scrollable part */
 .modal-body {
     flex: 1;
-    padding: 20px;
+    padding: 15px;
     overflow-y: auto !important; /* স্ক্রল করার অনুমতি */
     background: #f9f9f9;
     -webkit-overflow-scrolling: touch; /* মোবাইলে স্মুথ স্ক্রলিং */
@@ -136,7 +136,7 @@ body {
 
 /* Settings section */
 .settings-section {
-    margin-bottom: 20px;
+    margin-bottom: 15px;
     padding: 15px;
     background: white;
     border-radius: 8px;
@@ -144,15 +144,15 @@ body {
 }
 
 .settings-section h3 {
-    margin: 0 0 15px;
-    font-size: 18px;
+    margin: 0 0 10px;
+    font-size: 16px;
     color: #333;
     border-bottom: 2px solid #eee;
     padding-bottom: 8px;
 }
 
 .form-group {
-    margin-bottom: 15px;
+    margin-bottom: 12px;
 }
 
 .form-group label {
@@ -160,18 +160,22 @@ body {
     margin-bottom: 5px;
     font-weight: 600;
     color: #444;
-    font-size: 14px;
+    font-size: 13px;
 }
 
 .form-row {
     display: flex;
-    gap: 15px;
-    flex-wrap: wrap; /* মোবাইলে নিচে নিচে আসার জন্য */
+    gap: 10px;
+    flex-direction: column; /* মোবাইলে নিচে নিচে আসবে */
 }
 
-.form-row .form-group {
-    flex: 1;
-    min-width: 120px;
+@media screen and (min-width: 480px) {
+    .form-row {
+        flex-direction: row; /* বড় স্ক্রিনে পাশাপাশি */
+    }
+    .form-row .form-group {
+        flex: 1;
+    }
 }
 
 /* Inputs and selects */
@@ -209,6 +213,7 @@ body {
     font-weight: 600;
     width: 100%;
     margin-top: 10px;
+    margin-bottom: 20px;
 }
 
 .music-select-row {
@@ -232,14 +237,12 @@ body {
 
 /* Theme buttons */
 .color-theme-buttons {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* ২টা করে কলাম */
     gap: 8px;
-    flex-wrap: wrap; /* মোবাইলে নিচে নিচে আসার জন্য */
 }
 
 .color-theme-btn {
-    flex: 1;
-    min-width: 80px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -255,11 +258,17 @@ body {
     background: #fff5f5;
 }
 
+.color-theme-btn span {
+    font-size: 12px;
+    margin-top: 5px;
+    text-align: center;
+}
+
 .color-preview {
     width: 25px;
     height: 25px;
     border-radius: 50%;
-    margin-bottom: 8px;
+    margin-bottom: 5px;
 }
 
 .pink-preview { background: linear-gradient(135deg, #ff69b4, #ff1493); }
@@ -342,6 +351,10 @@ body {
     transform: rotateY(-90deg);
 }
 
+/* Dynamic z-index cho pages */
+.page { z-index: var(--page-z-index, 1); }
+.page.flipped { z-index: var(--page-flipped-z-index, 1); }
+
 /* Floating Hearts */
 .heart {
     position: fixed;
@@ -417,30 +430,62 @@ body {
     background: #333;
 }
 
+/* Page config box */
+.page-config {
+    border: 1px solid #eee;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    background: #fff;
+    position: relative;
+}
+
+.page-config h3 {
+    font-size: 14px;
+    margin: 0 0 10px 0;
+}
+
+.page-config-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #ff4444;
+    color: white;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 20px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.page-config img {
+    margin: 10px 0;
+    border-radius: 6px;
+    max-width: 100px;
+    height: auto;
+}
+
+#pageConfigs button {
+    background: #4caf50;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 10px;
+}
+
 /* Mobile Responsive */
 @media screen and (max-width: 768px) {
     .modal-content {
         width: 95%;
-        height: 95vh;
-        margin: 2.5vh auto;
+        height: 90vh;
+        margin: 5vh auto;
     }
     
-    .color-theme-buttons {
-        flex-direction: column;
+    .modal-body {
+        max-height: calc(90vh - 60px);
     }
-    
-    .form-row {
-        flex-direction: column;
-    }
-
-    .book {
-        width: 300px;
-        height: 200px;
-        transform: scale(0.8);
-    }
-
-    .page {
-        width: 150px;
-        height: 200px;
-    }
-}
