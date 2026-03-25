@@ -4,18 +4,11 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title> Birthday Site 🎁</title>
+    <title>GS Birthday Site 🎁</title>
     <meta name="description" content="A special birthday surprise! A beautiful interactive site with animations, music, and memories!">
 
-    <!-- Favicon and Icons -->
     <link rel="icon" href="./image/logo.png" type="image/png">
     <link rel="apple-touch-icon" href="./image/logo.png">
-
-    <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="GS Birthday Site 🎁">
-    <meta property="og:description" content="A special birthday surprise! A beautiful interactive site with animations, music, and memories!">
-    <meta property="og:image" content="./image/logo.png">
-    <meta property="og:type" content="website">
 
     <!-- Styles -->
     <link rel="stylesheet" href="./css/index.css">
@@ -48,7 +41,7 @@
 
         <!-- Settings hint element -->
         <div id="settingsHint" class="settings-hint">
-            <div class="hint-text">Click here to customize settings</div>
+            <div class="hint-text">সেটিংস পরিবর্তন করতে এখানে ক্লিক করুন</div>
         </div>
 
         <div id="settingsModal" class="modal">
@@ -62,7 +55,7 @@
                     
                     <!-- Music Settings -->
                     <div class="settings-section">
-                        <h3>🎵 Music Settings</h3>
+                        <h3>🎵 Music (গান সিলেক্ট করুন)</h3>
                         <div class="form-group music-select-row">
                             <select id="backgroundMusic"></select>
                             <button id="musicPreviewButton" class="music-preview-btn">▶ Play</button>
@@ -72,55 +65,55 @@
 
                     <!-- Main Text Settings -->
                     <div class="settings-section">
-                        <h3>📝 Text Settings</h3>
+                        <h3>📝 Text Settings (লেখা পরিবর্তন করুন)</h3>
                         <div class="form-group">
-                            <label for="sequenceText">Main Animation Text (Use | to separate words):</label>
+                            <label for="sequenceText">মূল লেখা (শব্দের মাঝে | ব্যবহার করুন):</label>
                             <input type="text" id="sequenceText" value="HAPPY|BIRTHDAY|ZAHRA|❤">
                         </div>
                         <div class="form-group">
-                            <label for="matrixText">Background Matrix Text:</label>
+                            <label for="matrixText">ব্যাকগ্রাউন্ড ম্যাট্রিক্স টেক্সট:</label>
                             <input type="text" id="matrixText" value="HAPPYBIRTHDAY">
                         </div>
                         <div class="form-group">
-                            <label for="countdownTime">Countdown Time (seconds):</label>
+                            <label for="countdownTime">কাউন্টডাউন সময় (সেকেন্ড):</label>
                             <input type="number" id="countdownTime" value="3" min="1" max="10">
                         </div>
                     </div>
 
                     <!-- Color Settings -->
                     <div class="settings-section">
-                        <h3>🎨 Choose Color Theme</h3>
+                        <h3>🎨 Choose Color Theme (কালার)</h3>
                         <div class="form-group">
                             <div class="color-theme-buttons">
                                 <button type="button" class="color-theme-btn active" data-theme="pink">
                                     <div class="color-preview pink-preview"></div>
-                                    <span>Sweet Pink</span>
+                                    <span>মিষ্টি গোলাপী (Pink)</span>
                                 </button>
                                 <button type="button" class="color-theme-btn" data-theme="blue">
                                     <div class="color-preview blue-preview"></div>
-                                    <span>Cool Blue</span>
+                                    <span>নীল (Blue)</span>
                                 </button>
                                 <button type="button" class="color-theme-btn" data-theme="purple">
                                     <div class="color-preview purple-preview"></div>
-                                    <span>Dreamy Purple</span>
+                                    <span>বেগুনি (Purple)</span>
                                 </button>
                                 <button type="button" class="color-theme-btn" data-theme="custom">
                                     <div class="color-preview custom-preview"></div>
-                                    <span>Custom Color</span>
+                                    <span>কাস্টম কালার</span>
                                 </button>
                             </div>
                         </div>
                         <div class="form-row" id="customColorSection" style="display: none;">
                             <div class="form-group">
-                                <label for="matrixColor1">Matrix color 1:</label>
+                                <label for="matrixColor1">ম্যাট্রিক্স কালার ১:</label>
                                 <input type="color" id="matrixColor1" value="#ff69b4">
                             </div>
                             <div class="form-group">
-                                <label for="matrixColor2">Matrix color 2:</label>
+                                <label for="matrixColor2">ম্যাট্রিক্স কালার ২:</label>
                                 <input type="color" id="matrixColor2" value="#ff1493">
                             </div>
                             <div class="form-group" id="sequenceColorSection" style="display: none;">
-                                <label for="sequenceColor">Text color:</label>
+                                <label for="sequenceColor">টেক্সট কালার:</label>
                                 <input type="color" id="sequenceColor" value="#ff69b4">
                             </div>
                         </div>
@@ -128,24 +121,24 @@
 
                     <!-- Effects Settings -->
                     <div class="settings-section">
-                        <h3>🎁 Effects Settings</h3>
+                        <h3>🎁 Effects Settings (ইফেক্টস)</h3>
                         <div class="form-group">
-                            <label for="giftImage">Animated Image (Optional):</label>
+                            <label for="giftImage">এনিমেটেড গিফট ছবি (ঐচ্ছিক):</label>
                             <select id="giftImage"></select>
                         </div>
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="enableBook">Show Book Effect:</label>
+                                <label for="enableBook">বই দেখাবেন কি?:</label>
                                 <select id="enableBook">
-                                    <option value="true">Yes</option>
-                                    <option value="false">No</option>
+                                    <option value="true">হ্যাঁ (Yes)</option>
+                                    <option value="false">না (No)</option>
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label for="enableHeart">Show Floating Hearts:</label>
+                                <label for="enableHeart">ভাসমান হার্ট দেখাবেন কি?:</label>
                                 <select id="enableHeart">
-                                    <option value="true">Yes</option>
-                                    <option value="false">No</option>
+                                    <option value="true">হ্যাঁ (Yes)</option>
+                                    <option value="false">না (No)</option>
                                 </select>
                             </div>
                         </div>
@@ -153,16 +146,10 @@
 
                     <!-- Book Pages Settings -->
                     <div class="settings-section" id="bookSettingsSection">
-                        <h3>📖 Book Pages (Photos & Text)</h3>
+                        <h3>📖 Book Pages (বইয়ের পাতা ও ছবি)</h3>
                         <div id="pageConfigs"></div>
                     </div>
 
-                    <!-- Custom Message -->
-                    <div class="settings-p" style="margin-top: 20px; margin-bottom: 12px; background: #fff8e1; color: #b26a00; border-radius: 7px; padding: 10px 14px; font-size: 15px; box-shadow: 0 1px 6px rgba(0,0,0,0.04);">
-                        <div>💝 This special birthday website was lovingly created by WSM</div>
-                        <div>🎉 Happy Birthday Zahra! Wishing you a wonderful day filled with joy and love! 💕</div>
-                    </div>
-                    
                     <button id="applySettings" class="apply-settings-btn">🎉 Apply Settings</button>
                 </div>
             </div>
@@ -179,11 +166,11 @@
 
         <div id="orientation-lock">
             <div class="phone-icon">
-                <img src="./image/screen.png" alt="">
+                <img src="./image/screen.png" alt="Rotate screen">
             </div>
+            <p style="margin-top: 15px; font-size: 16px;">Please rotate your phone<br>(অনুগ্রহ করে ফোনটি আড়াআড়ি করুন)</p>
         </div>
 
-        <!-- Fullscreen button for Android -->
         <button id="fullscreenBtn" style="position: fixed; bottom: 20px; right: 20px; z-index: 990010; padding: 10px 18px; border-radius: 8px; border: none; background: #222; color: #fff; font-size: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); cursor: pointer; display: none;">
             <img style="width: 20px; height: 20px; vertical-align: middle;" src="./image/full.png" alt="Fullscreen">
         </button>
