@@ -1,183 +1,125 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GS Birthday Site 🎁</title>
-    <meta name="description" content="A special birthday surprise! A beautiful interactive site with animations, music, and memories!">
-
-    <link rel="icon" href="./image/logo.png" type="image/png">
-    <link rel="apple-touch-icon" href="./image/logo.png">
-
-    <!-- Styles -->
-    <link rel="stylesheet" href="./css/index.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css?family=Pacifico&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login 🔒</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1a0b1c 0%, #000000 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        .login-container {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            box-shadow: 0 0 20px rgba(255, 105, 180, 0.2);
+            width: 90%;
+            max-width: 350px;
+            animation: fadeIn 1s ease-in-out;
+        }
+        .login-container h2 {
+            color: #ff69b4;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid rgba(255, 105, 180, 0.5);
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+            transition: 0.3s;
+            text-align: center;
+        }
+        .input-group input:focus {
+            border-color: #ff1493;
+            box-shadow: 0 0 10px rgba(255, 20, 147, 0.5);
+        }
+        .login-btn {
+            background: linear-gradient(135deg, #ff69b4, #ff1493);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            transition: 0.3s;
+        }
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 105, 180, 0.4);
+        }
+        #errorMsg {
+            color: #ff4444;
+            margin-top: 15px;
+            font-size: 14px;
+            display: none;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
 </head>
-
 <body>
-    <canvas id="matrix-rain" style="display: none;"></canvas>
-    <canvas style="position:absolute;width:100%;height:100%;z-index:9999;display:none;" class="canvas"></canvas>
-    
-    <div class="overlay">
-        <div class="stars-container" id="starsContainer"></div>
-        <img id="gift-image" src="" style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10000; max-width: 80%; max-height: 80%;" />
-        
-        <div class="content-display" id="contentDisplay">
-            <p id="contentText"></p>
+
+    <div class="login-container">
+        <h2>⚙️ Admin Panel</h2>
+        <div class="input-group">
+            <input type="password" id="adminPass" placeholder="Enter Password" onkeypress="handleEnter(event)">
         </div>
-        
-        <div class="firework-container" id="fireworkContainer"></div>
-        
-        <div class="book-container">
-            <div class="book" id="book"></div>
-        </div>
-
-        <button class="music-control" id="musicControl" title="Play/Pause Music">▶</button>
-        <button class="settings-button" id="settingsButton" title="Settings">⚙</button>
-
-        <!-- Settings hint element -->
-        <div id="settingsHint" class="settings-hint">
-            <div class="hint-text">সেটিংস পরিবর্তন করতে এখানে ক্লিক করুন</div>
-        </div>
-
-        <div id="settingsModal" class="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2>⚙️ Website Settings</h2>
-                    <span class="close">×</span>
-                </div>
-                
-                <div class="modal-body">
-                    
-                    <!-- Music Settings -->
-                    <div class="settings-section">
-                        <h3>🎵 Music (গান সিলেক্ট করুন)</h3>
-                        <div class="form-group music-select-row">
-                            <select id="backgroundMusic"></select>
-                            <button id="musicPreviewButton" class="music-preview-btn">▶ Play</button>
-                        </div>
-                        <span id="musicPreviewStatus" class="music-preview-status"></span>
-                    </div>
-
-                    <!-- Main Text Settings -->
-                    <div class="settings-section">
-                        <h3>📝 Text Settings (লেখা পরিবর্তন করুন)</h3>
-                        <div class="form-group">
-                            <label for="sequenceText">মূল লেখা (শব্দের মাঝে | ব্যবহার করুন):</label>
-                            <input type="text" id="sequenceText" value="HAPPY|BIRTHDAY|ZAHRA|❤">
-                        </div>
-                        <div class="form-group">
-                            <label for="matrixText">ব্যাকগ্রাউন্ড ম্যাট্রিক্স টেক্সট:</label>
-                            <input type="text" id="matrixText" value="HAPPYBIRTHDAY">
-                        </div>
-                        <div class="form-group">
-                            <label for="countdownTime">কাউন্টডাউন সময় (সেকেন্ড):</label>
-                            <input type="number" id="countdownTime" value="3" min="1" max="10">
-                        </div>
-                    </div>
-
-                    <!-- Color Settings -->
-                    <div class="settings-section">
-                        <h3>🎨 Choose Color Theme (কালার)</h3>
-                        <div class="form-group">
-                            <div class="color-theme-buttons">
-                                <button type="button" class="color-theme-btn active" data-theme="pink">
-                                    <div class="color-preview pink-preview"></div>
-                                    <span>মিষ্টি গোলাপী (Pink)</span>
-                                </button>
-                                <button type="button" class="color-theme-btn" data-theme="blue">
-                                    <div class="color-preview blue-preview"></div>
-                                    <span>নীল (Blue)</span>
-                                </button>
-                                <button type="button" class="color-theme-btn" data-theme="purple">
-                                    <div class="color-preview purple-preview"></div>
-                                    <span>বেগুনি (Purple)</span>
-                                </button>
-                                <button type="button" class="color-theme-btn" data-theme="custom">
-                                    <div class="color-preview custom-preview"></div>
-                                    <span>কাস্টম কালার</span>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="form-row" id="customColorSection" style="display: none;">
-                            <div class="form-group">
-                                <label for="matrixColor1">ম্যাট্রিক্স কালার ১:</label>
-                                <input type="color" id="matrixColor1" value="#ff69b4">
-                            </div>
-                            <div class="form-group">
-                                <label for="matrixColor2">ম্যাট্রিক্স কালার ২:</label>
-                                <input type="color" id="matrixColor2" value="#ff1493">
-                            </div>
-                            <div class="form-group" id="sequenceColorSection" style="display: none;">
-                                <label for="sequenceColor">টেক্সট কালার:</label>
-                                <input type="color" id="sequenceColor" value="#ff69b4">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Effects Settings -->
-                    <div class="settings-section">
-                        <h3>🎁 Effects Settings (ইফেক্টস)</h3>
-                        <div class="form-group">
-                            <label for="giftImage">এনিমেটেড গিফট ছবি (ঐচ্ছিক):</label>
-                            <select id="giftImage"></select>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="enableBook">বই দেখাবেন কি?:</label>
-                                <select id="enableBook">
-                                    <option value="true">হ্যাঁ (Yes)</option>
-                                    <option value="false">না (No)</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="enableHeart">ভাসমান হার্ট দেখাবেন কি?:</label>
-                                <select id="enableHeart">
-                                    <option value="true">হ্যাঁ (Yes)</option>
-                                    <option value="false">না (No)</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Book Pages Settings -->
-                    <div class="settings-section" id="bookSettingsSection">
-                        <h3>📖 Book Pages (বইয়ের পাতা ও ছবি)</h3>
-                        <div id="pageConfigs"></div>
-                    </div>
-
-                    <button id="applySettings" class="apply-settings-btn">🎉 Apply Settings</button>
-                </div>
-            </div>
-        </div>
-
-        <audio id="birthdayAudio" loop autoplay>
-            <source src="./music/zahra.mp3" type="audio/mpeg">
-            Your browser does not support the audio element.
-        </audio>
-
-        <div class="copyright">
-            Made with 💕 for a Special Birthday
-        </div>
-
-        <div id="orientation-lock">
-            <div class="phone-icon">
-                <img src="./image/screen.png" alt="Rotate screen">
-            </div>
-            <p style="margin-top: 15px; font-size: 16px;">Please rotate your phone<br>(অনুগ্রহ করে ফোনটি আড়াআড়ি করুন)</p>
-        </div>
-
-        <button id="fullscreenBtn" style="position: fixed; bottom: 20px; right: 20px; z-index: 990010; padding: 10px 18px; border-radius: 8px; border: none; background: #222; color: #fff; font-size: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); cursor: pointer; display: none;">
-            <img style="width: 20px; height: 20px; vertical-align: middle;" src="./image/full.png" alt="Fullscreen">
-        </button>
+        <button class="login-btn" onclick="checkLogin()">Login</button>
+        <p id="errorMsg">❌ Wrong Password!</p>
     </div>
 
-    <!-- Scripts -->
-    <script src="./jscp/settings.js"></script>
-    <script src="./jscp/main.js"></script>
+    <script>
+        // এখানে আপনার পছন্দমতো পাসওয়ার্ড সেট করুন
+        const ADMIN_PASSWORD = "zahra"; 
+
+        function checkLogin() {
+            const passInput = document.getElementById('adminPass').value;
+            const errorMsg = document.getElementById('errorMsg');
+
+            if (passInput === ADMIN_PASSWORD) {
+                // সঠিক পাসওয়ার্ড হলে লোকাল স্টোরেজে সেভ করে admin.html এ নিয়ে যাবে
+                localStorage.setItem("isAdminLoggedIn", "true");
+                window.location.href = "admin.html";
+            } else {
+                // ভুল পাসওয়ার্ড হলে এরর দেখাবে
+                errorMsg.style.display = "block";
+                document.getElementById('adminPass').value = ""; // বক্স ক্লিয়ার করে দিবে
+            }
+        }
+
+        // এন্টার (Enter) বাটন চাপলেও যাতে লগিন হয়
+        function handleEnter(e) {
+            if (e.key === 'Enter') {
+                checkLogin();
+            }
+        }
+    </script>
+
 </body>
 </html>
