@@ -2,12 +2,11 @@
 // ⚙️ ADMIN SETTINGS (For admin.html)
 // ==========================================
 
-// 🔑 আপনার ImgBB API Key
 const IMGBB_API_KEY = "250ca5e91b77576f5bb44dcd1dd9ad46";
-
 const applySettingsButton = document.getElementById('applySettings');
 let settings = {};
 
+// লোকাল ফোল্ডারে থাকা আপনার ডিফল্ট মিউজিকগুলো
 const musicOptions = [
     { value: './music/zahra.mp3', label: 'Zahra Birthday Music' },
     { value: './music/happy-birthday.mp3', label: 'Happy Birthday (Miễn phí)' },
@@ -73,7 +72,16 @@ function loadSettingsForAdmin() {
     const savedSettings = localStorage.getItem("birthdaySettings");
     if (savedSettings) {
         settings = JSON.parse(savedSettings);
+        
+        // অ্যাডমিন প্যানেলে কভার পেজ দেখানোর দরকার নেই, তাই প্রথম ও শেষ পেজ রিমুভ করে শুধু ভেতরের পেজগুলো রাখছি
+        if(settings.pages.length > 0 && settings.pages[0].isCover) {
+            settings.pages.shift(); // প্রথম কভার রিমুভ
+        }
+        if(settings.pages.length > 0 && settings.pages[settings.pages.length - 1].isCover) {
+            settings.pages.pop(); // শেষ কভার রিমুভ
+        }
     } else {
+        // ডিফল্ট সেটিংস (ভেতরের পেজগুলো)
         settings = {
             music: './music/zahra.mp3',
             countdown: 3,
@@ -87,9 +95,8 @@ function loadSettingsForAdmin() {
             enableHeart: true,
             colorTheme: 'pink',
             pages: [
-                { image: './image/Birthday!/cover.jpg', content: '' }, 
-                { image: './image/Birthday!/photo1.jpg', content: 'Dear Zahra, you bring so much joy and happiness! 💕' },
-                { image: './image/Birthday!/9.jpg', content: '' }
+                { image: '', content: 'Dear Zahra, you bring so much joy and happiness! 💕' },
+                { image: '', content: 'Wishing you the most wonderful birthday ever! 🎉' }
             ]
         };
     }
@@ -145,8 +152,8 @@ async function uploadToImgBB(file, index) {
         const data = await response.json();
         
         if (data.success) {
-            const imageUrl = data.data.url; // ImgBB ডিরেক্ট লিংক
-            settings.pages[index].image = imageUrl; // সেটিংসে সেভ করা
+            const imageUrl = data.data.url; 
+            settings.pages[index].image = imageUrl; 
             
             statusText.textContent = 'Upload Success! ✅';
             setTimeout(() => statusText.style.display = 'none', 2000);
@@ -163,7 +170,7 @@ async function uploadToImgBB(file, index) {
     }
 }
 
-// পেজ ফর্ম রেন্ডার করা
+// পেজ ফর্ম রেন্ডার করা (কভার ছাড়া শুধু ভেতরের পেজ)
 function renderPagesForm() {
     const pageConfigs = document.getElementById('pageConfigs');
     if (!pageConfigs) return;
@@ -180,7 +187,7 @@ function renderPagesForm() {
 
         pageDiv.innerHTML = `
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                <h4 style="margin: 0;">Page ${index + 1} ${index === 0 ? '(Cover)' : ''}</h4>
+                <h4 style="margin: 0; color: #ff1493;">Page ${index + 1}</h4>
                 ${settings.pages.length > 1 ? `<button onclick="removePage(${index})" style="background: #ff4444; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">Remove</button>` : ''}
             </div>
             
@@ -198,7 +205,6 @@ function renderPagesForm() {
         
         pageConfigs.appendChild(pageDiv);
 
-        // ফাইল সিলেক্ট করলেই ImgBB তে আপলোড শুরু হবে
         document.getElementById(`pageFile${index}`).addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file) {
@@ -207,11 +213,11 @@ function renderPagesForm() {
         });
     });
 
-    if (settings.pages.length < 20) {
+    if (settings.pages.length < 18) { // ম্যাক্সিমাম ১৮টি ইনার পেজ রাখা যাবে
         const addBtn = document.createElement('button');
         addBtn.textContent = '+ Add New Page';
         addBtn.onclick = addNewPage;
-        addBtn.style.cssText = 'background: #4caf50; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer;';
+        addBtn.style.cssText = 'background: #4caf50; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; margin-top: 10px;';
         pageConfigs.appendChild(addBtn);
     }
 }
@@ -235,7 +241,7 @@ function saveFormDataLocally() {
     });
 }
 
-// 🪄 Magic Link জেনারেট করা
+// 🪄 Magic Link জেনারেট করা এবং লোকাল ইমেজ যুক্ত করা
 if (applySettingsButton) {
     applySettingsButton.addEventListener('click', () => {
         
@@ -251,25 +257,31 @@ if (applySettingsButton) {
         settings.sequenceColor = document.getElementById('sequenceColor').value;
         
         saveFormDataLocally(); 
-        
-        // লোকাল স্টোরেজে সেভ (অ্যাডমিন প্রিভিউর জন্য)
-        localStorage.setItem("birthdaySettings", JSON.stringify(settings));
 
-        // 🪄 Magic Link তৈরি (Base64 Encode করে URL এ জুড়ে দেওয়া)
-        const encodedData = btoa(unescape(encodeURIComponent(JSON.stringify(settings))));
+        // 🎯 ম্যাজিক লিংক তৈরির আগে ফ্রন্ট কভার এবং ব্যাক কভার অটোমেটিক যুক্ত করা
+        let finalSettings = JSON.parse(JSON.stringify(settings)); // কপি তৈরি করা হলো
         
-        // বর্তমান ওয়েবসাইটের ডোমেইন বের করে surprise.html এর লিংক তৈরি
+        // লোকাল কভার ইমেজ (আপনার image ফোল্ডার থেকে)
+        const frontCover = { image: './image/Birthday!/cover.jpg', content: '', isCover: true };
+        const backCover = { image: './image/Birthday!/cover.jpg', content: '', isCover: true };
+
+        // শুরুতে এবং শেষে কভার যোগ করে দেওয়া হলো
+        finalSettings.pages.unshift(frontCover);
+        finalSettings.pages.push(backCover);
+
+        // লোকাল স্টোরেজে সেভ (অ্যাডমিন প্রিভিউর জন্য)
+        localStorage.setItem("birthdaySettings", JSON.stringify(finalSettings));
+
+        // 🪄 Magic Link তৈরি 
+        const encodedData = btoa(unescape(encodeURIComponent(JSON.stringify(finalSettings))));
         const currentUrl = window.location.href.split('admin.html')[0];
         const magicLink = `${currentUrl}surprise.html?data=${encodedData}`;
 
-        // স্ক্রিনে ম্যাজিক লিংক দেখানো
         const magicLinkSection = document.getElementById('magicLinkSection');
         const magicLinkInput = document.getElementById('magicLinkInput');
         
         magicLinkInput.value = magicLink;
         magicLinkSection.style.display = 'block';
-
-        // ম্যাজিক লিংক সেকশনে স্ক্রল করে যাওয়া
         magicLinkSection.scrollIntoView({ behavior: "smooth" });
     });
 }
