@@ -1,43 +1,5 @@
-let isLandscape = false;
-let matrixInterval = null;
-const confettiPool = [];
-const maxConfetti = 50;
-const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-let isUserStarted = false; // 🛠️ ইউজার ফুলস্ক্রিন বাটনে ক্লিক করেছে কি না তা চেক করার ভেরিয়েবল
+let isUserStarted = false; 
 
-function createConfetti() {
-    const confetti = document.createElement("div");
-    confetti.className = "confetti";
-    return confetti;
-}
-
-function getConfettiFromPool() {
-    if (confettiPool.length > 0) {
-        return confettiPool.pop();
-    }
-    return createConfetti();
-}
-
-function forceResizeMatrix() {
-    const matrixCanvas = document.getElementById('matrix-rain');
-    if (matrixCanvas) {
-        matrixCanvas.width = window.innerWidth;
-        matrixCanvas.height = window.innerHeight;
-
-        if (matrixInterval) {
-            clearInterval(matrixInterval);
-            matrixInterval = null;
-        }
-        initMatrixRain();
-    }
-}
-
-function returnConfettiToPool(confetti) {
-    confetti.remove();
-    confettiPool.push(confetti);
-}
-
-// 🛠️ ফিক্সড এবং স্মার্ট রোটেশন লজিক
 function checkOrientation() {
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     const orientationLock = document.getElementById('orientation-lock');
@@ -50,6 +12,16 @@ function checkOrientation() {
         isLandscape = true;
         isUserStarted = true;
         if(orientationLock) orientationLock.style.display = 'none';
+        
+        // পিসিতে ইউজার যেকোনো জায়গায় ক্লিক করলে গান বাজবে (ব্রাউজার পলিসির জন্য)
+        document.body.addEventListener('click', function playAudioOnce() {
+            const birthdayAudio = document.getElementById('birthdayAudio');
+            if (birthdayAudio && birthdayAudio.paused) {
+                birthdayAudio.play().catch(e => console.log("Audio auto-play blocked"));
+            }
+            document.body.removeEventListener('click', playAudioOnce);
+        });
+
         startWebsite();
     } else {
         // মোবাইলের জন্য লজিক
@@ -59,17 +31,19 @@ function checkOrientation() {
             isLandscape = e.matches;
 
             if (isLandscape) {
-                // ল্যান্ডস্কেপ করা হয়েছে, কিন্তু এখনো স্টার্ট বাটনে চাপ দেয়নি
+                // ফোন ঘুরালে (ল্যান্ডস্কেপ), কিন্তু এখনো স্টার্ট বাটনে চাপ দেয়নি
                 if (!isUserStarted) {
                     if(orientationLock) orientationLock.style.display = 'flex';
-                    if(phoneIcon) phoneIcon.style.display = 'none'; // রোটেশন আইকন হাইড
+                    if(phoneIcon) phoneIcon.style.display = 'none'; 
                     if(orientationMsg) orientationMsg.innerHTML = "Ready for the surprise?<br>Tap the button below!";
-                    if(startSurpriseBtn) startSurpriseBtn.style.display = 'flex'; // ফুলস্ক্রিন বাটন শো
+                    if(startSurpriseBtn) startSurpriseBtn.style.display = 'flex'; 
                 } else {
-                    // আগে স্টার্ট করেছিলো, এখন আবার ল্যান্ডস্কেপ করেছে
+                    // আগে স্টার্ট করেছিলো, এখন আবার ল্যান্ডস্কেপ করেছে (সব ঠিক আছে)
                     if(orientationLock) orientationLock.style.display = 'none';
-                    startWebsite();
-                    setTimeout(forceResizeMatrix, 100);
+                    setTimeout(() => {
+                        forceResizeMatrix();
+                        if (typeof S !== 'undefined' && S.Drawing) S.Drawing.adjustCanvas(); 
+                    }, 200);
                 }
             } else {
                 // পোর্ট্রেট মোডে আনলে সব হাইড করে রোটেশন আইকন দেখাবে
@@ -77,46 +51,48 @@ function checkOrientation() {
                 if(phoneIcon) phoneIcon.style.display = 'block';
                 if(orientationMsg) orientationMsg.innerHTML = "Please rotate your phone<br>(ল্যান্ডস্কেপ করে ধরুন)";
                 if(startSurpriseBtn) startSurpriseBtn.style.display = 'none';
-                stopWebsite();
+                stopWebsite(); 
             }
         }
 
-        // প্রথমবার পেজ লোড হওয়ার সময় চেক
         handleScreenChange(mediaQuery);
-        
-        // ফোন ঘুরালে চেক
         mediaQuery.addEventListener('change', handleScreenChange);
         
-        // 🛠️ ফুলস্ক্রিন বাটনে ক্লিক করার ইভেন্ট
+        // 🛠️ ফুলস্ক্রিন বাটনে ক্লিক করার পর কী হবে তার লজিক
         if(startSurpriseBtn) {
             startSurpriseBtn.addEventListener('click', function() {
-                // ফুলস্ক্রিন রিকোয়েস্ট (ব্রাউজারের সাদা বার হাইড করা)
+                // ১. ফুলস্ক্রিন রিকোয়েস্ট
                 const elem = document.documentElement;
                 if (elem.requestFullscreen) {
                     elem.requestFullscreen();
-                } else if (elem.webkitRequestFullscreen) { /* Safari */
+                } else if (elem.webkitRequestFullscreen) { 
                     elem.webkitRequestFullscreen();
-                } else if (elem.msRequestFullscreen) { /* IE11 */
+                } else if (elem.msRequestFullscreen) { 
                     elem.msRequestFullscreen();
                 }
                 
-                // এনিমেশন শুরু করার পারমিশন
+                // ২. লক স্ক্রিন হাইড করা
                 isUserStarted = true;
-                orientationLock.style.display = 'none';
+                if(orientationLock) orientationLock.style.display = 'none';
                 
-                // মিউজিক চালু করা (যদি অটো প্লে বন্ধ থাকে)
+                // ৩. মিউজিক প্লে করা (ব্রাউজার আটকানোর চেষ্টা করলেও ইগনোর করবে)
                 const birthdayAudio = document.getElementById('birthdayAudio');
                 if (birthdayAudio) {
-                    birthdayAudio.play().catch(e => console.log("Audio play allowed after interaction"));
+                    birthdayAudio.play().catch(e => console.log("Audio error ignored"));
                 }
 
+                // ৪. মূল এনিমেশন শুরু করা
                 startWebsite();
-                setTimeout(forceResizeMatrix, 100);
+
+                // ৫. ক্যানভাস সাইজ ঠিক করা
+                setTimeout(() => {
+                    forceResizeMatrix();
+                    if (typeof S !== 'undefined' && S.Drawing) S.Drawing.adjustCanvas();
+                }, 500);
             });
         }
     }
 }
-
 function startWebsite() {
     if (!matrixInterval) {
         initMatrixRain();
