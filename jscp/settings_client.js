@@ -1,5 +1,5 @@
 // ==========================================
-// 🎈 CLIENT SETTINGS (For surprise.html)
+// 🎈 CLIENT SETTINGS (For surprise.html Magic Link)
 // ==========================================
 
 const defaultSettings = {
@@ -17,24 +17,40 @@ const defaultSettings = {
     pages: [
         { image: './image/Birthday!/cover.jpg', content: '' }, 
         { image: './image/Birthday!/photo1.jpg', content: 'Dear Zahra, you bring so much joy and happiness! 💕' },
-        { image: './image/Birthday!/photo2.jpg', content: 'Your smile lights up every room you enter! ✨' },
-        { image: './image/Birthday!/photo3.jpg', content: 'You are such an amazing and beautiful person! 🌸' },
-        { image: './image/Birthday!/photo4.jpg', content: 'Your kindness and warmth touch hearts! 💖' },
-        { image: './image/Birthday!/photo5.jpg', content: 'Wishing you the most wonderful birthday ever! 🎉' },
-        { image: './image/Birthday!/photo6.jpg', content: 'May all your dreams come true! ⭐' },
-        { image: './image/Birthday!/photo7.jpg', content: 'You deserve all the happiness! 🌈' },
-        { image: './image/Birthday!/photo8.jpg', content: 'Love you so much! Have the best day! ❤️🎂' },
         { image: './image/Birthday!/9.jpg', content: '' }
     ]
 };
 
-// লোকাল স্টোরেজ থেকে সেটিংস লোড করা
+// 🪄 ম্যাজিক লিংক বা লোকাল স্টোরেজ থেকে সেটিংস লোড করা
 function loadSettings() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const magicData = urlParams.get('data'); // লিংকের ?data= অংশটুকু নেওয়া
+
+    if (magicData) {
+        try {
+            // Base64 ডিকোড করে JSON থেকে অবজেক্টে রূপান্তর করা
+            const decodedString = decodeURIComponent(escape(atob(magicData)));
+            window.settings = JSON.parse(decodedString);
+            console.log("✅ Magic Link Loaded Successfully!");
+        } catch (e) {
+            console.error("❌ Invalid Magic Link! Loading default settings...", e);
+            fallbackToLocalOrDefaults();
+        }
+    } else {
+        // যদি কেউ ডিরেক্ট surprise.html এ ঢুকে (লিংক ছাড়া), তবে লোকাল স্টোরেজ চেক করবে
+        fallbackToLocalOrDefaults();
+    }
+}
+
+// ম্যাজিক লিংক না থাকলে লোকাল স্টোরেজ বা ডিফল্ট সেটিংস লোড করা
+function fallbackToLocalOrDefaults() {
     const savedSettings = localStorage.getItem("birthdaySettings");
     if (savedSettings) {
         window.settings = JSON.parse(savedSettings);
+        console.log("✅ Local Storage Loaded (Admin Preview Mode)");
     } else {
         window.settings = defaultSettings;
+        console.log("⚠️ No Magic Link or Local Storage found. Loading defaults.");
     }
 }
 
@@ -42,20 +58,24 @@ function loadSettings() {
 function applyLoadedSettings() {
     const settings = window.settings;
     
+    // গান সেট করা
     const birthdayAudio = document.getElementById('birthdayAudio');
     if (birthdayAudio) {
         birthdayAudio.src = settings.music;
     }
 
+    // গিফট ইমেজ সেট করা
     const giftImageElement = document.getElementById('gift-image');
     if (giftImageElement && settings.gift) {
         giftImageElement.src = settings.gift;
     }
 
+    // ম্যাট্রিক্স রেইন এর টেক্সট সেট করা
     if (typeof matrixChars !== 'undefined') {
         matrixChars = settings.matrixText.split('');
     }
 
+    // থ্রিডি বই তৈরি করা
     createPages();
 }
 
@@ -65,7 +85,10 @@ function createPages() {
     if(!book) return;
     
     book.innerHTML = '';
-    const pages = window.settings.pages;
+    const pages = window.settings.pages || [];
+    
+    if (pages.length === 0) return; // পেজ না থাকলে বই তৈরি হবে না
+
     const totalPhysicalPages = Math.ceil(pages.length / 2);
 
     for (let physicalPageIndex = 0; physicalPageIndex < totalPhysicalPages; physicalPageIndex++) {
@@ -83,24 +106,20 @@ function createPages() {
         if (frontLogicalIndex < pages.length && pages[frontLogicalIndex]) {
             const frontPageData = pages[frontLogicalIndex];
 
-            if (frontPageData.image) {
+            if (frontPageData.image && frontPageData.image.trim() !== "") {
                 const frontImg = document.createElement('img');
                 frontImg.src = frontPageData.image;
                 front.appendChild(frontImg);
-                
-                if (frontPageData.content) {
-                    const textDiv = document.createElement('div');
-                    textDiv.classList.add('page-text');
-                    textDiv.textContent = frontPageData.content;
-                    front.appendChild(textDiv);
-                }
-            } else if (frontPageData.content) {
-                front.classList.add('text-page');
+            }
+            if (frontPageData.content && frontPageData.content.trim() !== "") {
                 const textDiv = document.createElement('div');
                 textDiv.classList.add('page-text');
                 textDiv.textContent = frontPageData.content;
                 front.appendChild(textDiv);
-            } else {
+            }
+            
+            // যদি ছবি বা টেক্সট কিছুই না থাকে
+            if(!frontPageData.image && !frontPageData.content) {
                 front.classList.add('empty-page');
                 front.textContent = 'Empty';
             }
@@ -116,38 +135,40 @@ function createPages() {
         if (backLogicalIndex < pages.length && pages[backLogicalIndex]) {
             const backPageData = pages[backLogicalIndex];
 
-            if (backPageData.image) {
+            if (backPageData.image && backPageData.image.trim() !== "") {
                 const backImg = document.createElement('img');
                 backImg.src = backPageData.image;
                 back.appendChild(backImg);
-                
-                if (backPageData.content) {
-                    const textDiv = document.createElement('div');
-                    textDiv.classList.add('page-text');
-                    textDiv.textContent = backPageData.content;
-                    back.appendChild(textDiv);
-                }
-            } else if (backPageData.content) {
-                back.classList.add('text-page');
+            }
+            if (backPageData.content && backPageData.content.trim() !== "") {
                 const textDiv = document.createElement('div');
                 textDiv.classList.add('page-text');
                 textDiv.textContent = backPageData.content;
                 back.appendChild(textDiv);
-            } else {
+            }
+            
+            // যদি ছবি বা টেক্সট কিছুই না থাকে
+            if(!backPageData.image && !backPageData.content) {
                 back.classList.add('empty-page');
                 back.textContent = 'Empty';
             }
         } else {
-            const endImg = document.createElement('img');
-            endImg.src = './image/theend.jpg';
-            back.appendChild(endImg);
+            // বইয়ের শেষ পাতা
+            const img = document.createElement('img');
+            img.src = './image/theend.jpg';
+            // যদি theend.jpg না থাকে তবে অন্তত Empty দেখাবে
+            img.onerror = () => {
+                back.classList.add('empty-page');
+                back.textContent = 'The End';
+            };
+            back.appendChild(img);
         }
 
         page.appendChild(front);
         page.appendChild(back);
         book.appendChild(page);
 
-        // ফিপিং লজিক
+        // ফিপিং লজিক (ক্লিক করলে পাতা উল্টাবে)
         page.addEventListener('click', (e) => {
             if (typeof isFlipping !== 'undefined' && !isFlipping) {
                 const rect = page.getBoundingClientRect();
@@ -163,7 +184,7 @@ function createPages() {
     }
 
     if (typeof photoUrls !== 'undefined') {
-        photoUrls = pages.filter(page => page.image).map(page => page.image);
+        photoUrls = pages.filter(page => page.image && page.image.trim() !== "").map(page => page.image);
     }
     
     if (typeof calculatePageZIndexes === 'function') calculatePageZIndexes();
@@ -182,11 +203,13 @@ document.addEventListener('DOMContentLoaded', function () {
         bookContainer.classList.remove('show');
     }
 
+    // সেটিংস লোড এবং অ্যাপ্লাই
     loadSettings();
     applyLoadedSettings();
 
     window.isWebsiteReady = true;
 
+    // এনিমেশন শুরু
     if (typeof tryStartWebsiteWhenLandscape === 'function') {
         tryStartWebsiteWhenLandscape();
     } else if (typeof startWebsite === 'function') {
