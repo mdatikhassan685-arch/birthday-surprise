@@ -6,7 +6,6 @@
     <title>Happy Birthday Surprise 🎁</title>
     <meta name="description" content="A special birthday surprise!">
     
-    <!-- 🛠️ ফিক্স: লোগো (Favicon) পাথ আপডেট করা হয়েছে -->
     <link rel="icon" href="./image/Birthday!/logo.png" type="image/png">
     <link rel="apple-touch-icon" href="./image/Birthday!/logo.png">
 
@@ -17,25 +16,61 @@
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        /* ⚙️ সেটিংস বাটন হাইড করা */
-        #settingsButton, 
-        .settings-hint, 
-        #settingsModal {
+        #settingsButton, .settings-hint, #settingsModal {
             display: none !important;
             pointer-events: none !important;
+        }
+
+        /* 🛠️ ফিক্স: রোটেশন এবং ফুলস্ক্রিন স্ক্রিনের নতুন স্টাইল */
+        #orientation-lock {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 99999;
+            color: #fff;
+            text-align: center;
+            font-family: 'Arial', sans-serif;
+            font-size: 18px;
+        }
+        #orientation-lock .phone-icon img {
+            width: 80px; height: auto;
+            margin-bottom: 20px;
+            animation: phone-bounce-smooth 2.2s infinite;
+        }
+        #startSurpriseBtn {
+            margin-top: 30px;
+            background: linear-gradient(135deg, #ff69b4, #ff1493);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(255, 105, 180, 0.5);
+            display: none; /* প্রথমে হাইড করা থাকবে, ল্যান্ডস্কেপ করলে আসবে */
+            align-items: center;
+            gap: 10px;
+            animation: pulseBtn 1.5s infinite;
+        }
+        @keyframes pulseBtn {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
         }
     </style>
 </head>
 
 <body>
-
     <canvas id="matrix-rain" style="display: none;"></canvas>
     <canvas style="position:absolute;width:100%;height:100%;z-index:9999;display:none;" class="canvas"></canvas>
     
     <div class="overlay">
         <div class="stars-container" id="starsContainer"></div>
-        <img id="gift-image" src=""
-            style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10000; max-width: 80%; max-height: 80%;" />
+        <img id="gift-image" src="" style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10000; max-width: 80%; max-height: 80%;" />
         <div class="content-display" id="contentDisplay">
             <p id="contentText"></p>
         </div>
@@ -44,37 +79,29 @@
             <div class="book" id="book"></div>
         </div>
 
-        <button class="music-control" id="musicControl" title="Play/Pause Music">
-            ▶
-        </button>
-
+        <button class="music-control" id="musicControl" title="Play/Pause Music">▶</button>
         <audio id="birthdayAudio" loop autoplay>
             <source src="./music/zahra.mp3" type="audio/mpeg">
-            Your browser does not support the audio element.
         </audio>
 
-        <div class="copyright">
-            Made with 💕 for a Special Birthday
-        </div>
+        <div class="copyright">Made with 💕 for a Special Birthday</div>
 
+        <!-- 🛠️ রোটেশন এবং ফুলস্ক্রিন লক স্ক্রিন -->
         <div id="orientation-lock">
             <div class="phone-icon">
-                <!-- 🛠️ ফিক্স: রোটেশন আইকনের পাথ আপডেট করা হয়েছে -->
-                <img src="./image/Birthday!/screen.png" alt="Rotate Screen" style="width: 80px; height: auto;">
+                <img src="./image/Birthday!/screen.png" alt="Rotate Screen">
             </div>
-            <br>
-            <p>Please rotate your phone<br>(ল্যান্ডস্কেপ করে ধরুন)</p>
+            <p id="orientationMsg">Please rotate your phone<br>(ল্যান্ডস্কেপ করে ধরুন)</p>
+            
+            <!-- ল্যান্ডস্কেপ করার পর এই বাটনটি আসবে -->
+            <button id="startSurpriseBtn">
+                <img src="./image/Birthday!/full.png" style="width: 20px; filter: invert(1);"> 
+                Tap to Start Surprise
+            </button>
         </div>
-
-        <!-- 🛠️ ফিক্স: ফুলস্ক্রিন বাটন অ্যাড করা হয়েছে এবং আইকনের পাথ আপডেট করা হয়েছে -->
-        <button id="fullscreenBtn" style="position: fixed; bottom: 20px; right: 20px; z-index: 990010; padding: 10px 18px; border-radius: 8px; border: none; background: #222; color: #fff; font-size: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); cursor: pointer; display: none;">
-            <img style="width: 20px; height: 20px; vertical-align: middle;" src="./image/Birthday!/full.png" alt="Fullscreen">
-        </button>
     </div>
 
-    <!-- স্ক্রিপ্ট ফাইলগুলো -->
     <script src="./jscp/settings_client.js"></script>
     <script src="./jscp/main.js"></script>
-
 </body>
 </html>
