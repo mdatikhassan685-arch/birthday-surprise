@@ -2,6 +2,9 @@
 // ⚙️ ADMIN SETTINGS (For admin.html)
 // ==========================================
 
+// 🔑 আপনার ImgBB API Key
+const IMGBB_API_KEY = "250ca5e91b77576f5bb44dcd1dd9ad46";
+
 const applySettingsButton = document.getElementById('applySettings');
 let settings = {};
 
@@ -71,7 +74,6 @@ function loadSettingsForAdmin() {
     if (savedSettings) {
         settings = JSON.parse(savedSettings);
     } else {
-        // ডিফল্ট সেটিংস
         settings = {
             music: './music/zahra.mp3',
             countdown: 3,
@@ -123,6 +125,44 @@ function populateAdminForm() {
     renderPagesForm();
 }
 
+// ☁️ ImgBB Upload Function
+async function uploadToImgBB(file, index) {
+    const previewBox = document.getElementById(`previewBox${index}`);
+    const statusText = document.getElementById(`uploadStatus${index}`);
+    
+    statusText.style.display = 'block';
+    statusText.textContent = 'Uploading... ⏳';
+
+    const formData = new FormData();
+    formData.append('image', file);
+
+    try {
+        const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            const imageUrl = data.data.url; // ImgBB ডিরেক্ট লিংক
+            settings.pages[index].image = imageUrl; // সেটিংসে সেভ করা
+            
+            statusText.textContent = 'Upload Success! ✅';
+            setTimeout(() => statusText.style.display = 'none', 2000);
+            
+            previewBox.innerHTML = `<img src="${imageUrl}" alt="Preview">`;
+        } else {
+            statusText.textContent = 'Upload Failed! ❌';
+            statusText.style.backgroundColor = 'rgba(255,0,0,0.7)';
+        }
+    } catch (error) {
+        console.error('Error uploading image:', error);
+        statusText.textContent = 'Error! ❌';
+        statusText.style.backgroundColor = 'rgba(255,0,0,0.7)';
+    }
+}
+
 // পেজ ফর্ম রেন্ডার করা
 function renderPagesForm() {
     const pageConfigs = document.getElementById('pageConfigs');
@@ -136,6 +176,7 @@ function renderPagesForm() {
         pageDiv.style.padding = "15px";
         pageDiv.style.marginBottom = "15px";
         pageDiv.style.borderRadius = "8px";
+        pageDiv.style.background = "#fff";
 
         pageDiv.innerHTML = `
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
@@ -143,13 +184,27 @@ function renderPagesForm() {
                 ${settings.pages.length > 1 ? `<button onclick="removePage(${index})" style="background: #ff4444; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">Remove</button>` : ''}
             </div>
             
-            <label style="display: block; margin-bottom: 5px;">Image URL (e.g., ./image/Birthday!/photo1.jpg):</label>
-            <input type="text" id="pageImage${index}" value="${page.image}" style="width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 4px;">
+            <label style="display: block; margin-bottom: 5px; font-weight: bold;">Upload Photo (Auto-saves to ImgBB):</label>
+            <input type="file" id="pageFile${index}" accept="image/*" style="width: 100%; padding: 8px; margin-bottom: 5px; border: 1px solid #ddd; border-radius: 4px;">
             
-            <label style="display: block; margin-bottom: 5px;">Text Content (Optional):</label>
+            <div class="image-preview-box" id="previewBox${index}">
+                <div class="upload-status" id="uploadStatus${index}"></div>
+                ${page.image ? `<img src="${page.image}" alt="Preview">` : '<span style="color:#aaa; font-size: 12px;">No Image</span>'}
+            </div>
+            
+            <label style="display: block; margin-top: 15px; margin-bottom: 5px; font-weight: bold;">Text Content (Optional):</label>
             <textarea id="pageContent${index}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; min-height: 60px;">${page.content || ''}</textarea>
         `;
+        
         pageConfigs.appendChild(pageDiv);
+
+        // ফাইল সিলেক্ট করলেই ImgBB তে আপলোড শুরু হবে
+        document.getElementById(`pageFile${index}`).addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                uploadToImgBB(file, index);
+            }
+        });
     });
 
     if (settings.pages.length < 20) {
@@ -162,47 +217,61 @@ function renderPagesForm() {
 }
 
 function addNewPage() {
-    saveFormData();
+    saveFormDataLocally();
     settings.pages.push({ image: '', content: '' });
     renderPagesForm();
 }
 
 function removePage(index) {
-    saveFormData();
+    saveFormDataLocally();
     settings.pages.splice(index, 1);
     renderPagesForm();
 }
 
-// ফর্ম থেকে ডেটা পড়ে লোকাল স্টোরেজে সেভ করা
-function saveFormData() {
-    settings.music = document.getElementById('backgroundMusic').value;
-    settings.countdown = parseInt(document.getElementById('countdownTime').value) || 3;
-    settings.enableBook = document.getElementById('enableBook').value === 'true';
-    settings.enableHeart = document.getElementById('enableHeart').value === 'true';
-    settings.gift = document.getElementById('giftImage').value;
-    settings.matrixText = document.getElementById('matrixText').value;
-    settings.matrixColor1 = document.getElementById('matrixColor1').value;
-    settings.matrixColor2 = document.getElementById('matrixColor2').value;
-    settings.sequence = document.getElementById('sequenceText').value;
-    settings.sequenceColor = document.getElementById('sequenceColor').value;
-
+function saveFormDataLocally() {
     settings.pages.forEach((page, index) => {
-        const imageInput = document.getElementById(`pageImage${index}`);
         const contentInput = document.getElementById(`pageContent${index}`);
-        if (imageInput) settings.pages[index].image = imageInput.value;
         if (contentInput) settings.pages[index].content = contentInput.value;
     });
-
-    localStorage.setItem("birthdaySettings", JSON.stringify(settings));
 }
 
-// সেভ বাটন
+// 🪄 Magic Link জেনারেট করা
 if (applySettingsButton) {
     applySettingsButton.addEventListener('click', () => {
-        saveFormData();
-        alert("✅ Settings Saved Successfully! Open surprise.html to see the magic!");
+        
+        settings.music = document.getElementById('backgroundMusic').value;
+        settings.countdown = parseInt(document.getElementById('countdownTime').value) || 3;
+        settings.enableBook = document.getElementById('enableBook').value === 'true';
+        settings.enableHeart = document.getElementById('enableHeart').value === 'true';
+        settings.gift = document.getElementById('giftImage').value;
+        settings.matrixText = document.getElementById('matrixText').value;
+        settings.matrixColor1 = document.getElementById('matrixColor1').value;
+        settings.matrixColor2 = document.getElementById('matrixColor2').value;
+        settings.sequence = document.getElementById('sequenceText').value;
+        settings.sequenceColor = document.getElementById('sequenceColor').value;
+        
+        saveFormDataLocally(); 
+        
+        // লোকাল স্টোরেজে সেভ (অ্যাডমিন প্রিভিউর জন্য)
+        localStorage.setItem("birthdaySettings", JSON.stringify(settings));
+
+        // 🪄 Magic Link তৈরি (Base64 Encode করে URL এ জুড়ে দেওয়া)
+        const encodedData = btoa(unescape(encodeURIComponent(JSON.stringify(settings))));
+        
+        // বর্তমান ওয়েবসাইটের ডোমেইন বের করে surprise.html এর লিংক তৈরি
+        const currentUrl = window.location.href.split('admin.html')[0];
+        const magicLink = `${currentUrl}surprise.html?data=${encodedData}`;
+
+        // স্ক্রিনে ম্যাজিক লিংক দেখানো
+        const magicLinkSection = document.getElementById('magicLinkSection');
+        const magicLinkInput = document.getElementById('magicLinkInput');
+        
+        magicLinkInput.value = magicLink;
+        magicLinkSection.style.display = 'block';
+
+        // ম্যাজিক লিংক সেকশনে স্ক্রল করে যাওয়া
+        magicLinkSection.scrollIntoView({ behavior: "smooth" });
     });
 }
 
-// পেজ লোড হলে ফর্ম রেন্ডার করা
 document.addEventListener('DOMContentLoaded', populateAdminForm);
