@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard ⚙️</title>
+    <title>User Dashboard ⚙️</title> <!-- টাইটেল পরিবর্তন করা হলো -->
     <link rel="stylesheet" href="./css/index.css">
     <style>
         html, body {
@@ -14,7 +14,7 @@
             display: block !important;
             padding: 10px 0 !important;
         }
-        .admin-container {
+        .user-container { /* ক্লাস নেম পরিবর্তন */
             max-width: 800px;
             margin: 0 auto 20px auto;
             background: white;
@@ -23,7 +23,7 @@
             overflow: hidden;
             animation: slideUp 0.5s ease;
         }
-        .admin-header {
+        .user-header { /* ক্লাস নেম পরিবর্তন */
             background: linear-gradient(135deg, #ff69b4, #ff1493);
             color: white;
             padding: 20px 30px;
@@ -31,7 +31,7 @@
             justify-content: space-between;
             align-items: center;
         }
-        .admin-header h1 { margin: 0; font-size: 20px; }
+        .user-header h1 { margin: 0; font-size: 20px; }
         .header-buttons { display: flex; gap: 10px; }
         .header-buttons button {
             background: rgba(255,255,255,0.2);
@@ -44,7 +44,7 @@
             font-size: 14px;
         }
         .header-buttons button:hover { background: white; color: #ff1493; }
-        .admin-body { padding: 20px; }
+        .user-body { padding: 20px; }
         .settings-section {
             background: #fff;
             border: 1px solid #eee;
@@ -105,8 +105,6 @@
             font-size: 12px;
             display: none;
         }
-        
-        /* 🪄 Magic Link Section */
         .magic-link-section {
             background: #e8f5e9;
             border: 2px dashed #4caf50;
@@ -145,29 +143,29 @@
 <body>
 
     <script>
-        if (localStorage.getItem("isAdminLoggedIn") !== "true") {
+        // ইউজার লগিন ভেরিফিকেশন (আপাতত আগের মতোই রাখা হলো)
+        if (localStorage.getItem("isUserLoggedIn") !== "true") {
             window.location.href = "index.html";
         }
         function logout() {
-            localStorage.removeItem("isAdminLoggedIn");
+            localStorage.removeItem("isUserLoggedIn");
             window.location.href = "index.html";
         }
         function viewSite() {
-            // লোকাল স্টোরেজ থেকে দেখলে কোনো লিংক লাগবে না, সোজা surprise.html এ যাবে
             window.open("surprise.html", "_blank");
         }
     </script>
 
-    <div class="admin-container">
-        <div class="admin-header">
-            <h1>⚙️ Admin Panel</h1>
+    <div class="user-container">
+        <div class="user-header">
+            <h1>⚙️ Create Your Surprise</h1>
             <div class="header-buttons">
                 <button onclick="viewSite()">👁️ Preview</button>
                 <button onclick="logout()">🚪 Logout</button>
             </div>
         </div>
 
-        <div class="admin-body">
+        <div class="user-body">
             
             <div class="settings-section">
                 <h3>🎵 Music Settings</h3>
@@ -182,7 +180,7 @@
                 <h3>📝 Text Settings</h3>
                 <div class="form-group">
                     <label>Main Animation Text (Use | to separate words):</label>
-                    <input type="text" id="sequenceText" value="HAPPY|BIRTHDAY|ZAHRA|❤" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                    <input type="text" id="sequenceText" value="HAPPY|BIRTHDAY|LOVE|❤" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
                 </div>
                 <div class="form-group" style="margin-top: 15px;">
                     <label>Background Matrix Text:</label>
@@ -256,10 +254,9 @@
                 </div>
             </div>
 
-            <!-- Book Pages Settings with ImgBB Upload -->
             <div class="settings-section" id="bookSettingsSection">
-                <h3>📖 Book Pages (Upload Photos to ImgBB)</h3>
-                <p style="font-size: 12px; color: #666; margin-bottom: 15px;">Photos will automatically upload to ImgBB and generate a public link.</p>
+                <h3>📖 Book Pages (Upload Photos)</h3>
+                <p style="font-size: 12px; color: #666; margin-bottom: 15px;">Photos will automatically upload to our secure server and generate a public link.</p>
                 <div id="pageConfigs"></div>
             </div>
 
@@ -267,10 +264,9 @@
                 <button id="applySettings" class="save-btn">🪄 Generate Magic Link</button>
             </div>
 
-            <!-- 🪄 Magic Link Result Section -->
             <div class="magic-link-section" id="magicLinkSection">
                 <h3>🎉 Your Surprise Link is Ready!</h3>
-                <p style="font-size: 14px; color: #555;">Copy this link and send it to the birthday person. They will see everything exactly as you set it up!</p>
+                <p style="font-size: 14px; color: #555;">Copy this link and send it to your special person. They will see everything exactly as you set it up!</p>
                 <input type="text" class="magic-link-input" id="magicLinkInput" readonly>
                 <button class="copy-btn" onclick="copyMagicLink()">📋 Copy Link</button>
             </div>
@@ -278,7 +274,8 @@
         </div>
     </div>
 
-    <script src="./jscp/settings_admin.js"></script>
+    <!-- 🛠️ স্ক্রিপ্ট ফাইলের নাম পরিবর্তন করা হয়েছে -->
+    <script src="./jscp/settings_user.js"></script>
 
     <script>
         function copyMagicLink() {
