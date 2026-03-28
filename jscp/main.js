@@ -49,35 +49,32 @@ function checkOrientation() {
     const startBtn = document.getElementById('startSurpriseBtn');
 
     if (!isMobile) {
-        // Desktop Mode: সরাসরি স্টার্ট বাটন দেখাবে
         isLandscape = true;
         if(rotateMessage) rotateMessage.style.display = 'none';
         if(startBtn) startBtn.style.display = 'block';
     } else {
-        // Mobile Mode: ল্যান্ডস্কেপ চেক করবে
         const checkLandscape = () => {
-            const mediaQuery = window.matchMedia("(orientation: landscape)");
-            isLandscape = mediaQuery.matches;
+            isLandscape = window.innerWidth > window.innerHeight;
 
             if (isLandscape) {
-                // ল্যান্ডস্কেপ হলে স্টার্ট বাটন দেখাবে (যদি আগে স্টার্ট না হয়ে থাকে)
                 if (!isSurpriseStarted) {
                     if(rotateMessage) rotateMessage.style.display = 'none';
                     if(startBtn) startBtn.style.display = 'block';
                 } else {
-                    // যদি আগেই স্টার্ট হয়ে থাকে, তবে নরমালি চলবে
-                    orientationLock.style.display = 'none';
+                    if(orientationLock) orientationLock.style.display = 'none';
+                    
+                    // 🛠️ ফিক্স: যদি ফুলস্ক্রিন অবস্থায় ফোন ঘোরানো হয়, ক্যানভাস মাঝখানে আনতে হবে
+                    if(S && S.Drawing) S.Drawing.adjustCanvas();
                 }
             } else {
-                // পোর্ট্রেট হলে রোটেশন মেসেজ দেখাবে
-                orientationLock.style.display = 'flex';
+                if(orientationLock) orientationLock.style.display = 'flex';
                 if(rotateMessage) rotateMessage.style.display = 'block';
                 if(startBtn) startBtn.style.display = 'none';
             }
         };
 
-        checkLandscape(); // Initial check
-        window.addEventListener('resize', checkLandscape); // On Rotate check
+        checkLandscape(); 
+        window.addEventListener('resize', checkLandscape); 
     }
 }
 
@@ -88,7 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const startBtn = document.getElementById('startSurpriseBtn');
     
     if (startBtn) {
-        startBtn.addEventListener('click', () => {
+        startBtn.addEventListener('click', async () => {
             isSurpriseStarted = true;
             
             // 1. Hide Start Screen & Show Main Content
@@ -97,38 +94,40 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('matrix-rain').style.display = 'block';
             document.querySelector('.canvas').style.display = 'block';
             
-            // 2. Play Audio (User interaction allows autoplay)
+            // 2. Play Audio 
             const birthdayAudio = document.getElementById('birthdayAudio');
             const musicControl = document.getElementById('musicControl');
             
             if (birthdayAudio) {
-                birthdayAudio.play().then(() => {
+                try {
+                    await birthdayAudio.play();
                     isPlaying = true;
                     if(musicControl) {
                         musicControl.innerHTML = '⏸';
                         musicControl.classList.add('playing');
                         musicControl.title = 'Pause Music';
                     }
-                }).catch(error => {
-                    console.log("Audio autoplay failed.", error);
-                });
+                } catch(e) {
+                    console.log("Audio autoplay failed.", e);
+                }
             }
 
             // 3. Request Fullscreen
             const elem = document.documentElement;
             if (elem.requestFullscreen) {
-                elem.requestFullscreen().catch(err => console.log("Fullscreen not supported"));
+                try { await elem.requestFullscreen(); } catch(e) {}
             } else if (elem.webkitRequestFullscreen) {
                 elem.webkitRequestFullscreen();
             } else if (elem.msRequestFullscreen) {
                 elem.msRequestFullscreen();
             }
 
-            // 4. Start Animation
-            startWebsite();
+            // 🛠️ 4. ফিক্স: ফুলস্ক্রিন হওয়ার পর উইন্ডো সাইজ রিফ্রেশ করার জন্য ৩০০ms অপেক্ষা করা
             setTimeout(() => {
                 forceResizeMatrix();
-            }, 100);
+                if(S && S.Drawing) S.Drawing.adjustCanvas(); // ক্যানভাস ঠিক মাঝখানে আনবে
+                startWebsite();
+            }, 300); 
         });
     }
 });
@@ -155,7 +154,10 @@ function stopWebsite() {
             matrixCtx.clearRect(0, 0, matrixCanvas.width, matrixCanvas.height);
         }
     }
-}
+                }
+
+
+
 
 
 // ==========================================
