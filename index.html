@@ -3,121 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login 🔒</title>
+    <title>User Login 🔒</title>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #1a0b1c 0%, #000000 100%);
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-        }
-        .login-container {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 40px;
-            border-radius: 15px;
-            text-align: center;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 105, 180, 0.3);
-            box-shadow: 0 0 20px rgba(255, 105, 180, 0.2);
-            width: 90%;
-            max-width: 350px;
-            animation: fadeIn 1s ease-in-out;
-        }
-        .login-container h2 {
-            color: #ff69b4;
-            margin-bottom: 20px;
-            font-size: 24px;
-        }
-        .input-group {
-            margin-bottom: 20px;
-        }
-        .input-group input {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid rgba(255, 105, 180, 0.5);
-            background: rgba(0, 0, 0, 0.5);
-            color: white;
-            border-radius: 8px;
-            font-size: 16px;
-            outline: none;
-            transition: 0.3s;
-            text-align: center;
-        }
-        .input-group input:focus {
-            border-color: #ff1493;
-            box-shadow: 0 0 10px rgba(255, 20, 147, 0.5);
-        }
-        .login-btn {
-            background: linear-gradient(135deg, #ff69b4, #ff1493);
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 8px;
-            cursor: pointer;
-            width: 100%;
-            transition: 0.3s;
-        }
-        .login-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(255, 105, 180, 0.4);
-        }
-        #errorMsg {
-            color: #ff4444;
-            margin-top: 15px;
-            font-size: 14px;
-            display: none;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Arial', sans-serif; background: linear-gradient(135deg, #1a0b1c 0%, #000000 100%); height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+        .login-container { background: rgba(255, 255, 255, 0.05); padding: 40px; border-radius: 15px; text-align: center; backdrop-filter: blur(10px); border: 1px solid rgba(255, 105, 180, 0.3); box-shadow: 0 0 20px rgba(255, 105, 180, 0.2); width: 90%; max-width: 350px; animation: fadeIn 1s ease-in-out; }
+        .login-container h2 { color: #ff69b4; margin-bottom: 20px; font-size: 24px; }
+        .input-group { margin-bottom: 20px; }
+        .input-group input { width: 100%; padding: 12px; border: 1px solid rgba(255, 105, 180, 0.5); background: rgba(0, 0, 0, 0.5); color: white; border-radius: 8px; font-size: 16px; outline: none; transition: 0.3s; text-align: center; }
+        .input-group input:focus { border-color: #ff1493; box-shadow: 0 0 10px rgba(255, 20, 147, 0.5); }
+        .login-btn { background: linear-gradient(135deg, #ff69b4, #ff1493); color: white; border: none; padding: 12px 30px; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer; width: 100%; transition: 0.3s; }
+        .login-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(255, 105, 180, 0.4); }
+        #errorMsg { color: #ff4444; margin-top: 15px; font-size: 14px; display: none; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
     <div class="login-container">
-        <h2>⚙️ Admin Panel</h2>
+        <h2>👋 Welcome User</h2>
         <div class="input-group">
-            <input type="password" id="adminPass" placeholder="Enter Password" onkeypress="handleEnter(event)">
+            <input type="password" id="userPass" placeholder="Enter Password" onkeypress="handleEnter(event)">
         </div>
         <button class="login-btn" onclick="checkLogin()">Login</button>
         <p id="errorMsg">❌ Wrong Password!</p>
     </div>
 
     <script>
-        // এখানে আপনার পছন্দমতো পাসওয়ার্ড সেট করুন
-        const ADMIN_PASSWORD = "zahra"; 
+        const USER_PASSWORD = "user123"; // এখন ইউজারদের জন্য এই পাসওয়ার্ডটি ব্যবহার হবে 
 
         function checkLogin() {
-            const passInput = document.getElementById('adminPass').value;
+            const passInput = document.getElementById('userPass').value;
             const errorMsg = document.getElementById('errorMsg');
 
-            if (passInput === ADMIN_PASSWORD) {
-                // সঠিক পাসওয়ার্ড হলে লোকাল স্টোরেজে সেভ করে admin.html এ নিয়ে যাবে
-                localStorage.setItem("isAdminLoggedIn", "true");
-                window.location.href = "admin.html";
+            if (passInput === USER_PASSWORD) {
+                localStorage.setItem("isUserLoggedIn", "true");
+                window.location.href = "user.html"; // 🛠️ ফিক্স: admin.html থেকে user.html এ যাবে
             } else {
-                // ভুল পাসওয়ার্ড হলে এরর দেখাবে
                 errorMsg.style.display = "block";
-                document.getElementById('adminPass').value = ""; // বক্স ক্লিয়ার করে দিবে
+                document.getElementById('userPass').value = ""; 
             }
         }
 
-        // এন্টার (Enter) বাটন চাপলেও যাতে লগিন হয়
         function handleEnter(e) {
-            if (e.key === 'Enter') {
-                checkLogin();
-            }
+            if (e.key === 'Enter') checkLogin();
         }
     </script>
 
