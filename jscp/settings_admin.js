@@ -10,16 +10,16 @@ let settings = {};
 
 const musicOptions = [
     { value: './music/zahra.mp3', label: 'Zahra Birthday Music' },
-    { value: './music/happy-birthday.mp3', label: 'Happy Birthday (Miễn phí)' },
-    { value: './music/happybirthday.mp3', label: 'Happy Birthday (Phiên bản 2)' },
-    { value: './music/perfect.mp3', label: 'Perfect' }
+    { value: './music/happy-birthday1.mp3', label: 'Happy Birthday 1' },
+    { value: './music/happybirthday2.mp3', label: 'Happy Birthday 2' },
+    { value: './music/happybirthday3.mp3', label: 'Happy Birthday 3' }
 ];
 
 const gifOptions = [
     { value: '', label: 'None' },
-    { value: './gif/happy.gif', label: 'Gif1' },
-    { value: './gif/Cat Love GIF by KIKI.gif', label: 'Gif2' },
-    { value: './gif/happy2.gif', label: 'Gif4' },
+    { value: './gif/happy.gif', label: 'Gif' },
+    { value: './gif/happy1.gif', label: 'Gif1' },
+    { value: './gif/happy2.gif', label: 'Gif2' },
 ];
 
 const musicPreviewButton = document.getElementById('musicPreviewButton');
@@ -79,14 +79,14 @@ function loadSettingsForAdmin() {
             matrixText: 'HAPPYBIRTHDAY',
             matrixColor1: '#ff69b4',
             matrixColor2: '#ff1493',
-            sequence: 'HAPPY|BIRTHDAY|ZAHRA|❤',
+            sequence: 'HAPPY|BIRTHDAY|name|❤',
             sequenceColor: '#ff69b4',
             gift: '',
             enableBook: true,
             enableHeart: true,
             colorTheme: 'pink',
             pages: [
-                { image: '', content: 'Dear Zahra, you bring so much joy and happiness! 💕' },
+                { image: '', content: 'Dear name, you bring so much joy and happiness! 💕' },
                 { image: '', content: 'Wishing you the most wonderful birthday ever! 🎉' }
             ]
         };
