@@ -12,8 +12,7 @@ const defaultSettings = {
     colorTheme: 'pink',
     pages: [
         { image: './image/Birthday!/cover.jpg', content: '', isCover: true }, 
-        { image: './image/Birthday!/photo1.jpg', content: 'Dear Zahra, you bring so much joy and happiness! 💕' },
-        { image: './image/Birthday!/9.jpg', content: '' }
+        { image: './image/Birthday!/photo1.jpg', content: 'Dear Zahra, you bring so much joy and happiness! 💕' }, 
     ]
 };
 
