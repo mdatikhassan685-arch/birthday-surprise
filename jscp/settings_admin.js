@@ -3,10 +3,11 @@
 // ==========================================
 
 const IMGBB_API_KEY = "250ca5e91b77576f5bb44dcd1dd9ad46";
+const JSONBIN_API_KEY = "$2a$10$WXbOxmvcjLQuVo5jnoQCAeAeSkcuDJlabKulj.TwfCN0CBKfpvFrq";
+
 const applySettingsButton = document.getElementById('applySettings');
 let settings = {};
 
-// লোকাল ফোল্ডারে থাকা আপনার ডিফল্ট মিউজিকগুলো
 const musicOptions = [
     { value: './music/zahra.mp3', label: 'Zahra Birthday Music' },
     { value: './music/happy-birthday.mp3', label: 'Happy Birthday (Miễn phí)' },
@@ -29,8 +30,7 @@ let currentPreviewTrack = '';
 function getSelectedMusicLabel() {
     const musicSelect = document.getElementById('backgroundMusic');
     if (!musicSelect) return '';
-    const selectedOption = musicSelect.options[musicSelect.selectedIndex];
-    return selectedOption ? selectedOption.textContent : '';
+    return musicSelect.options[musicSelect.selectedIndex]?.textContent || '';
 }
 
 function stopMusicPreview(customMessage) {
@@ -46,7 +46,6 @@ function handleMusicPreview() {
     if (!musicSelect || !musicSelect.value) return;
 
     const selectedSrc = musicSelect.value;
-
     if (currentPreviewTrack === selectedSrc && !musicPreviewAudio.paused) {
         stopMusicPreview();
         return;
@@ -67,21 +66,13 @@ function handleMusicPreview() {
 if (musicPreviewButton) musicPreviewButton.addEventListener('click', handleMusicPreview);
 musicPreviewAudio.addEventListener('ended', () => stopMusicPreview());
 
-// লোকাল স্টোরেজ থেকে ডেটা লোড করা
 function loadSettingsForAdmin() {
     const savedSettings = localStorage.getItem("birthdaySettings");
     if (savedSettings) {
         settings = JSON.parse(savedSettings);
-        
-        // অ্যাডমিন প্যানেলে কভার পেজ দেখানোর দরকার নেই, তাই প্রথম ও শেষ পেজ রিমুভ করে শুধু ভেতরের পেজগুলো রাখছি
-        if(settings.pages.length > 0 && settings.pages[0].isCover) {
-            settings.pages.shift(); // প্রথম কভার রিমুভ
-        }
-        if(settings.pages.length > 0 && settings.pages[settings.pages.length - 1].isCover) {
-            settings.pages.pop(); // শেষ কভার রিমুভ
-        }
+        if(settings.pages.length > 0 && settings.pages[0].isCover) settings.pages.shift(); 
+        if(settings.pages.length > 0 && settings.pages[settings.pages.length - 1].isCover) settings.pages.pop(); 
     } else {
-        // ডিফল্ট সেটিংস (ভেতরের পেজগুলো)
         settings = {
             music: './music/zahra.mp3',
             countdown: 3,
@@ -102,7 +93,6 @@ function loadSettingsForAdmin() {
     }
 }
 
-// ফর্ম পপুলেট করা
 function populateAdminForm() {
     loadSettingsForAdmin();
 
@@ -132,7 +122,6 @@ function populateAdminForm() {
     renderPagesForm();
 }
 
-// ☁️ ImgBB Upload Function
 async function uploadToImgBB(file, index) {
     const previewBox = document.getElementById(`previewBox${index}`);
     const statusText = document.getElementById(`uploadStatus${index}`);
@@ -148,29 +137,23 @@ async function uploadToImgBB(file, index) {
             method: 'POST',
             body: formData
         });
-        
         const data = await response.json();
         
         if (data.success) {
-            const imageUrl = data.data.url; 
-            settings.pages[index].image = imageUrl; 
-            
+            settings.pages[index].image = data.data.url; 
             statusText.textContent = 'Upload Success! ✅';
             setTimeout(() => statusText.style.display = 'none', 2000);
-            
-            previewBox.innerHTML = `<img src="${imageUrl}" alt="Preview">`;
+            previewBox.innerHTML = `<img src="${data.data.url}" alt="Preview">`;
         } else {
             statusText.textContent = 'Upload Failed! ❌';
             statusText.style.backgroundColor = 'rgba(255,0,0,0.7)';
         }
     } catch (error) {
-        console.error('Error uploading image:', error);
         statusText.textContent = 'Error! ❌';
         statusText.style.backgroundColor = 'rgba(255,0,0,0.7)';
     }
 }
 
-// পেজ ফর্ম রেন্ডার করা (কভার ছাড়া শুধু ভেতরের পেজ)
 function renderPagesForm() {
     const pageConfigs = document.getElementById('pageConfigs');
     if (!pageConfigs) return;
@@ -190,30 +173,23 @@ function renderPagesForm() {
                 <h4 style="margin: 0; color: #ff1493;">Page ${index + 1}</h4>
                 ${settings.pages.length > 1 ? `<button onclick="removePage(${index})" style="background: #ff4444; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">Remove</button>` : ''}
             </div>
-            
             <label style="display: block; margin-bottom: 5px; font-weight: bold;">Upload Photo (Auto-saves to ImgBB):</label>
             <input type="file" id="pageFile${index}" accept="image/*" style="width: 100%; padding: 8px; margin-bottom: 5px; border: 1px solid #ddd; border-radius: 4px;">
-            
-            <div class="image-preview-box" id="previewBox${index}">
-                <div class="upload-status" id="uploadStatus${index}"></div>
-                ${page.image ? `<img src="${page.image}" alt="Preview">` : '<span style="color:#aaa; font-size: 12px;">No Image</span>'}
+            <div class="image-preview-box" id="previewBox${index}" style="width: 100%; height: 150px; border: 2px dashed #ddd; border-radius: 8px; display: flex; justify-content: center; align-items: center; overflow: hidden; background: #f9f9f9; position: relative;">
+                <div class="upload-status" id="uploadStatus${index}" style="position: absolute; background: rgba(0,0,0,0.7); color: white; padding: 5px 10px; border-radius: 4px; font-size: 12px; display: none;"></div>
+                ${page.image ? `<img src="${page.image}" style="max-width: 100%; max-height: 100%; object-fit: cover;">` : '<span style="color:#aaa; font-size: 12px;">No Image</span>'}
             </div>
-            
             <label style="display: block; margin-top: 15px; margin-bottom: 5px; font-weight: bold;">Text Content (Optional):</label>
             <textarea id="pageContent${index}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; min-height: 60px;">${page.content || ''}</textarea>
         `;
-        
         pageConfigs.appendChild(pageDiv);
 
         document.getElementById(`pageFile${index}`).addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                uploadToImgBB(file, index);
-            }
+            if (e.target.files[0]) uploadToImgBB(e.target.files[0], index);
         });
     });
 
-    if (settings.pages.length < 18) { // ম্যাক্সিমাম ১৮টি ইনার পেজ রাখা যাবে
+    if (settings.pages.length < 18) { 
         const addBtn = document.createElement('button');
         addBtn.textContent = '+ Add New Page';
         addBtn.onclick = addNewPage;
@@ -241,9 +217,9 @@ function saveFormDataLocally() {
     });
 }
 
-// 🪄 Magic Link জেনারেট করা এবং লোকাল ইমেজ যুক্ত করা
+// 🎯 Save to Database & Generate Short Link
 if (applySettingsButton) {
-    applySettingsButton.addEventListener('click', () => {
+    applySettingsButton.addEventListener('click', async () => {
         
         settings.music = document.getElementById('backgroundMusic').value;
         settings.countdown = parseInt(document.getElementById('countdownTime').value) || 3;
@@ -258,31 +234,50 @@ if (applySettingsButton) {
         
         saveFormDataLocally(); 
 
-        // 🎯 ম্যাজিক লিংক তৈরির আগে ফ্রন্ট কভার এবং ব্যাক কভার অটোমেটিক যুক্ত করা
-        let finalSettings = JSON.parse(JSON.stringify(settings)); // কপি তৈরি করা হলো
-        
-        // লোকাল কভার ইমেজ (আপনার image ফোল্ডার থেকে)
-        const frontCover = { image: './image/Birthday!/cover.jpg', content: '', isCover: true };
-        const backCover = { image: './image/Birthday!/cover.jpg', content: '', isCover: true };
+        let finalSettings = JSON.parse(JSON.stringify(settings)); 
+        finalSettings.pages = finalSettings.pages.filter(p => (p.image && p.image.trim() !== '') || (p.content && p.content.trim() !== ''));
 
-        // শুরুতে এবং শেষে কভার যোগ করে দেওয়া হলো
-        finalSettings.pages.unshift(frontCover);
-        finalSettings.pages.push(backCover);
+        // কভার যোগ করা
+        finalSettings.pages.unshift({ image: './image/Birthday!/cover.jpg', content: '', isCover: true });
+        finalSettings.pages.push({ image: './image/Birthday!/cover.jpg', content: '', isCover: true });
 
-        // লোকাল স্টোরেজে সেভ (অ্যাডমিন প্রিভিউর জন্য)
+        // লোকাল স্টোরেজে সেভ (অ্যাডমিনের জন্য)
         localStorage.setItem("birthdaySettings", JSON.stringify(finalSettings));
-
-        // 🪄 Magic Link তৈরি 
-        const encodedData = btoa(unescape(encodeURIComponent(JSON.stringify(finalSettings))));
-        const currentUrl = window.location.href.split('admin.html')[0];
-        const magicLink = `${currentUrl}surprise.html?data=${encodedData}`;
 
         const magicLinkSection = document.getElementById('magicLinkSection');
         const magicLinkInput = document.getElementById('magicLinkInput');
         
-        magicLinkInput.value = magicLink;
+        magicLinkInput.value = "Saving to Database... ⏳";
         magicLinkSection.style.display = 'block';
         magicLinkSection.scrollIntoView({ behavior: "smooth" });
+
+        // 🚀 JSONbin.io Database এ ডেটা সেভ করা
+        try {
+            const response = await fetch("https://api.jsonbin.io/v3/b", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-Master-Key": JSONBIN_API_KEY,
+                    "X-Bin-Private": "false" // যাতে ক্লায়েন্ট লিংক থেকে ডিরেক্ট রিড করতে পারে
+                },
+                body: JSON.stringify(finalSettings)
+            });
+            
+            const data = await response.json();
+            
+            if(data.metadata && data.metadata.id) {
+                const binId = data.metadata.id; // ডাটাবেস থেকে পাওয়া ছোট আইডি
+                const currentUrl = window.location.href.split('admin.html')[0];
+                const finalLink = `${currentUrl}surprise.html?id=${binId}`;
+                
+                magicLinkInput.value = finalLink; // তৈরি হয়ে গেলো প্রফেশনাল শর্ট লিংক!
+            } else {
+                magicLinkInput.value = "Error saving to database! ❌";
+            }
+        } catch (error) {
+            console.error("DB Error:", error);
+            magicLinkInput.value = "Network Error! ❌";
+        }
     });
 }
 
