@@ -4,94 +4,91 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Happy Birthday Surprise 🎁</title>
+    <meta name="description" content="A special birthday surprise! A beautiful interactive site with animations, music, and memories!">
     
-    <link rel="icon" href="./image/logo.png" type="image/png">
+    <link rel="icon" href="./image/Birthday!/logo.png" type="image/png">
+    <link rel="apple-touch-icon" href="./image/Birthday!/logo.png">
+
     <link rel="stylesheet" href="./css/index.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css?family=Pacifico&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        #settingsButton, .settings-hint, #settingsModal { display: none !important; pointer-events: none !important; }
-        
-        /* 🎯 Start Button Style */
-        .start-btn {
-            background: linear-gradient(135deg, #ff69b4, #ff1493);
-            color: white;
-            border: 2px solid white;
-            padding: 15px 40px;
-            font-size: 22px;
-            font-weight: bold;
-            border-radius: 50px;
-            cursor: pointer;
-            box-shadow: 0 0 20px rgba(255, 105, 180, 0.8);
-            animation: pulseBtn 1.5s infinite;
-            margin-top: 20px;
-            pointer-events: auto;
-            z-index: 100000;
+        #settingsButton, 
+        .settings-hint, 
+        #settingsModal {
+            display: none !important;
+            pointer-events: none !important;
         }
+        
+        .phone-icon img {
+            width: 120px;
+            height: auto;
+            object-fit: contain;
+        }
+
+        /* 🎁 নতুন Tap to Start বাটনের এনিমেশন */
         @keyframes pulseBtn {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-        
-        /* Orientation Lock UI */
-        #orientation-lock {
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            background: #000;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 999999;
-            color: white;
-            text-align: center;
-            font-family: Arial, sans-serif;
-        }
-        #main-content {
-            display: none; /* শুরুতে মূল কনটেন্ট লুকানো থাকবে */
+            0% { transform: scale(1); box-shadow: 0 0 20px rgba(255, 105, 180, 0.5); }
+            50% { transform: scale(1.08); box-shadow: 0 0 35px rgba(255, 105, 180, 0.9); }
+            100% { transform: scale(1); box-shadow: 0 0 20px rgba(255, 105, 180, 0.5); }
         }
     </style>
 </head>
 
 <body>
 
-    <!-- 🎯 Start / Rotation UI (সবসময় প্রথমে এটা দেখাবে) -->
-    <div id="orientation-lock">
-        <div id="rotateMessage">
-            <img src="./image/screen.png" alt="Rotate Screen" style="width: 80px; margin-bottom: 20px; animation: phone-bounce-smooth 2s infinite;">
-            <h2 style="color: #ff69b4;">Please rotate your phone</h2>
-            <p>(অনুগ্রহ করে ফোনটি ল্যান্ডস্কেপ করুন)</p>
-        </div>
-        
-        <button id="startSurpriseBtn" class="start-btn" style="display: none;">Tap to Start Surprise 🎉</button>
+    <canvas id="matrix-rain" style="display: none;"></canvas>
+    <canvas style="position:absolute;width:100%;height:100%;z-index:9999;display:none;" class="canvas"></canvas>
+    
+    <!-- 🎁 Tap to Start স্ক্রিন (রোটেট করার পর এটি আসবে) -->
+    <div id="start-screen" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 999995; flex-direction: column; justify-content: center; align-items: center;">
+        <button id="startSurpriseBtn" style="background: linear-gradient(135deg, #ff69b4, #ff1493); color: white; border: none; padding: 15px 40px; font-size: 26px; font-family: 'Pacifico', cursive; border-radius: 50px; cursor: pointer; animation: pulseBtn 1.5s infinite; outline: none;">
+            Tap to Start Surprise 🎁
+        </button>
     </div>
 
-    <!-- 🎁 Main Content (স্টার্ট বাটনে ক্লিক করার পর এটা দেখাবে) -->
-    <div id="main-content">
-        <canvas id="matrix-rain" style="display: none;"></canvas>
-        <canvas style="position:absolute;width:100%;height:100%;z-index:9999;display:none;" class="canvas"></canvas>
-        
-        <div class="overlay">
-            <div class="stars-container" id="starsContainer"></div>
-            <img id="gift-image" src="" style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10000; max-width: 80%; max-height: 80%;" />
-            <div class="content-display" id="contentDisplay"><p id="contentText"></p></div>
-            <div class="firework-container" id="fireworkContainer"></div>
-            
-            <div class="book-container">
-                <div class="book" id="book"></div>
+    <div class="overlay">
+        <div class="stars-container" id="starsContainer"></div>
+        <img id="gift-image" src=""
+            style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10000; max-width: 80%; max-height: 80%;" />
+        <div class="content-display" id="contentDisplay">
+            <p id="contentText"></p>
+        </div>
+        <div class="firework-container" id="fireworkContainer"></div>
+        <div class="book-container">
+            <div class="book" id="book"></div>
+        </div>
+
+        <button class="music-control" id="musicControl" title="Play/Pause Music" style="display: none;">
+            ▶
+        </button>
+
+        <audio id="birthdayAudio" loop>
+            <source src="./music/zahra.mp3" type="audio/mpeg">
+            Your browser does not support the audio element.
+        </audio>
+
+        <div class="copyright">
+            Made with 💕 for a Special Birthday
+        </div>
+
+        <div id="orientation-lock">
+            <div class="phone-icon">
+                <img src="./image/Birthday!/screen.png" alt="Rotate Screen">
             </div>
-
-            <button class="music-control" id="musicControl" title="Play/Pause Music">▶</button>
-            <audio id="birthdayAudio" loop>
-                <source src="./music/zahra.mp3" type="audio/mpeg">
-            </audio>
-
-            <div class="copyright">Made with 💕 for a Special Birthday</div>
+            <br>
+            <p>Please rotate your phone<br>(ল্যান্ডস্কেপ করে ধরুন)</p>
         </div>
+
+        <button id="fullscreenBtn" style="position: fixed; bottom: 20px; right: 20px; z-index: 990010; padding: 10px 18px; border-radius: 8px; border: none; background: rgba(0,0,0,0.6); color: #fff; font-size: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); cursor: pointer; display: none;">
+            <img style="width: 20px; height: 20px; vertical-align: middle;" src="./image/Birthday!/full.png" alt="Fullscreen">
+        </button>
+
     </div>
 
-    <!-- Scripts -->
     <script src="./jscp/settings_client.js"></script>
     <script src="./jscp/main.js"></script>
 
