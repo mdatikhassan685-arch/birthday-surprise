@@ -1,21 +1,17 @@
-// ==========================================
-// 🎈 CLIENT SETTINGS (For surprise.html Magic Link)
-// ==========================================
-
 const defaultSettings = {
     music: './music/zahra.mp3',
     countdown: 3,
     matrixText: 'HAPPYBIRTHDAY',
     matrixColor1: '#ff69b4',
     matrixColor2: '#ff1493',
-    sequence: 'HAPPY|BIRTHDAY|ZAHRA|❤',
+    sequence: 'HAPPY|BIRTHDAY|NAME|❤',
     sequenceColor: '#ff69b4',
     gift: '',
     enableBook: true,
     enableHeart: true,
     colorTheme: 'pink',
     pages: [
-        { image: './image/Birthday!/cover.jpg', content: '' }, 
+        { image: './image/Birthday!/cover.jpg', content: '', isCover: true }, 
         { image: './image/Birthday!/photo1.jpg', content: 'Dear Zahra, you bring so much joy and happiness! 💕' },
         { image: './image/Birthday!/9.jpg', content: '' }
     ]
@@ -24,11 +20,10 @@ const defaultSettings = {
 // 🪄 ম্যাজিক লিংক বা লোকাল স্টোরেজ থেকে সেটিংস লোড করা
 function loadSettings() {
     const urlParams = new URLSearchParams(window.location.search);
-    const magicData = urlParams.get('data'); // লিংকের ?data= অংশটুকু নেওয়া
+    const magicData = urlParams.get('data'); 
 
     if (magicData) {
         try {
-            // Base64 ডিকোড করে JSON থেকে অবজেক্টে রূপান্তর করা
             const decodedString = decodeURIComponent(escape(atob(magicData)));
             window.settings = JSON.parse(decodedString);
             console.log("✅ Magic Link Loaded Successfully!");
@@ -37,7 +32,6 @@ function loadSettings() {
             fallbackToLocalOrDefaults();
         }
     } else {
-        // যদি কেউ ডিরেক্ট surprise.html এ ঢুকে (লিংক ছাড়া), তবে লোকাল স্টোরেজ চেক করবে
         fallbackToLocalOrDefaults();
     }
 }
@@ -58,24 +52,20 @@ function fallbackToLocalOrDefaults() {
 function applyLoadedSettings() {
     const settings = window.settings;
     
-    // গান সেট করা
     const birthdayAudio = document.getElementById('birthdayAudio');
     if (birthdayAudio) {
         birthdayAudio.src = settings.music;
     }
 
-    // গিফট ইমেজ সেট করা
     const giftImageElement = document.getElementById('gift-image');
     if (giftImageElement && settings.gift) {
         giftImageElement.src = settings.gift;
     }
 
-    // ম্যাট্রিক্স রেইন এর টেক্সট সেট করা
     if (typeof matrixChars !== 'undefined') {
         matrixChars = settings.matrixText.split('');
     }
 
-    // থ্রিডি বই তৈরি করা
     createPages();
 }
 
@@ -87,7 +77,7 @@ function createPages() {
     book.innerHTML = '';
     const pages = window.settings.pages || [];
     
-    if (pages.length === 0) return; // পেজ না থাকলে বই তৈরি হবে না
+    if (pages.length === 0) return; 
 
     const totalPhysicalPages = Math.ceil(pages.length / 2);
 
@@ -118,7 +108,6 @@ function createPages() {
                 front.appendChild(textDiv);
             }
             
-            // যদি ছবি বা টেক্সট কিছুই না থাকে
             if(!frontPageData.image && !frontPageData.content) {
                 front.classList.add('empty-page');
                 front.textContent = 'Empty';
@@ -147,16 +136,14 @@ function createPages() {
                 back.appendChild(textDiv);
             }
             
-            // যদি ছবি বা টেক্সট কিছুই না থাকে
             if(!backPageData.image && !backPageData.content) {
                 back.classList.add('empty-page');
                 back.textContent = 'Empty';
             }
         } else {
-            // বইয়ের শেষ পাতা
+            // বইয়ের শেষ পাতা (ডিফল্ট)
             const img = document.createElement('img');
             img.src = './image/theend.jpg';
-            // যদি theend.jpg না থাকে তবে অন্তত Empty দেখাবে
             img.onerror = () => {
                 back.classList.add('empty-page');
                 back.textContent = 'The End';
@@ -168,7 +155,7 @@ function createPages() {
         page.appendChild(back);
         book.appendChild(page);
 
-        // ফিপিং লজিক (ক্লিক করলে পাতা উল্টাবে)
+        // ফিপিং লজিক
         page.addEventListener('click', (e) => {
             if (typeof isFlipping !== 'undefined' && !isFlipping) {
                 const rect = page.getBoundingClientRect();
@@ -183,8 +170,16 @@ function createPages() {
         });
     }
 
+    // 🛠️ ফিক্স: এখানে কভার ইমেজগুলোকে ফিল্টার করে বাদ দেওয়া হয়েছে!
     if (typeof photoUrls !== 'undefined') {
-        photoUrls = pages.filter(page => page.image && page.image.trim() !== "").map(page => page.image);
+        photoUrls = pages
+            .filter(page => page.image && page.image.trim() !== "" && !page.isCover) // isCover: true থাকলে বাদ
+            .map(page => page.image);
+            
+        // যদি কভার ছাড়া অন্য কোনো ছবি না থাকে, তবে ডিফল্ট হিসেবে কিছু একটা দেখাতে হবে, যাতে ক্র্যাশ না করে
+        if(photoUrls.length === 0) {
+            photoUrls = ['./image/logo.png']; 
+        }
     }
     
     if (typeof calculatePageZIndexes === 'function') calculatePageZIndexes();
