@@ -3,260 +3,152 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Dashboard ⚙️</title> <!-- টাইটেল পরিবর্তন করা হলো -->
+    <title>User Dashboard ⚙️</title>
     <link rel="stylesheet" href="./css/index.css">
     <style>
-        html, body {
-            overflow: auto !important;
-            overflow-x: hidden !important;
-            height: auto !important;
-            background: #f0f2f5 !important;
-            display: block !important;
-            padding: 10px 0 !important;
-        }
-        .user-container { /* ক্লাস নেম পরিবর্তন */
-            max-width: 800px;
-            margin: 0 auto 20px auto;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            overflow: hidden;
-            animation: slideUp 0.5s ease;
-        }
-        .user-header { /* ক্লাস নেম পরিবর্তন */
-            background: linear-gradient(135deg, #ff69b4, #ff1493);
-            color: white;
-            padding: 20px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+        html, body { overflow: auto !important; overflow-x: hidden !important; height: auto !important; background: #f0f2f5 !important; display: block !important; padding: 10px 0 !important; }
+        .user-container { max-width: 800px; margin: 0 auto 20px auto; background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; animation: slideUp 0.5s ease; }
+        .user-header { background: linear-gradient(135deg, #ff69b4, #ff1493); color: white; padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; }
         .user-header h1 { margin: 0; font-size: 20px; }
         .header-buttons { display: flex; gap: 10px; }
-        .header-buttons button {
-            background: rgba(255,255,255,0.2);
-            border: 1px solid rgba(255,255,255,0.5);
-            color: white;
-            padding: 8px 12px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: 0.3s;
-            font-size: 14px;
-        }
+        .header-buttons button { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.5); color: white; padding: 8px 12px; border-radius: 5px; cursor: pointer; transition: 0.3s; font-size: 14px; }
         .header-buttons button:hover { background: white; color: #ff1493; }
         .user-body { padding: 20px; }
-        .settings-section {
-            background: #fff;
-            border: 1px solid #eee;
-            margin-bottom: 25px;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
-        }
-        .apply-btn-container {
-            text-align: center;
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
-            padding-bottom: 20px;
-        }
-        .save-btn {
-            background: linear-gradient(135deg, #4caf50, #45a049);
-            color: white;
-            border: none;
-            padding: 15px 40px;
-            font-size: 18px;
-            font-weight: bold;
-            border-radius: 8px;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(76,175,80,0.3);
-            transition: 0.3s;
-            width: 100%;
-            max-width: 300px;
-        }
-        .save-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(76,175,80,0.4);
-        }
-        .image-preview-box {
-            width: 100%;
-            height: 150px;
-            border: 2px dashed #ddd;
-            border-radius: 8px;
-            margin-top: 10px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-            background: #f9f9f9;
-            position: relative;
-        }
-        .image-preview-box img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: cover;
-        }
-        .upload-status {
-            position: absolute;
-            background: rgba(0,0,0,0.7);
-            color: white;
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-size: 12px;
-            display: none;
-        }
-        .magic-link-section {
-            background: #e8f5e9;
-            border: 2px dashed #4caf50;
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 20px;
-            display: none;
-            text-align: center;
-        }
+        .settings-section { background: #fff; border: 1px solid #eee; margin-bottom: 25px; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
+        .apply-btn-container { text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; padding-bottom: 20px; }
+        .save-btn { background: linear-gradient(135deg, #4caf50, #45a049); color: white; border: none; padding: 15px 40px; font-size: 18px; font-weight: bold; border-radius: 8px; cursor: pointer; box-shadow: 0 4px 15px rgba(76,175,80,0.3); transition: 0.3s; width: 100%; max-width: 300px; }
+        .save-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(76,175,80,0.4); }
+        .image-preview-box { width: 100%; height: 150px; border: 2px dashed #ddd; border-radius: 8px; margin-top: 10px; display: flex; justify-content: center; align-items: center; overflow: hidden; background: #f9f9f9; position: relative; }
+        .image-preview-box img { max-width: 100%; max-height: 100%; object-fit: cover; }
+        .upload-status { position: absolute; background: rgba(0,0,0,0.7); color: white; padding: 5px 10px; border-radius: 4px; font-size: 12px; display: none; }
+        .magic-link-section { background: #e8f5e9; border: 2px dashed #4caf50; padding: 20px; border-radius: 10px; margin-top: 20px; display: none; text-align: center; }
         .magic-link-section h3 { color: #2e7d32; margin-top: 0; }
-        .magic-link-input {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #a5d6a7;
-            border-radius: 6px;
-            margin: 10px 0;
-            font-family: monospace;
-            background: #fff;
-            color: #333;
-        }
-        .copy-btn {
-            background: #2e7d32;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        .magic-link-input { width: 100%; padding: 12px; border: 1px solid #a5d6a7; border-radius: 6px; margin: 10px 0; font-family: monospace; background: #fff; color: #333; }
+        .copy-btn { background: #2e7d32; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
     <script>
-        // ইউজার লগিন ভেরিফিকেশন (আপাতত আগের মতোই রাখা হলো)
-        if (localStorage.getItem("isUserLoggedIn") !== "true") {
-            window.location.href = "index.html";
-        }
-        function logout() {
-            localStorage.removeItem("isUserLoggedIn");
-            window.location.href = "index.html";
-        }
-        function viewSite() {
-            window.open("surprise.html", "_blank");
-        }
+        if (localStorage.getItem("isUserLoggedIn") !== "true") window.location.href = "index.html";
+        function logout() { localStorage.removeItem("isUserLoggedIn"); window.location.href = "index.html"; }
+        function viewSite() { window.open("surprise.html", "_blank"); }
     </script>
 
     <div class="user-container">
         <div class="user-header">
             <h1>⚙️ Create Your Surprise</h1>
-            <div class="header-buttons">
-                <button onclick="viewSite()">👁️ Preview</button>
-                <button onclick="logout()">🚪 Logout</button>
-            </div>
+            <div class="header-buttons"><button onclick="viewSite()">👁️ Preview</button><button onclick="logout()">🚪 Logout</button></div>
         </div>
 
         <div class="user-body">
             
             <div class="settings-section">
                 <h3>🎵 Music Settings</h3>
-                <div class="form-group music-select-row">
+                <div class="form-group music-select-row" style="display: flex; gap: 10px;">
                     <select id="backgroundMusic" style="width: 100%; padding: 10px; border-radius: 5px;"></select>
-                    <button id="musicPreviewButton" style="background: linear-gradient(135deg, #ff6b9d, #ff9270); color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer;">▶ Play</button>
+                    <button id="musicPreviewButton" style="background: linear-gradient(135deg, #ff6b9d, #ff9270); color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; min-width: 80px;">▶ Play</button>
                 </div>
                 <span id="musicPreviewStatus" style="display: block; margin-top: 10px; font-size: 12px; color: #666;"></span>
             </div>
 
             <div class="settings-section">
-                <h3>📝 Text Settings</h3>
-                <div class="form-group">
-                    <label>Main Animation Text (Use | to separate words):</label>
-                    <input type="text" id="sequenceText" value="HAPPY|BIRTHDAY|LOVE|❤" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
-                </div>
-                <div class="form-group" style="margin-top: 15px;">
-                    <label>Background Matrix Text:</label>
-                    <input type="text" id="matrixText" value="HAPPYBIRTHDAY" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
-                </div>
-                <div class="form-group" style="margin-top: 15px;">
-                    <label>Countdown Time (seconds):</label>
-                    <input type="number" id="countdownTime" value="3" min="1" max="10" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
-                </div>
+                <h3>📝 Text & Matrix Settings</h3>
+                <label style="display:block; margin-bottom:5px;">Main Animation Text (Use | to separate words):</label>
+                <input type="text" id="sequenceText" value="HAPPY|BIRTHDAY|LOVE|❤" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-bottom:15px;">
+                
+                <label style="display:block; margin-bottom:5px;">Background Matrix Text:</label>
+                <input type="text" id="matrixText" value="HAPPYBIRTHDAY" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-bottom:15px;">
+                
+                <label style="display:block; margin-bottom:5px;">Countdown Time (seconds):</label>
+                <input type="number" id="countdownTime" value="3" min="1" max="10" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
             </div>
 
             <div class="settings-section">
                 <h3>🎨 Choose Color Theme</h3>
-                <div class="form-group">
-                    <div class="color-theme-buttons">
-                        <button type="button" class="color-theme-btn active" data-theme="pink">
-                            <div class="color-preview pink-preview"></div>
-                            <span>Sweet Pink</span>
-                        </button>
-                        <button type="button" class="color-theme-btn" data-theme="blue">
-                            <div class="color-preview blue-preview"></div>
-                            <span>Cool Blue</span>
-                        </button>
-                        <button type="button" class="color-theme-btn" data-theme="purple">
-                            <div class="color-preview purple-preview"></div>
-                            <span>Dreamy Purple</span>
-                        </button>
-                        <button type="button" class="color-theme-btn" data-theme="custom">
-                            <div class="color-preview custom-preview"></div>
-                            <span>Custom Color</span>
-                        </button>
-                    </div>
+                <div class="color-theme-buttons" style="display: flex; gap: 10px;">
+                    <button type="button" class="color-theme-btn active" data-theme="pink"><div class="color-preview pink-preview" style="background: linear-gradient(135deg, #ff69b4, #ff1493); width: 25px; height: 25px; border-radius: 50%; margin: 0 auto 5px;"></div><span>Sweet Pink</span></button>
+                    <button type="button" class="color-theme-btn" data-theme="blue"><div class="color-preview blue-preview" style="background: linear-gradient(135deg, #87ceeb, #4169e1); width: 25px; height: 25px; border-radius: 50%; margin: 0 auto 5px;"></div><span>Cool Blue</span></button>
+                    <button type="button" class="color-theme-btn" data-theme="purple"><div class="color-preview purple-preview" style="background: linear-gradient(135deg, #dda0dd, #9370db); width: 25px; height: 25px; border-radius: 50%; margin: 0 auto 5px;"></div><span>Dreamy Purple</span></button>
+                    <button type="button" class="color-theme-btn" data-theme="custom"><div class="color-preview custom-preview" style="background: linear-gradient(135deg, #ffb6c1, #ffc0cb); width: 25px; height: 25px; border-radius: 50%; margin: 0 auto 5px;"></div><span>Custom Color</span></button>
                 </div>
-                <div class="form-row" id="customColorSection" style="display: none; margin-top: 15px;">
-                    <div class="form-group" style="flex: 1; margin-right: 10px;">
-                        <label>Matrix color 1:</label>
-                        <input type="color" id="matrixColor1" value="#ff69b4" style="width: 100%; height: 40px; border: none; border-radius: 5px;">
-                    </div>
-                    <div class="form-group" style="flex: 1;">
-                        <label>Matrix color 2:</label>
-                        <input type="color" id="matrixColor2" value="#ff1493" style="width: 100%; height: 40px; border: none; border-radius: 5px;">
-                    </div>
-                    <div class="form-group" id="sequenceColorSection" style="display: none; flex: 1; margin-left: 10px;">
-                        <label>Text color:</label>
-                        <input type="color" id="sequenceColor" value="#ff69b4" style="width: 100%; height: 40px; border: none; border-radius: 5px;">
-                    </div>
+                <div class="form-row" id="customColorSection" style="display: none; margin-top: 15px; display:flex; gap:10px;">
+                    <div style="flex: 1;"><label>Matrix color 1:</label><input type="color" id="matrixColor1" value="#ff69b4" style="width: 100%; height: 40px; border: none;"></div>
+                    <div style="flex: 1;"><label>Matrix color 2:</label><input type="color" id="matrixColor2" value="#ff1493" style="width: 100%; height: 40px; border: none;"></div>
+                    <div id="sequenceColorSection" style="display: none; flex: 1;"><label>Text color:</label><input type="color" id="sequenceColor" value="#ff69b4" style="width: 100%; height: 40px; border: none;"></div>
                 </div>
             </div>
 
             <div class="settings-section">
-                <h3>🎁 Effects Settings</h3>
-                <div class="form-group">
-                    <label>Animated Image (Optional):</label>
-                    <select id="giftImage" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></select>
-                </div>
-                <div class="form-row" style="display: flex; gap: 15px; margin-top: 15px;">
-                    <div class="form-group" style="flex: 1;">
-                        <label>Show Book Effect:</label>
-                        <select id="enableBook" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
-                            <option value="true">Yes</option>
-                            <option value="false">No</option>
+                <h3>🎁 Animated Gift Image (Optional)</h3>
+                <select id="giftImage" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></select>
+            </div>
+
+            <!-- 🎯 Timeline Sequence (New System) -->
+            <div class="settings-section" style="border: 2px dashed #4caf50; background: #f1f8e9;">
+                <h3 style="color: #2e7d32;">⏱️ Animation Sequence (Timeline)</h3>
+                <p style="font-size: 12px; color: #666; margin-bottom: 15px;">Choose the order of effects. What shows first, second, and last?</p>
+                
+                <div style="display: flex; gap: 15px;">
+                    <div style="flex: 1;">
+                        <label style="display:block; margin-bottom:5px;">Step 1 (First):</label>
+                        <select id="phase1" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                            <option value="memory">Memory Card</option>
+                            <option value="book">3D Book</option>
+                            <option value="hearts">Fireworks & Hearts</option>
+                            <option value="none">None</option>
                         </select>
                     </div>
-                    <div class="form-group" style="flex: 1;">
-                        <label>Show Floating Hearts:</label>
-                        <select id="enableHeart" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
-                            <option value="true">Yes</option>
-                            <option value="false">No</option>
+                    <div style="flex: 1;">
+                        <label style="display:block; margin-bottom:5px;">Step 2 (Second):</label>
+                        <select id="phase2" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                            <option value="book">3D Book</option>
+                            <option value="memory">Memory Card</option>
+                            <option value="hearts">Fireworks & Hearts</option>
+                            <option value="none">None</option>
+                        </select>
+                    </div>
+                    <div style="flex: 1;">
+                        <label style="display:block; margin-bottom:5px;">Step 3 (Last):</label>
+                        <select id="phase3" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                            <option value="hearts">Fireworks & Hearts</option>
+                            <option value="book">3D Book</option>
+                            <option value="memory">Memory Card</option>
+                            <option value="none">None</option>
                         </select>
                     </div>
                 </div>
             </div>
 
+            <!-- Memory Card Design Setup -->
+            <div class="settings-section">
+                <h3>💌 Memory Card Design</h3>
+                <p style="font-size: 12px; color: #666; margin-bottom: 15px;">Set up the text and image for the Memory Card effect.</p>
+                <div id="memoryCardOptions">
+                    <label style="display:block; margin-bottom:5px;">Heading Text:</label>
+                    <input type="text" id="memoryHeading" value="Hyy Baby ❤️" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-bottom:15px;">
+                    
+                    <label style="display:block; margin-bottom:5px;">Paragraph Text:</label>
+                    <textarea id="memoryText" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-bottom:15px; min-height: 60px;">Today is your special day! Let me celebrate the incredible woman you are.</textarea>
+                    
+                    <label style="display:block; margin-bottom:5px;">Button Text:</label>
+                    <input type="text" id="memoryBtnText" value="Open Memories ✨" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-bottom:15px;">
+
+                    <label style="display:block; margin-bottom:5px;">Upload Side Photo (ImgBB):</label>
+                    <input type="file" id="memoryImageFile" accept="image/*" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                    <div class="image-preview-box" id="memoryPreviewBox">
+                        <div class="upload-status" id="memoryUploadStatus"></div>
+                        <img id="memoryImageDisplay" src="" style="display:none; max-width: 100%; max-height: 100%; object-fit: cover;">
+                        <span id="memoryNoImage" style="color:#aaa; font-size: 12px;">No Image</span>
+                    </div>
+                    <input type="hidden" id="memoryImageUrl" value="">
+                </div>
+            </div>
+
+            <!-- Book Pages Settings -->
             <div class="settings-section" id="bookSettingsSection">
                 <h3>📖 Book Pages (Upload Photos)</h3>
-                <p style="font-size: 12px; color: #666; margin-bottom: 15px;">Photos will automatically upload to our secure server and generate a public link.</p>
                 <div id="pageConfigs"></div>
             </div>
 
@@ -266,7 +158,6 @@
 
             <div class="magic-link-section" id="magicLinkSection">
                 <h3>🎉 Your Surprise Link is Ready!</h3>
-                <p style="font-size: 14px; color: #555;">Copy this link and send it to your special person. They will see everything exactly as you set it up!</p>
                 <input type="text" class="magic-link-input" id="magicLinkInput" readonly>
                 <button class="copy-btn" onclick="copyMagicLink()">📋 Copy Link</button>
             </div>
@@ -274,9 +165,7 @@
         </div>
     </div>
 
-    <!-- 🛠️ স্ক্রিপ্ট ফাইলের নাম পরিবর্তন করা হয়েছে -->
     <script src="./jscp/settings_user.js"></script>
-
     <script>
         function copyMagicLink() {
             const linkInput = document.getElementById('magicLinkInput');
@@ -285,6 +174,5 @@
             alert('✅ Link copied to clipboard!');
         }
     </script>
-
 </body>
 </html>
