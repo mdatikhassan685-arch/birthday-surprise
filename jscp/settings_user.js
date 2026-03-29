@@ -18,16 +18,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
 const musicOptions = [
     { value: './music/zahra.mp3', label: 'Zahra Birthday Music' },
-    { value: './music/happy-birthday.mp3', label: 'Happy Birthday (Miễn phí)' },
-    { value: './music/happybirthday.mp3', label: 'Happy Birthday (Phiên bản 2)' },
-    { value: './music/perfect.mp3', label: 'Perfect' }
+    { value: './music/happy-birthday1.mp3', label: 'Happy Birthday 1' },
+    { value: './music/happybirthday2.mp3', label: 'Happy Birthday 2' },
+    { value: './music/happybirthday3.mp3', label: 'Happy Birthday 3' }
 ];
 
 const gifOptions = [
     { value: '', label: 'None' },
-    { value: './gif/happy.gif', label: 'Gif1' },
-    { value: './gif/Cat Love GIF by KIKI.gif', label: 'Gif2' },
-    { value: './gif/happy2.gif', label: 'Gif4' },
+    { value: './gif/happy.gif', label: 'Gif' },
+    { value: './gif/happy 1.gif', label: 'Gif1' },
+    { value: './gif/happy2.gif', label: 'Gif2' },
 ];
 
 const musicPreviewButton = document.getElementById('musicPreviewButton');
