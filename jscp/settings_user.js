@@ -8,17 +8,12 @@ const JSONBIN_API_KEY = "$2a$10$WXbOxmvcjLQuVo5jnoQCAeAeSkcuDJlabKulj.TwfCN0CBKf
 const applySettingsButton = document.getElementById('applySettings');
 let settings = {};
 
-// 🎯 লগিন করা ইউজারের নাম বের করা
 const currentUserName = localStorage.getItem("currentUserName") || "guest";
-// 🎯 ইউজারের নিজস্ব স্টোরেজ কী (Key) তৈরি করা
 const userStorageKey = `birthdaySettings_${currentUserName}`;
 
-// ওয়েলকাম মেসেজ দেখানো (Optional)
 document.addEventListener('DOMContentLoaded', () => {
     const headerTitle = document.querySelector('.user-header h1');
-    if (headerTitle && currentUserName !== "guest") {
-        headerTitle.innerHTML = `⚙️ Hello, ${currentUserName}!`;
-    }
+    if (headerTitle && currentUserName !== "guest") headerTitle.innerHTML = `⚙️ Hello, ${currentUserName}!`;
 });
 
 const musicOptions = [
@@ -36,76 +31,59 @@ const gifOptions = [
 ];
 
 const musicPreviewButton = document.getElementById('musicPreviewButton');
-const musicPreviewStatus = document.getElementById('musicPreviewStatus');
 const musicPreviewAudio = new Audio();
-let currentPreviewTrack = '';
-
-function getSelectedMusicLabel() {
-    const musicSelect = document.getElementById('backgroundMusic');
-    if (!musicSelect) return '';
-    return musicSelect.options[musicSelect.selectedIndex]?.textContent || '';
-}
-
-function stopMusicPreview(customMessage) {
-    musicPreviewAudio.pause();
-    musicPreviewAudio.currentTime = 0;
-    currentPreviewTrack = '';
-    if (musicPreviewButton) musicPreviewButton.textContent = '▶ Play';
-    if (musicPreviewStatus) musicPreviewStatus.textContent = customMessage || getSelectedMusicLabel();
-}
 
 function handleMusicPreview() {
     const musicSelect = document.getElementById('backgroundMusic');
     if (!musicSelect || !musicSelect.value) return;
-
-    const selectedSrc = musicSelect.value;
-
-    if (currentPreviewTrack === selectedSrc && !musicPreviewAudio.paused) {
-        stopMusicPreview();
+    if (!musicPreviewAudio.paused) {
+        musicPreviewAudio.pause();
+        musicPreviewButton.textContent = '▶ Play';
         return;
     }
+    musicPreviewAudio.src = musicSelect.value;
+    musicPreviewAudio.play().then(() => { musicPreviewButton.textContent = '⏸ Stop'; });
+}
+if (musicPreviewButton) musicPreviewButton.addEventListener('click', handleMusicPreview);
 
-    currentPreviewTrack = selectedSrc;
-    musicPreviewAudio.pause();
-    musicPreviewAudio.src = selectedSrc;
+async function uploadImageToImgBB(file, previewImgId, noImgId, statusId, urlInputId, arrayIndex = null) {
+    const statusText = document.getElementById(statusId);
+    statusText.style.display = 'block'; statusText.textContent = 'Uploading... ⏳';
+    const formData = new FormData(); formData.append('image', file);
 
-    musicPreviewAudio.play().then(() => {
-        if (musicPreviewButton) musicPreviewButton.textContent = '⏸ Stop';
-        if (musicPreviewStatus) musicPreviewStatus.textContent = `Playing: ${getSelectedMusicLabel()}`;
-    }).catch(error => {
-        stopMusicPreview('Error playing preview.');
-    });
+    try {
+        const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: 'POST', body: formData });
+        const data = await response.json();
+        
+        if (data.success) {
+            statusText.textContent = 'Success! ✅';
+            setTimeout(() => statusText.style.display = 'none', 2000);
+            document.getElementById(previewImgId).src = data.data.url;
+            document.getElementById(previewImgId).style.display = 'block';
+            if(document.getElementById(noImgId)) document.getElementById(noImgId).style.display = 'none';
+
+            if(arrayIndex !== null) settings.pages[arrayIndex].image = data.data.url; 
+            else document.getElementById(urlInputId).value = data.data.url;
+        } else statusText.textContent = 'Failed! ❌';
+    } catch (error) { statusText.textContent = 'Error! ❌'; }
 }
 
-if (musicPreviewButton) musicPreviewButton.addEventListener('click', handleMusicPreview);
-musicPreviewAudio.addEventListener('ended', () => stopMusicPreview());
+document.getElementById('memoryImageFile').addEventListener('change', function(e) {
+    if (e.target.files[0]) uploadImageToImgBB(e.target.files[0], 'memoryImageDisplay', 'memoryNoImage', 'memoryUploadStatus', 'memoryImageUrl', null);
+});
 
-// 🎯 শুধুমাত্র এই ইউজারের ডেটা লোড করা হবে
 function loadSettingsForAdmin() {
     const savedSettings = localStorage.getItem(userStorageKey);
     if (savedSettings) {
         settings = JSON.parse(savedSettings);
-        
         if(settings.pages.length > 0 && settings.pages[0].isCover) settings.pages.shift(); 
         if(settings.pages.length > 0 && settings.pages[settings.pages.length - 1].isCover) settings.pages.pop(); 
     } else {
-        // নতুন ইউজার হলে একদম ফ্রেশ ডিফল্ট ডেটা দেখাবে
         settings = {
-            music: './music/zahra.mp3',
-            countdown: 3,
-            matrixText: 'HAPPYBIRTHDAY',
-            matrixColor1: '#ff69b4',
-            matrixColor2: '#ff1493',
-            sequence: 'HAPPY|BIRTHDAY|TO|YOU|❤',
-            sequenceColor: '#ff69b4',
-            gift: '',
-            enableBook: true,
-            enableHeart: true,
-            colorTheme: 'pink',
-            pages: [
-                { image: '', content: 'Write your message here... 💕' },
-                { image: '', content: 'Another special message... 🎉' }
-            ]
+            music: './music/zahra.mp3', countdown: 3, matrixText: 'HAPPYBIRTHDAY', matrixColor1: '#ff69b4', matrixColor2: '#ff1493', sequence: 'HAPPY|BIRTHDAY|TO|YOU|❤', sequenceColor: '#ff69b4', gift: '', colorTheme: 'pink',
+            sequenceOrder: ['memory', 'book', 'hearts'], // 🎯 New Timeline Default
+            memoryHeading: 'Hyy Baby ❤️', memoryText: 'Today is your special day!', memoryBtnText: 'Open Memories ✨', memoryImage: '',
+            pages: [ { image: '', content: 'Message 1' }, { image: '', content: 'Message 2' } ]
         };
     }
 }
@@ -113,62 +91,36 @@ function loadSettingsForAdmin() {
 function populateAdminForm() {
     loadSettingsForAdmin();
 
-    const musicSelect = document.getElementById('backgroundMusic');
-    if (musicSelect) {
-        musicSelect.innerHTML = musicOptions.map(opt => `<option value="${opt.value}">${opt.label}</option>`).join('');
-        musicSelect.value = settings.music;
-        musicSelect.onchange = () => stopMusicPreview();
-    }
-
+    document.getElementById('backgroundMusic').innerHTML = musicOptions.map(opt => `<option value="${opt.value}">${opt.label}</option>`).join('');
+    document.getElementById('backgroundMusic').value = settings.music;
     document.getElementById('countdownTime').value = settings.countdown;
-    document.getElementById('enableBook').value = settings.enableBook.toString();
-    document.getElementById('enableHeart').value = settings.enableHeart.toString();
-    
-    const giftSelect = document.getElementById('giftImage');
-    if (giftSelect) {
-        giftSelect.innerHTML = gifOptions.map(opt => `<option value="${opt.value}">${opt.label}</option>`).join('');
-        giftSelect.value = settings.gift;
-    }
-
+    document.getElementById('giftImage').innerHTML = gifOptions.map(opt => `<option value="${opt.value}">${opt.label}</option>`).join('');
+    document.getElementById('giftImage').value = settings.gift;
     document.getElementById('matrixText').value = settings.matrixText;
     document.getElementById('matrixColor1').value = settings.matrixColor1;
     document.getElementById('matrixColor2').value = settings.matrixColor2;
     document.getElementById('sequenceText').value = settings.sequence;
     document.getElementById('sequenceColor').value = settings.sequenceColor;
 
-    renderPagesForm();
-}
-
-async function uploadToImgBB(file, index) {
-    const previewBox = document.getElementById(`previewBox${index}`);
-    const statusText = document.getElementById(`uploadStatus${index}`);
-    
-    statusText.style.display = 'block';
-    statusText.textContent = 'Uploading... ⏳';
-
-    const formData = new FormData();
-    formData.append('image', file);
-
-    try {
-        const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
-            method: 'POST',
-            body: formData
-        });
-        const data = await response.json();
-        
-        if (data.success) {
-            settings.pages[index].image = data.data.url; 
-            statusText.textContent = 'Upload Success! ✅';
-            setTimeout(() => statusText.style.display = 'none', 2000);
-            previewBox.innerHTML = `<img src="${data.data.url}" style="max-width: 100%; max-height: 100%; object-fit: cover;" alt="Preview">`;
-        } else {
-            statusText.textContent = 'Upload Failed! ❌';
-            statusText.style.backgroundColor = 'rgba(255,0,0,0.7)';
-        }
-    } catch (error) {
-        statusText.textContent = 'Error! ❌';
-        statusText.style.backgroundColor = 'rgba(255,0,0,0.7)';
+    // 🎯 Timeline population
+    if(settings.sequenceOrder && settings.sequenceOrder.length === 3) {
+        document.getElementById('phase1').value = settings.sequenceOrder[0];
+        document.getElementById('phase2').value = settings.sequenceOrder[1];
+        document.getElementById('phase3').value = settings.sequenceOrder[2];
     }
+
+    document.getElementById('memoryHeading').value = settings.memoryHeading || 'Hyy Baby ❤️';
+    document.getElementById('memoryText').value = settings.memoryText || '';
+    document.getElementById('memoryBtnText').value = settings.memoryBtnText || 'Open Memories ✨';
+    
+    if(settings.memoryImage) {
+        document.getElementById('memoryImageUrl').value = settings.memoryImage;
+        document.getElementById('memoryImageDisplay').src = settings.memoryImage;
+        document.getElementById('memoryImageDisplay').style.display = 'block';
+        document.getElementById('memoryNoImage').style.display = 'none';
+    }
+
+    renderPagesForm();
 }
 
 function renderPagesForm() {
@@ -179,30 +131,25 @@ function renderPagesForm() {
     settings.pages.forEach((page, index) => {
         const pageDiv = document.createElement('div');
         pageDiv.className = 'page-config';
-        pageDiv.style.border = "1px solid #ddd";
-        pageDiv.style.padding = "15px";
-        pageDiv.style.marginBottom = "15px";
-        pageDiv.style.borderRadius = "8px";
-        pageDiv.style.background = "#fff";
+        pageDiv.style.cssText = "border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 8px; background: #fff;";
 
         pageDiv.innerHTML = `
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                 <h4 style="margin: 0; color: #ff1493;">Page ${index + 1}</h4>
                 ${settings.pages.length > 1 ? `<button onclick="removePage(${index})" style="background: #ff4444; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">Remove</button>` : ''}
             </div>
-            <label style="display: block; margin-bottom: 5px; font-weight: bold;">Upload Photo (Auto-saves to ImgBB):</label>
             <input type="file" id="pageFile${index}" accept="image/*" style="width: 100%; padding: 8px; margin-bottom: 5px; border: 1px solid #ddd; border-radius: 4px;">
-            <div class="image-preview-box" id="previewBox${index}" style="width: 100%; height: 150px; border: 2px dashed #ddd; border-radius: 8px; display: flex; justify-content: center; align-items: center; overflow: hidden; background: #f9f9f9; position: relative;">
+            <div class="image-preview-box" style="width: 100%; height: 150px; border: 2px dashed #ddd; border-radius: 8px; display: flex; justify-content: center; align-items: center; overflow: hidden; background: #f9f9f9; position: relative;">
                 <div class="upload-status" id="uploadStatus${index}" style="position: absolute; background: rgba(0,0,0,0.7); color: white; padding: 5px 10px; border-radius: 4px; font-size: 12px; display: none;"></div>
-                ${page.image ? `<img src="${page.image}" style="max-width: 100%; max-height: 100%; object-fit: cover;">` : '<span style="color:#aaa; font-size: 12px;">No Image</span>'}
+                <img id="previewImg${index}" src="${page.image || ''}" style="max-width: 100%; max-height: 100%; object-fit: cover; display: ${page.image ? 'block' : 'none'};">
+                <span id="noImg${index}" style="color:#aaa; font-size: 12px; display: ${page.image ? 'none' : 'block'};">No Image</span>
             </div>
-            <label style="display: block; margin-top: 15px; margin-bottom: 5px; font-weight: bold;">Text Content (Optional):</label>
-            <textarea id="pageContent${index}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; min-height: 60px;">${page.content || ''}</textarea>
+            <textarea id="pageContent${index}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; min-height: 60px; margin-top:10px;">${page.content || ''}</textarea>
         `;
         pageConfigs.appendChild(pageDiv);
 
         document.getElementById(`pageFile${index}`).addEventListener('change', function(e) {
-            if (e.target.files[0]) uploadToImgBB(e.target.files[0], index);
+            if (e.target.files[0]) uploadImageToImgBB(e.target.files[0], `previewImg${index}`, `noImg${index}`, `uploadStatus${index}`, null, index);
         });
     });
 
@@ -215,17 +162,8 @@ function renderPagesForm() {
     }
 }
 
-function addNewPage() {
-    saveFormDataLocally();
-    settings.pages.push({ image: '', content: '' });
-    renderPagesForm();
-}
-
-function removePage(index) {
-    saveFormDataLocally();
-    settings.pages.splice(index, 1);
-    renderPagesForm();
-}
+function addNewPage() { saveFormDataLocally(); settings.pages.push({ image: '', content: '' }); renderPagesForm(); }
+function removePage(index) { saveFormDataLocally(); settings.pages.splice(index, 1); renderPagesForm(); }
 
 function saveFormDataLocally() {
     settings.pages.forEach((page, index) => {
@@ -236,17 +174,26 @@ function saveFormDataLocally() {
 
 if (applySettingsButton) {
     applySettingsButton.addEventListener('click', async () => {
-        
         settings.music = document.getElementById('backgroundMusic').value;
         settings.countdown = parseInt(document.getElementById('countdownTime').value) || 3;
-        settings.enableBook = document.getElementById('enableBook').value === 'true';
-        settings.enableHeart = document.getElementById('enableHeart').value === 'true';
         settings.gift = document.getElementById('giftImage').value;
         settings.matrixText = document.getElementById('matrixText').value;
         settings.matrixColor1 = document.getElementById('matrixColor1').value;
         settings.matrixColor2 = document.getElementById('matrixColor2').value;
         settings.sequence = document.getElementById('sequenceText').value;
         settings.sequenceColor = document.getElementById('sequenceColor').value;
+        
+        // 🎯 Save Sequence Order
+        settings.sequenceOrder = [
+            document.getElementById('phase1').value,
+            document.getElementById('phase2').value,
+            document.getElementById('phase3').value
+        ];
+
+        settings.memoryHeading = document.getElementById('memoryHeading').value;
+        settings.memoryText = document.getElementById('memoryText').value;
+        settings.memoryBtnText = document.getElementById('memoryBtnText').value;
+        settings.memoryImage = document.getElementById('memoryImageUrl').value;
         
         saveFormDataLocally(); 
 
@@ -256,45 +203,29 @@ if (applySettingsButton) {
         finalSettings.pages.unshift({ image: './image/Birthday!/cover.jpg', content: '', isCover: true });
         finalSettings.pages.push({ image: './image/Birthday!/cover.jpg', content: '', isCover: true });
 
-        // 🎯 ইউজারের নিজস্ব আইডিতে সেভ করা হচ্ছে
         localStorage.setItem(userStorageKey, JSON.stringify(finalSettings));
-        
-        // 🎯 View Preview এর জন্য কমন যায়গাতেও একটি কপি রাখা হচ্ছে
         localStorage.setItem("birthdaySettings", JSON.stringify(finalSettings));
 
         const magicLinkSection = document.getElementById('magicLinkSection');
         const magicLinkInput = document.getElementById('magicLinkInput');
-        
         magicLinkInput.value = "Saving to Database... ⏳";
         magicLinkSection.style.display = 'block';
         magicLinkSection.scrollIntoView({ behavior: "smooth" });
 
-        try {
-            const response = await fetch("https://api.jsonbin.io/v3/b", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-Master-Key": JSONBIN_API_KEY,
-                    "X-Bin-Private": "false" 
-                },
-                body: JSON.stringify(finalSettings)
-            });
-            
-            const data = await response.json();
-            
-            if(data.metadata && data.metadata.id) {
-                const binId = data.metadata.id; 
-                const currentUrl = window.location.href.split('user.html')[0];
-                const finalLink = `${currentUrl}surprise.html?id=${binId}`;
-                
-                magicLinkInput.value = finalLink; 
-            } else {
-                magicLinkInput.value = "Error saving to database! ❌";
-            }
-        } catch (error) {
-            console.error("DB Error:", error);
-            magicLinkInput.value = "Network Error! ❌";
-        }
+        const jsonString = JSON.stringify(finalSettings);
+        const base64Data = btoa(unescape(encodeURIComponent(jsonString)));
+        const safeUrlData = encodeURIComponent(base64Data);
+        const currentUrl = window.location.href.split('user.html')[0];
+        const longMagicLink = `${currentUrl}surprise.html?data=${safeUrlData}`;
+
+        window.handleShortUrl = function(data) {
+            if (data && data.shorturl) magicLinkInput.value = data.shorturl; 
+            else magicLinkInput.value = longMagicLink; 
+        };
+
+        const script = document.createElement('script');
+        script.src = `https://is.gd/create.php?format=json&url=${encodeURIComponent(longMagicLink)}&callback=handleShortUrl`;
+        document.body.appendChild(script);
     });
 }
 
