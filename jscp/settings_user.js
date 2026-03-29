@@ -1,5 +1,5 @@
 // ==========================================
-// ⚙️ ADMIN SETTINGS (For admin.html)
+// ⚙️ USER SETTINGS (For user.html)
 // ==========================================
 
 const IMGBB_API_KEY = "250ca5e91b77576f5bb44dcd1dd9ad46";
@@ -8,18 +8,31 @@ const JSONBIN_API_KEY = "$2a$10$WXbOxmvcjLQuVo5jnoQCAeAeSkcuDJlabKulj.TwfCN0CBKf
 const applySettingsButton = document.getElementById('applySettings');
 let settings = {};
 
+// 🎯 লগিন করা ইউজারের নাম বের করা
+const currentUserName = localStorage.getItem("currentUserName") || "guest";
+// 🎯 ইউজারের নিজস্ব স্টোরেজ কী (Key) তৈরি করা
+const userStorageKey = `birthdaySettings_${currentUserName}`;
+
+// ওয়েলকাম মেসেজ দেখানো (Optional)
+document.addEventListener('DOMContentLoaded', () => {
+    const headerTitle = document.querySelector('.user-header h1');
+    if (headerTitle && currentUserName !== "guest") {
+        headerTitle.innerHTML = `⚙️ Hello, ${currentUserName}!`;
+    }
+});
+
 const musicOptions = [
     { value: './music/zahra.mp3', label: 'Zahra Birthday Music' },
-    { value: './music/happy-birthday1.mp3', label: 'Happy Birthday 1' },
-    { value: './music/happybirthday2.mp3', label: 'Happy Birthday 2' },
-    { value: './music/happybirthday3.mp3', label: 'Happy Birthday 3' }
+    { value: './music/happy-birthday.mp3', label: 'Happy Birthday (Miễn phí)' },
+    { value: './music/happybirthday.mp3', label: 'Happy Birthday (Phiên bản 2)' },
+    { value: './music/perfect.mp3', label: 'Perfect' }
 ];
 
 const gifOptions = [
     { value: '', label: 'None' },
-    { value: './gif/happy.gif', label: 'Gif' },
-    { value: './gif/happy1.gif', label: 'Gif1' },
-    { value: './gif/happy2.gif', label: 'Gif2' },
+    { value: './gif/happy.gif', label: 'Gif1' },
+    { value: './gif/Cat Love GIF by KIKI.gif', label: 'Gif2' },
+    { value: './gif/happy2.gif', label: 'Gif4' },
 ];
 
 const musicPreviewButton = document.getElementById('musicPreviewButton');
@@ -46,6 +59,7 @@ function handleMusicPreview() {
     if (!musicSelect || !musicSelect.value) return;
 
     const selectedSrc = musicSelect.value;
+
     if (currentPreviewTrack === selectedSrc && !musicPreviewAudio.paused) {
         stopMusicPreview();
         return;
@@ -66,28 +80,31 @@ function handleMusicPreview() {
 if (musicPreviewButton) musicPreviewButton.addEventListener('click', handleMusicPreview);
 musicPreviewAudio.addEventListener('ended', () => stopMusicPreview());
 
+// 🎯 শুধুমাত্র এই ইউজারের ডেটা লোড করা হবে
 function loadSettingsForAdmin() {
-    const savedSettings = localStorage.getItem("birthdaySettings");
+    const savedSettings = localStorage.getItem(userStorageKey);
     if (savedSettings) {
         settings = JSON.parse(savedSettings);
+        
         if(settings.pages.length > 0 && settings.pages[0].isCover) settings.pages.shift(); 
         if(settings.pages.length > 0 && settings.pages[settings.pages.length - 1].isCover) settings.pages.pop(); 
     } else {
+        // নতুন ইউজার হলে একদম ফ্রেশ ডিফল্ট ডেটা দেখাবে
         settings = {
             music: './music/zahra.mp3',
             countdown: 3,
             matrixText: 'HAPPYBIRTHDAY',
             matrixColor1: '#ff69b4',
             matrixColor2: '#ff1493',
-            sequence: 'HAPPY|BIRTHDAY|name|❤',
+            sequence: 'HAPPY|BIRTHDAY|TO|YOU|❤',
             sequenceColor: '#ff69b4',
             gift: '',
             enableBook: true,
             enableHeart: true,
             colorTheme: 'pink',
             pages: [
-                { image: '', content: 'Dear name, you bring so much joy and happiness! 💕' },
-                { image: '', content: 'Wishing you the most wonderful birthday ever! 🎉' }
+                { image: '', content: 'Write your message here... 💕' },
+                { image: '', content: 'Another special message... 🎉' }
             ]
         };
     }
@@ -143,7 +160,7 @@ async function uploadToImgBB(file, index) {
             settings.pages[index].image = data.data.url; 
             statusText.textContent = 'Upload Success! ✅';
             setTimeout(() => statusText.style.display = 'none', 2000);
-            previewBox.innerHTML = `<img src="${data.data.url}" alt="Preview">`;
+            previewBox.innerHTML = `<img src="${data.data.url}" style="max-width: 100%; max-height: 100%; object-fit: cover;" alt="Preview">`;
         } else {
             statusText.textContent = 'Upload Failed! ❌';
             statusText.style.backgroundColor = 'rgba(255,0,0,0.7)';
@@ -217,7 +234,6 @@ function saveFormDataLocally() {
     });
 }
 
-// 🎯 Save to Database & Generate Short Link
 if (applySettingsButton) {
     applySettingsButton.addEventListener('click', async () => {
         
@@ -237,11 +253,13 @@ if (applySettingsButton) {
         let finalSettings = JSON.parse(JSON.stringify(settings)); 
         finalSettings.pages = finalSettings.pages.filter(p => (p.image && p.image.trim() !== '') || (p.content && p.content.trim() !== ''));
 
-        // কভার যোগ করা
         finalSettings.pages.unshift({ image: './image/Birthday!/cover.jpg', content: '', isCover: true });
         finalSettings.pages.push({ image: './image/Birthday!/cover.jpg', content: '', isCover: true });
 
-        // লোকাল স্টোরেজে সেভ (অ্যাডমিনের জন্য)
+        // 🎯 ইউজারের নিজস্ব আইডিতে সেভ করা হচ্ছে
+        localStorage.setItem(userStorageKey, JSON.stringify(finalSettings));
+        
+        // 🎯 View Preview এর জন্য কমন যায়গাতেও একটি কপি রাখা হচ্ছে
         localStorage.setItem("birthdaySettings", JSON.stringify(finalSettings));
 
         const magicLinkSection = document.getElementById('magicLinkSection');
@@ -251,14 +269,13 @@ if (applySettingsButton) {
         magicLinkSection.style.display = 'block';
         magicLinkSection.scrollIntoView({ behavior: "smooth" });
 
-        // 🚀 JSONbin.io Database এ ডেটা সেভ করা
         try {
             const response = await fetch("https://api.jsonbin.io/v3/b", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     "X-Master-Key": JSONBIN_API_KEY,
-                    "X-Bin-Private": "false" // যাতে ক্লায়েন্ট লিংক থেকে ডিরেক্ট রিড করতে পারে
+                    "X-Bin-Private": "false" 
                 },
                 body: JSON.stringify(finalSettings)
             });
@@ -266,11 +283,11 @@ if (applySettingsButton) {
             const data = await response.json();
             
             if(data.metadata && data.metadata.id) {
-                const binId = data.metadata.id; // ডাটাবেস থেকে পাওয়া ছোট আইডি
-                const currentUrl = window.location.href.split('admin.html')[0];
+                const binId = data.metadata.id; 
+                const currentUrl = window.location.href.split('user.html')[0];
                 const finalLink = `${currentUrl}surprise.html?id=${binId}`;
                 
-                magicLinkInput.value = finalLink; // তৈরি হয়ে গেলো প্রফেশনাল শর্ট লিংক!
+                magicLinkInput.value = finalLink; 
             } else {
                 magicLinkInput.value = "Error saving to database! ❌";
             }
