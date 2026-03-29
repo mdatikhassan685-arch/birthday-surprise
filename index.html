@@ -3,51 +3,276 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Login 🔒</title>
+    <title>Welcome | User Authentication 🔒</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Arial', sans-serif; background: linear-gradient(135deg, #1a0b1c 0%, #000000 100%); height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden; }
-        .login-container { background: rgba(255, 255, 255, 0.05); padding: 40px; border-radius: 15px; text-align: center; backdrop-filter: blur(10px); border: 1px solid rgba(255, 105, 180, 0.3); box-shadow: 0 0 20px rgba(255, 105, 180, 0.2); width: 90%; max-width: 350px; animation: fadeIn 1s ease-in-out; }
-        .login-container h2 { color: #ff69b4; margin-bottom: 20px; font-size: 24px; }
-        .input-group { margin-bottom: 20px; }
-        .input-group input { width: 100%; padding: 12px; border: 1px solid rgba(255, 105, 180, 0.5); background: rgba(0, 0, 0, 0.5); color: white; border-radius: 8px; font-size: 16px; outline: none; transition: 0.3s; text-align: center; }
-        .input-group input:focus { border-color: #ff1493; box-shadow: 0 0 10px rgba(255, 20, 147, 0.5); }
-        .login-btn { background: linear-gradient(135deg, #ff69b4, #ff1493); color: white; border: none; padding: 12px 30px; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer; width: 100%; transition: 0.3s; }
-        .login-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(255, 105, 180, 0.4); }
-        #errorMsg { color: #ff4444; margin-top: 15px; font-size: 14px; display: none; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        body { 
+            font-family: 'Arial', sans-serif; 
+            background: linear-gradient(135deg, #1a0b1c 0%, #000000 100%); 
+            height: 100vh; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            overflow: hidden; 
+        }
+        .auth-container { 
+            background: rgba(255, 255, 255, 0.05); 
+            padding: 40px; 
+            border-radius: 15px; 
+            text-align: center; 
+            backdrop-filter: blur(10px); 
+            border: 1px solid rgba(255, 105, 180, 0.3); 
+            box-shadow: 0 0 20px rgba(255, 105, 180, 0.2); 
+            width: 90%; 
+            max-width: 400px; 
+            animation: fadeIn 0.5s ease-in-out; 
+            position: relative;
+        }
+        .auth-container h2 { 
+            color: #ff69b4; 
+            margin-bottom: 25px; 
+            font-size: 26px; 
+        }
+        .input-group { margin-bottom: 15px; text-align: left; }
+        .input-group label {
+            display: block;
+            color: #ccc;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        .input-group input { 
+            width: 100%; 
+            padding: 12px; 
+            border: 1px solid rgba(255, 105, 180, 0.5); 
+            background: rgba(0, 0, 0, 0.5); 
+            color: white; 
+            border-radius: 8px; 
+            font-size: 14px; 
+            outline: none; 
+            transition: 0.3s; 
+        }
+        .input-group input:focus { 
+            border-color: #ff1493; 
+            box-shadow: 0 0 10px rgba(255, 20, 147, 0.5); 
+        }
+        .auth-btn { 
+            background: linear-gradient(135deg, #ff69b4, #ff1493); 
+            color: white; 
+            border: none; 
+            padding: 12px 30px; 
+            font-size: 16px; 
+            font-weight: bold; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            width: 100%; 
+            margin-top: 10px;
+            transition: 0.3s; 
+        }
+        .auth-btn:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 5px 15px rgba(255, 105, 180, 0.4); 
+        }
+        .switch-form {
+            margin-top: 20px;
+            color: #ccc;
+            font-size: 14px;
+        }
+        .switch-form span {
+            color: #ff69b4;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: underline;
+        }
+        .switch-form span:hover {
+            color: #ff1493;
+        }
+        .error-msg { 
+            color: #ff4444; 
+            margin-top: 15px; 
+            font-size: 14px; 
+            display: none; 
+            background: rgba(255,0,0,0.1);
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .success-msg {
+            color: #00C851; 
+            margin-top: 15px; 
+            font-size: 14px; 
+            display: none; 
+            background: rgba(0,200,81,0.1);
+            padding: 10px;
+            border-radius: 5px;
+        }
+        
+        /* ফর্মে সুইচ করার এনিমেশন */
+        #loginForm, #signupForm {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        #loginForm.active, #signupForm.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn { 
+            from { opacity: 0; transform: translateY(10px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
     </style>
 </head>
 <body>
 
-    <div class="login-container">
-        <h2>👋 Welcome User</h2>
-        <div class="input-group">
-            <input type="password" id="userPass" placeholder="Enter Password" onkeypress="handleEnter(event)">
+    <div class="auth-container">
+        
+        <!-- 🔐 Login Form -->
+        <div id="loginForm" class="active">
+            <h2>👋 Welcome Back!</h2>
+            <div class="input-group">
+                <label>Email or Phone Number</label>
+                <input type="text" id="loginId" placeholder="Enter Email or Phone">
+            </div>
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" id="loginPass" placeholder="Enter Password" onkeypress="handleLoginEnter(event)">
+            </div>
+            <button class="auth-btn" onclick="loginUser()">Login</button>
+            <p id="loginError" class="error-msg">❌ Invalid Email/Phone or Password!</p>
+            
+            <p class="switch-form">Don't have an account? <span onclick="switchForm('signup')">Sign Up Here</span></p>
         </div>
-        <button class="login-btn" onclick="checkLogin()">Login</button>
-        <p id="errorMsg">❌ Wrong Password!</p>
+
+        <!-- 📝 Sign Up Form -->
+        <div id="signupForm">
+            <h2>✨ Create Account</h2>
+            <div class="input-group">
+                <label>Full Name</label>
+                <input type="text" id="regName" placeholder="Enter your name">
+            </div>
+            <div class="input-group">
+                <label>Email Address</label>
+                <input type="email" id="regEmail" placeholder="Enter email address">
+            </div>
+            <div class="input-group">
+                <label>Phone Number</label>
+                <input type="tel" id="regPhone" placeholder="Enter phone number">
+            </div>
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" id="regPass" placeholder="Create a password" onkeypress="handleSignupEnter(event)">
+            </div>
+            <button class="auth-btn" onclick="registerUser()">Sign Up</button>
+            
+            <p id="regError" class="error-msg">❌ Please fill all fields!</p>
+            <p id="regSuccess" class="success-msg">✅ Registration Successful! Please Login.</p>
+
+            <p class="switch-form">Already have an account? <span onclick="switchForm('login')">Login Here</span></p>
+        </div>
+
     </div>
 
     <script>
-        const USER_PASSWORD = "user123"; // এখন ইউজারদের জন্য এই পাসওয়ার্ডটি ব্যবহার হবে 
+        // পেজ লোড হলেই চেক করবে আগে থেকে লগিন করা আছে কি না
+        if (localStorage.getItem("isUserLoggedIn") === "true") {
+            window.location.href = "user.html";
+        }
 
-        function checkLogin() {
-            const passInput = document.getElementById('userPass').value;
-            const errorMsg = document.getElementById('errorMsg');
+        // ফর্ম সুইচ করার ফাংশন (Login <-> Sign Up)
+        function switchForm(formType) {
+            document.getElementById('loginError').style.display = "none";
+            document.getElementById('regError').style.display = "none";
+            document.getElementById('regSuccess').style.display = "none";
 
-            if (passInput === USER_PASSWORD) {
-                localStorage.setItem("isUserLoggedIn", "true");
-                window.location.href = "user.html"; // 🛠️ ফিক্স: admin.html থেকে user.html এ যাবে
+            if(formType === 'signup') {
+                document.getElementById('loginForm').classList.remove('active');
+                document.getElementById('signupForm').classList.add('active');
             } else {
-                errorMsg.style.display = "block";
-                document.getElementById('userPass').value = ""; 
+                document.getElementById('signupForm').classList.remove('active');
+                document.getElementById('loginForm').classList.add('active');
             }
         }
 
-        function handleEnter(e) {
-            if (e.key === 'Enter') checkLogin();
+        // 📝 Sign Up Function
+        function registerUser() {
+            const name = document.getElementById('regName').value.trim();
+            const email = document.getElementById('regEmail').value.trim().toLowerCase();
+            const phone = document.getElementById('regPhone').value.trim();
+            const pass = document.getElementById('regPass').value.trim();
+            const errorMsg = document.getElementById('regError');
+            const successMsg = document.getElementById('regSuccess');
+
+            // ভ্যালিডেশন: কোনো ঘর ফাঁকা রাখা যাবে না
+            if(!name || !email || !phone || !pass) {
+                errorMsg.textContent = "❌ Please fill all fields!";
+                errorMsg.style.display = "block";
+                successMsg.style.display = "none";
+                return;
+            }
+
+            // লোকাল স্টোরেজ থেকে আগের সব ইউজারদের ডেটা আনা (যদি থাকে)
+            let users = JSON.parse(localStorage.getItem("allUsers")) || [];
+
+            // চেক করা ইমেইল বা ফোন নম্বর আগে থেকেই ব্যবহার করা হয়েছে কি না
+            const userExists = users.some(u => u.email === email || u.phone === phone);
+            
+            if(userExists) {
+                errorMsg.textContent = "❌ Email or Phone number already exists!";
+                errorMsg.style.display = "block";
+                successMsg.style.display = "none";
+                return;
+            }
+
+            // নতুন ইউজার সেভ করা
+            const newUser = { name, email, phone, pass };
+            users.push(newUser);
+            localStorage.setItem("allUsers", JSON.stringify(users));
+
+            // সাকসেস মেসেজ দেখানো এবং ফর্ম ক্লিয়ার করা
+            errorMsg.style.display = "none";
+            successMsg.style.display = "block";
+            
+            document.getElementById('regName').value = "";
+            document.getElementById('regEmail').value = "";
+            document.getElementById('regPhone').value = "";
+            document.getElementById('regPass').value = "";
+
+            // ২ সেকেন্ড পর অটোমেটিক লগিন ফর্মে চলে যাবে
+            setTimeout(() => {
+                switchForm('login');
+            }, 2000);
         }
+
+        // 🔐 Login Function
+        function loginUser() {
+            const loginId = document.getElementById('loginId').value.trim().toLowerCase(); // ইমেইল বা ফোন
+            const loginPass = document.getElementById('loginPass').value.trim();
+            const errorMsg = document.getElementById('loginError');
+
+            if(!loginId || !loginPass) {
+                errorMsg.textContent = "❌ Please enter Email/Phone and Password!";
+                errorMsg.style.display = "block";
+                return;
+            }
+
+            // লোকাল স্টোরেজ থেকে সব ইউজারদের ডাটাবেস আনা
+            let users = JSON.parse(localStorage.getItem("allUsers")) || [];
+
+            // চেক করা ইমেইল/ফোন এবং পাসওয়ার্ড মিলছে কি না
+            const validUser = users.find(u => (u.email === loginId || u.phone === loginId) && u.pass === loginPass);
+
+            if(validUser) {
+                // লগিন সাকসেসফুল! সেশন সেভ করা
+                localStorage.setItem("isUserLoggedIn", "true");
+                localStorage.setItem("currentUserName", validUser.name); // ড্যাশবোর্ডে নাম দেখানোর জন্য
+                window.location.href = "user.html";
+            } else {
+                errorMsg.textContent = "❌ Invalid Email/Phone or Password!";
+                errorMsg.style.display = "block";
+                document.getElementById('loginPass').value = "";
+            }
+        }
+
+        function handleSignupEnter(e) { if(e.key === 'Enter') registerUser(); }
+        function handleLoginEnter(e) { if(e.key === 'Enter') loginUser(); }
     </script>
 
 </body>
