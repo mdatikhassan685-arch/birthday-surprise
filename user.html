@@ -26,6 +26,7 @@
         .magic-link-input { width: 100%; padding: 12px; border: 1px solid #a5d6a7; border-radius: 6px; margin: 10px 0; font-family: monospace; background: #fff; color: #333; }
         .copy-btn { background: #2e7d32; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .seq-select { width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ffb3c6; background: white; }
     </style>
 </head>
 <body>
@@ -49,54 +50,77 @@
             
             <div class="settings-section">
                 <h3>🎵 Music Settings</h3>
-                <div class="form-group" style="display:flex; gap:10px;">
-                    <select id="backgroundMusic" style="flex:1; padding: 10px; border-radius: 5px;"></select>
+                <div style="display:flex; gap:10px;">
+                    <select id="backgroundMusic" style="flex:1; padding: 10px; border-radius: 5px; border: 1px solid #ddd;"></select>
                     <button id="musicPreviewButton" style="background: linear-gradient(135deg, #ff6b9d, #ff9270); color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer;">▶ Play</button>
                 </div>
+                <span id="musicPreviewStatus" style="display: block; margin-top: 10px; font-size: 12px; color: #666;"></span>
             </div>
 
             <div class="settings-section">
                 <h3>📝 Text Settings</h3>
-                <div class="form-group"><label>Main Animation Text (Use | to separate words):</label><input type="text" id="sequenceText" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></div>
-                <div class="form-group" style="margin-top: 15px;"><label>Background Matrix Text:</label><input type="text" id="matrixText" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></div>
+                <div style="margin-bottom: 15px;"><label>Main Animation Text (Use | to separate words):</label><input type="text" id="sequenceText" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></div>
+                <div style="margin-bottom: 15px;"><label>Background Matrix Text:</label><input type="text" id="matrixText" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></div>
+                <div><label>Countdown Time (seconds):</label><input type="number" id="countdownTime" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></div>
             </div>
 
-            <!-- 🎯 নতুন: Effect Sequence Section -->
+            <!-- 🎯 4 Effect Sequence Section -->
             <div class="settings-section" style="background: #fff0f5; border: 2px dashed #ffb3c6;">
                 <h3 style="color: #d81b60;">🪄 Effect Sequence (কোনটার পর কোনটা আসবে?)</h3>
-                <p style="font-size: 13px; color: #555; margin-bottom: 15px;">Set the order of effects after the animation. Select "None" to disable an effect.</p>
-                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                    <div style="flex: 1; min-width: 150px;">
+                <p style="font-size: 13px; color: #555; margin-bottom: 15px;">Set the order of effects. Select "None" to disable an effect.</p>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    
+                    <div>
                         <label style="font-weight: bold; color: #d81b60;">1st Effect:</label>
-                        <select id="seq1" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ffb3c6;"></select>
+                        <select id="seq1" class="seq-select">
+                            <option value="none">None (Disable)</option>
+                            <option value="matrix">🌧️ Matrix Rain</option>
+                            <option value="memory">💌 Memory Card</option>
+                            <option value="book">📖 3D Book</option>
+                            <option value="hearts">💖 Floating Hearts</option>
+                        </select>
                     </div>
-                    <div style="flex: 1; min-width: 150px;">
+                    <div>
                         <label style="font-weight: bold; color: #d81b60;">2nd Effect:</label>
-                        <select id="seq2" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ffb3c6;"></select>
+                        <select id="seq2" class="seq-select">
+                            <option value="none">None (Disable)</option>
+                            <option value="matrix">🌧️ Matrix Rain</option>
+                            <option value="memory">💌 Memory Card</option>
+                            <option value="book">📖 3D Book</option>
+                            <option value="hearts">💖 Floating Hearts</option>
+                        </select>
                     </div>
-                    <div style="flex: 1; min-width: 150px;">
+                    <div>
                         <label style="font-weight: bold; color: #d81b60;">3rd Effect:</label>
-                        <select id="seq3" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ffb3c6;"></select>
+                        <select id="seq3" class="seq-select">
+                            <option value="none">None (Disable)</option>
+                            <option value="matrix">🌧️ Matrix Rain</option>
+                            <option value="memory">💌 Memory Card</option>
+                            <option value="book">📖 3D Book</option>
+                            <option value="hearts">💖 Floating Hearts</option>
+                        </select>
                     </div>
+                    <div>
+                        <label style="font-weight: bold; color: #d81b60;">4th Effect:</label>
+                        <select id="seq4" class="seq-select">
+                            <option value="none">None (Disable)</option>
+                            <option value="matrix">🌧️ Matrix Rain</option>
+                            <option value="memory">💌 Memory Card</option>
+                            <option value="book">📖 3D Book</option>
+                            <option value="hearts">💖 Floating Hearts</option>
+                        </select>
+                    </div>
+
                 </div>
             </div>
 
-            <!-- 🎯 নতুন: Memory Card Settings -->
+            <!-- Memory Card Settings -->
             <div class="settings-section">
                 <h3>💌 Memory Card Settings</h3>
-                <div class="form-group">
-                    <label>Title (e.g., Hyy Baby ❤️):</label>
-                    <input type="text" id="mcTitle" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
-                </div>
-                <div class="form-group" style="margin-top: 10px;">
-                    <label>Message:</label>
-                    <textarea id="mcMessage" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; min-height: 80px;"></textarea>
-                </div>
-                <div class="form-group" style="margin-top: 10px;">
-                    <label>Button Text:</label>
-                    <input type="text" id="mcBtnText" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
-                </div>
-                <div class="form-group" style="margin-top: 10px;">
+                <div style="margin-bottom: 10px;"><label>Title (e.g., Hyy Baby ❤️):</label><input type="text" id="mcTitle" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></div>
+                <div style="margin-bottom: 10px;"><label>Message:</label><textarea id="mcMessage" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; min-height: 80px;"></textarea></div>
+                <div style="margin-bottom: 10px;"><label>Button Text:</label><input type="text" id="mcBtnText" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></div>
+                <div>
                     <label>Upload Photo (Auto-saves to ImgBB):</label>
                     <input type="file" id="mcImageFile" accept="image/*" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
                     <div class="image-preview-box" id="mcPreviewBox">
@@ -112,10 +136,10 @@
                 <div id="pageConfigs"></div>
             </div>
 
-            <!-- Others -->
+            <!-- Advanced Settings -->
             <div class="settings-section">
                 <h3>🎨 Advanced Settings</h3>
-                <div class="form-group"><label>Gift Box (Optional):</label><select id="giftImage" style="width: 100%; padding: 10px; border-radius: 5px;"></select></div>
+                <div style="margin-bottom: 15px;"><label>Gift Box (Optional):</label><select id="giftImage" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></select></div>
             </div>
 
             <div class="apply-btn-container">
