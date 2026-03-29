@@ -80,9 +80,26 @@
                 </div>
             </div>
 
+            <!-- 🎯 General Effects -->
             <div class="settings-section">
-                <h3>🎁 Animated Gift Image (Optional)</h3>
-                <select id="giftImage" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></select>
+                <h3>🎁 General Effects</h3>
+                <label style="display:block; margin-bottom:5px;">Animated Image (Optional):</label>
+                <select id="giftImage" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-bottom:15px;"></select>
+                
+                <div style="display: flex; gap: 15px;">
+                    <div style="flex: 1;">
+                        <label style="display:block; margin-bottom:5px;">Show Book Effect:</label>
+                        <select id="enableBook" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                            <option value="true">Yes</option><option value="false">No</option>
+                        </select>
+                    </div>
+                    <div style="flex: 1;">
+                        <label style="display:block; margin-bottom:5px;">Show Floating Hearts:</label>
+                        <select id="enableHeart" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                            <option value="true">Yes</option><option value="false">No</option>
+                        </select>
+                    </div>
+                </div>
             </div>
 
             <!-- 🎯 Timeline Sequence (New System) -->
@@ -149,6 +166,7 @@
             <!-- Book Pages Settings -->
             <div class="settings-section" id="bookSettingsSection">
                 <h3>📖 Book Pages (Upload Photos)</h3>
+                <p style="font-size: 12px; color: #666; margin-bottom: 15px;">Photos will automatically upload to our secure server and generate a public link.</p>
                 <div id="pageConfigs"></div>
             </div>
 
@@ -165,7 +183,11 @@
         </div>
     </div>
 
+    <!-- 🛠️ এখানে engine.js এবং main.js লিংক করা হলো -->
     <script src="./jscp/settings_user.js"></script>
+    <script src="./jscp/engine.js"></script>
+    <script src="./jscp/main.js"></script>
+    
     <script>
         function copyMagicLink() {
             const linkInput = document.getElementById('magicLinkInput');
