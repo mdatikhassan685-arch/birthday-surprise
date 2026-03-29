@@ -1,7 +1,3 @@
-// ==========================================
-// ⚙️ USER SETTINGS (For user.html)
-// ==========================================
-
 const IMGBB_API_KEY = "250ca5e91b77576f5bb44dcd1dd9ad46";
 const JSONBIN_API_KEY = "$2a$10$WXbOxmvcjLQuVo5jnoQCAeAeSkcuDJlabKulj.TwfCN0CBKfpvFrq";
 
@@ -18,59 +14,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
 const musicOptions = [
     { value: './music/zahra.mp3', label: 'Zahra Birthday Music' },
-    { value: './music/happy-birthday1.mp3', label: 'Happy Birthday 1' },
-    { value: './music/happybirthday2.mp3', label: 'Happy Birthday 2' },
-    { value: './music/happybirthday3.mp3', label: 'Happy Birthday 3' }
+    { value: './music/happy-birthday1.mp3', label: 'Happy Birthday 1' }
 ];
-
-const gifOptions = [
-    { value: '', label: 'None' },
-    { value: './gif/happy.gif', label: 'Gif' },
-    { value: './gif/happy 1.gif', label: 'Gif1' },
-    { value: './gif/happy2.gif', label: 'Gif2' },
+const gifOptions = [ { value: '', label: 'None' }, { value: './gif/happy.gif', label: 'Gif1' } ];
+const sequenceOptions = [
+    { value: 'none', label: 'None (Disable)' },
+    { value: 'memory', label: '💌 Memory Card' },
+    { value: 'book', label: '📖 3D Book' },
+    { value: 'hearts', label: '💖 Floating Hearts' }
 ];
-
-const musicPreviewButton = document.getElementById('musicPreviewButton');
-const musicPreviewAudio = new Audio();
-
-function handleMusicPreview() {
-    const musicSelect = document.getElementById('backgroundMusic');
-    if (!musicSelect || !musicSelect.value) return;
-    if (!musicPreviewAudio.paused) {
-        musicPreviewAudio.pause();
-        musicPreviewButton.textContent = '▶ Play';
-        return;
-    }
-    musicPreviewAudio.src = musicSelect.value;
-    musicPreviewAudio.play().then(() => { musicPreviewButton.textContent = '⏸ Stop'; });
-}
-if (musicPreviewButton) musicPreviewButton.addEventListener('click', handleMusicPreview);
-
-async function uploadImageToImgBB(file, previewImgId, noImgId, statusId, urlInputId, arrayIndex = null) {
-    const statusText = document.getElementById(statusId);
-    statusText.style.display = 'block'; statusText.textContent = 'Uploading... ⏳';
-    const formData = new FormData(); formData.append('image', file);
-
-    try {
-        const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: 'POST', body: formData });
-        const data = await response.json();
-        
-        if (data.success) {
-            statusText.textContent = 'Success! ✅';
-            setTimeout(() => statusText.style.display = 'none', 2000);
-            document.getElementById(previewImgId).src = data.data.url;
-            document.getElementById(previewImgId).style.display = 'block';
-            if(document.getElementById(noImgId)) document.getElementById(noImgId).style.display = 'none';
-
-            if(arrayIndex !== null) settings.pages[arrayIndex].image = data.data.url; 
-            else document.getElementById(urlInputId).value = data.data.url;
-        } else statusText.textContent = 'Failed! ❌';
-    } catch (error) { statusText.textContent = 'Error! ❌'; }
-}
-
-document.getElementById('memoryImageFile').addEventListener('change', function(e) {
-    if (e.target.files[0]) uploadImageToImgBB(e.target.files[0], 'memoryImageDisplay', 'memoryNoImage', 'memoryUploadStatus', 'memoryImageUrl', null);
-});
 
 function loadSettingsForAdmin() {
     const savedSettings = localStorage.getItem(userStorageKey);
@@ -80,10 +32,13 @@ function loadSettingsForAdmin() {
         if(settings.pages.length > 0 && settings.pages[settings.pages.length - 1].isCover) settings.pages.pop(); 
     } else {
         settings = {
-            music: './music/zahra.mp3', countdown: 3, matrixText: 'HAPPYBIRTHDAY', matrixColor1: '#ff69b4', matrixColor2: '#ff1493', sequence: 'HAPPY|BIRTHDAY|TO|YOU|❤', sequenceColor: '#ff69b4', gift: '', colorTheme: 'pink',
-            sequenceOrder: ['memory', 'book', 'hearts'], // 🎯 New Timeline Default
-            memoryHeading: 'Hyy Baby ❤️', memoryText: 'Today is your special day!', memoryBtnText: 'Open Memories ✨', memoryImage: '',
-            pages: [ { image: '', content: 'Message 1' }, { image: '', content: 'Message 2' } ]
+            music: './music/zahra.mp3', countdown: 3, matrixText: 'HAPPYBIRTHDAY',
+            sequence: 'HAPPY|BIRTHDAY|TO|YOU|❤', gift: '',
+            effectSequence: ['memory', 'book', 'hearts'], // 🎯 ডিফল্ট সিকোয়েন্স
+            memoryCard: {
+                title: 'Hyy Baby ❤️', message: 'Today is your special day! Let me celebrate the incredible person you are.', image: '', btnText: 'Open Memories ✨'
+            },
+            pages: [ { image: '', content: 'Message 1...' }, { image: '', content: 'Message 2...' } ]
         };
     }
 }
@@ -93,35 +48,55 @@ function populateAdminForm() {
 
     document.getElementById('backgroundMusic').innerHTML = musicOptions.map(opt => `<option value="${opt.value}">${opt.label}</option>`).join('');
     document.getElementById('backgroundMusic').value = settings.music;
-    document.getElementById('countdownTime').value = settings.countdown;
+    
     document.getElementById('giftImage').innerHTML = gifOptions.map(opt => `<option value="${opt.value}">${opt.label}</option>`).join('');
     document.getElementById('giftImage').value = settings.gift;
+
     document.getElementById('matrixText').value = settings.matrixText;
-    document.getElementById('matrixColor1').value = settings.matrixColor1;
-    document.getElementById('matrixColor2').value = settings.matrixColor2;
     document.getElementById('sequenceText').value = settings.sequence;
-    document.getElementById('sequenceColor').value = settings.sequenceColor;
 
-    // 🎯 Timeline population
-    if(settings.sequenceOrder && settings.sequenceOrder.length === 3) {
-        document.getElementById('phase1').value = settings.sequenceOrder[0];
-        document.getElementById('phase2').value = settings.sequenceOrder[1];
-        document.getElementById('phase3').value = settings.sequenceOrder[2];
-    }
+    // Populate Effect Sequence
+    const seqHtml = sequenceOptions.map(opt => `<option value="${opt.value}">${opt.label}</option>`).join('');
+    ['seq1', 'seq2', 'seq3'].forEach((id, i) => {
+        document.getElementById(id).innerHTML = seqHtml;
+        document.getElementById(id).value = settings.effectSequence[i] || 'none';
+    });
 
-    document.getElementById('memoryHeading').value = settings.memoryHeading || 'Hyy Baby ❤️';
-    document.getElementById('memoryText').value = settings.memoryText || '';
-    document.getElementById('memoryBtnText').value = settings.memoryBtnText || 'Open Memories ✨';
-    
-    if(settings.memoryImage) {
-        document.getElementById('memoryImageUrl').value = settings.memoryImage;
-        document.getElementById('memoryImageDisplay').src = settings.memoryImage;
-        document.getElementById('memoryImageDisplay').style.display = 'block';
-        document.getElementById('memoryNoImage').style.display = 'none';
+    // Populate Memory Card
+    document.getElementById('mcTitle').value = settings.memoryCard.title;
+    document.getElementById('mcMessage').value = settings.memoryCard.message;
+    document.getElementById('mcBtnText').value = settings.memoryCard.btnText;
+    if(settings.memoryCard.image) {
+        document.getElementById('mcPreviewBox').innerHTML = `<img src="${settings.memoryCard.image}" style="max-width:100%;max-height:100%;object-fit:cover;">`;
     }
 
     renderPagesForm();
 }
+
+async function uploadToImgBB(file, targetKey, index = null) {
+    const statusText = index !== null ? document.getElementById(`uploadStatus${index}`) : document.getElementById('mcUploadStatus');
+    const previewBox = index !== null ? document.getElementById(`previewBox${index}`) : document.getElementById('mcPreviewBox');
+    
+    statusText.style.display = 'block'; statusText.textContent = 'Uploading... ⏳';
+    const formData = new FormData(); formData.append('image', file);
+
+    try {
+        const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: 'POST', body: formData });
+        const data = await response.json();
+        if (data.success) {
+            if(targetKey === 'memory') settings.memoryCard.image = data.data.url;
+            else settings.pages[index].image = data.data.url;
+            
+            statusText.textContent = 'Success! ✅';
+            setTimeout(() => statusText.style.display = 'none', 2000);
+            previewBox.innerHTML = `<img src="${data.data.url}" style="max-width:100%;max-height:100%;object-fit:cover;">`;
+        }
+    } catch (error) { statusText.textContent = 'Error! ❌'; }
+}
+
+document.getElementById('mcImageFile').addEventListener('change', e => {
+    if(e.target.files[0]) uploadToImgBB(e.target.files[0], 'memory');
+});
 
 function renderPagesForm() {
     const pageConfigs = document.getElementById('pageConfigs');
@@ -130,34 +105,29 @@ function renderPagesForm() {
 
     settings.pages.forEach((page, index) => {
         const pageDiv = document.createElement('div');
-        pageDiv.className = 'page-config';
-        pageDiv.style.cssText = "border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 8px; background: #fff;";
-
+        pageDiv.style.cssText = "border:1px solid #ddd; padding:15px; margin-bottom:15px; border-radius:8px; background:#fff;";
         pageDiv.innerHTML = `
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                 <h4 style="margin: 0; color: #ff1493;">Page ${index + 1}</h4>
                 ${settings.pages.length > 1 ? `<button onclick="removePage(${index})" style="background: #ff4444; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">Remove</button>` : ''}
             </div>
-            <input type="file" id="pageFile${index}" accept="image/*" style="width: 100%; padding: 8px; margin-bottom: 5px; border: 1px solid #ddd; border-radius: 4px;">
-            <div class="image-preview-box" style="width: 100%; height: 150px; border: 2px dashed #ddd; border-radius: 8px; display: flex; justify-content: center; align-items: center; overflow: hidden; background: #f9f9f9; position: relative;">
+            <input type="file" id="pageFile${index}" accept="image/*" style="width: 100%; padding: 8px; margin-bottom: 5px;">
+            <div class="image-preview-box" id="previewBox${index}" style="width: 100%; height: 150px; border: 2px dashed #ddd; border-radius: 8px; display: flex; justify-content: center; align-items: center; overflow: hidden; background: #f9f9f9; position: relative;">
                 <div class="upload-status" id="uploadStatus${index}" style="position: absolute; background: rgba(0,0,0,0.7); color: white; padding: 5px 10px; border-radius: 4px; font-size: 12px; display: none;"></div>
-                <img id="previewImg${index}" src="${page.image || ''}" style="max-width: 100%; max-height: 100%; object-fit: cover; display: ${page.image ? 'block' : 'none'};">
-                <span id="noImg${index}" style="color:#aaa; font-size: 12px; display: ${page.image ? 'none' : 'block'};">No Image</span>
+                ${page.image ? `<img src="${page.image}" style="max-width: 100%; max-height: 100%; object-fit: cover;">` : '<span style="color:#aaa; font-size: 12px;">No Image</span>'}
             </div>
-            <textarea id="pageContent${index}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; min-height: 60px; margin-top:10px;">${page.content || ''}</textarea>
+            <textarea id="pageContent${index}" style="width: 100%; padding: 8px; margin-top: 10px; border: 1px solid #ddd; border-radius: 4px; min-height: 60px;">${page.content || ''}</textarea>
         `;
         pageConfigs.appendChild(pageDiv);
-
-        document.getElementById(`pageFile${index}`).addEventListener('change', function(e) {
-            if (e.target.files[0]) uploadImageToImgBB(e.target.files[0], `previewImg${index}`, `noImg${index}`, `uploadStatus${index}`, null, index);
+        document.getElementById(`pageFile${index}`).addEventListener('change', e => {
+            if (e.target.files[0]) uploadToImgBB(e.target.files[0], 'page', index);
         });
     });
 
     if (settings.pages.length < 18) { 
         const addBtn = document.createElement('button');
-        addBtn.textContent = '+ Add New Page';
-        addBtn.onclick = addNewPage;
-        addBtn.style.cssText = 'background: #4caf50; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; margin-top: 10px;';
+        addBtn.textContent = '+ Add New Page'; addBtn.onclick = addNewPage;
+        addBtn.style.cssText = 'background: #4caf50; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer;';
         pageConfigs.appendChild(addBtn);
     }
 }
@@ -175,58 +145,50 @@ function saveFormDataLocally() {
 if (applySettingsButton) {
     applySettingsButton.addEventListener('click', async () => {
         settings.music = document.getElementById('backgroundMusic').value;
-        settings.countdown = parseInt(document.getElementById('countdownTime').value) || 3;
-        settings.gift = document.getElementById('giftImage').value;
         settings.matrixText = document.getElementById('matrixText').value;
-        settings.matrixColor1 = document.getElementById('matrixColor1').value;
-        settings.matrixColor2 = document.getElementById('matrixColor2').value;
         settings.sequence = document.getElementById('sequenceText').value;
-        settings.sequenceColor = document.getElementById('sequenceColor').value;
+        settings.gift = document.getElementById('giftImage').value;
         
-        // 🎯 Save Sequence Order
-        settings.sequenceOrder = [
-            document.getElementById('phase1').value,
-            document.getElementById('phase2').value,
-            document.getElementById('phase3').value
+        settings.effectSequence = [
+            document.getElementById('seq1').value,
+            document.getElementById('seq2').value,
+            document.getElementById('seq3').value
         ];
 
-        settings.memoryHeading = document.getElementById('memoryHeading').value;
-        settings.memoryText = document.getElementById('memoryText').value;
-        settings.memoryBtnText = document.getElementById('memoryBtnText').value;
-        settings.memoryImage = document.getElementById('memoryImageUrl').value;
-        
+        settings.memoryCard.title = document.getElementById('mcTitle').value;
+        settings.memoryCard.message = document.getElementById('mcMessage').value;
+        settings.memoryCard.btnText = document.getElementById('mcBtnText').value;
+
         saveFormDataLocally(); 
 
         let finalSettings = JSON.parse(JSON.stringify(settings)); 
         finalSettings.pages = finalSettings.pages.filter(p => (p.image && p.image.trim() !== '') || (p.content && p.content.trim() !== ''));
-
         finalSettings.pages.unshift({ image: './image/Birthday!/cover.jpg', content: '', isCover: true });
         finalSettings.pages.push({ image: './image/Birthday!/cover.jpg', content: '', isCover: true });
 
         localStorage.setItem(userStorageKey, JSON.stringify(finalSettings));
         localStorage.setItem("birthdaySettings", JSON.stringify(finalSettings));
 
-        const magicLinkSection = document.getElementById('magicLinkSection');
         const magicLinkInput = document.getElementById('magicLinkInput');
+        document.getElementById('magicLinkSection').style.display = 'block';
         magicLinkInput.value = "Saving to Database... ⏳";
-        magicLinkSection.style.display = 'block';
-        magicLinkSection.scrollIntoView({ behavior: "smooth" });
 
-        const jsonString = JSON.stringify(finalSettings);
-        const base64Data = btoa(unescape(encodeURIComponent(jsonString)));
-        const safeUrlData = encodeURIComponent(base64Data);
-        const currentUrl = window.location.href.split('user.html')[0];
-        const longMagicLink = `${currentUrl}surprise.html?data=${safeUrlData}`;
-
-        window.handleShortUrl = function(data) {
-            if (data && data.shorturl) magicLinkInput.value = data.shorturl; 
-            else magicLinkInput.value = longMagicLink; 
-        };
-
-        const script = document.createElement('script');
-        script.src = `https://is.gd/create.php?format=json&url=${encodeURIComponent(longMagicLink)}&callback=handleShortUrl`;
-        document.body.appendChild(script);
+        try {
+            const response = await fetch("https://api.jsonbin.io/v3/b", {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "X-Master-Key": JSONBIN_API_KEY, "X-Bin-Private": "false" },
+                body: JSON.stringify(finalSettings)
+            });
+            const data = await response.json();
+            if(data.metadata && data.metadata.id) {
+                const currentUrl = window.location.href.split('user.html')[0];
+                const longLink = `${currentUrl}surprise.html?id=${data.metadata.id}`;
+                window.handleShortUrl = function(d) { magicLinkInput.value = d.shorturl || longLink; };
+                const script = document.createElement('script');
+                script.src = `https://is.gd/create.php?format=json&url=${encodeURIComponent(longLink)}&callback=handleShortUrl`;
+                document.body.appendChild(script);
+            }
+        } catch (error) { magicLinkInput.value = "Error! ❌"; }
     });
 }
-
 document.addEventListener('DOMContentLoaded', populateAdminForm);
