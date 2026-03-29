@@ -2,9 +2,9 @@
 // ⚙️ ANIMATION ENGINE (Matrix, Shapes, Dots)
 // ==========================================
 
-let matrixChars = "HAPPYBIRTHDAY".split("");
+window.matrixChars = "HAPPYBIRTHDAY".split("");
 
-function initMatrixRain() {
+window.initMatrixRain = function() {
     const matrixCanvas = document.getElementById('matrix-rain');
     if(!matrixCanvas) return;
     const matrixCtx = matrixCanvas.getContext('2d');
@@ -12,6 +12,7 @@ function initMatrixRain() {
     matrixCanvas.width = window.innerWidth * 1.2;
     matrixCanvas.height = window.innerHeight * 1.2;
 
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     const fontSize = isMobile ? 13 : 25;
     const intervalTime = isMobile ? 44 : 50; 
     const columns = Math.floor(matrixCanvas.width / fontSize);
@@ -43,7 +44,7 @@ function initMatrixRain() {
             if (!started[i] && currentTime - startTime >= delays[i]) started[i] = true;
 
             if (started[i] && drops[i] < maxLength) {
-                const text = matrixChars[Math.floor(Math.random() * matrixChars.length)];
+                const text = window.matrixChars[Math.floor(Math.random() * window.matrixChars.length)];
                 const x = i * fontSize;
                 const y = drops[i] * fontSize;
                 const color = columnColors[i];
@@ -64,13 +65,15 @@ function initMatrixRain() {
         }
     }
 
-    matrixInterval = setInterval(drawMatrixRain, intervalTime);
+    window.matrixInterval = setInterval(drawMatrixRain, intervalTime);
 
     window.addEventListener('resize', () => {
         clearTimeout(window.matrixResizeTimeout);
         window.matrixResizeTimeout = setTimeout(() => {
-            matrixCanvas.width = window.innerWidth * 1.2;
-            matrixCanvas.height = window.innerHeight * 1.2;
+            if(matrixCanvas) {
+                matrixCanvas.width = window.innerWidth * 1.2;
+                matrixCanvas.height = window.innerHeight * 1.2;
+            }
             const newColumns = Math.floor(matrixCanvas.width / fontSize);
 
             drops.length = 0;
@@ -89,12 +92,15 @@ function initMatrixRain() {
             startTime = Date.now();
         }, 100);
     });
-}
+};
 
-let S = {
+window.S = {
     initialized: false,
     init: function () {
-        if (!isLandscape && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        const isLandscape = window.innerWidth > window.innerHeight;
+        
+        if (!isLandscape && isMobile) {
             return;
         }
         
@@ -103,18 +109,18 @@ let S = {
         const sequenceText = currentSettings.sequence || 'HAPPY|BIRTHDAY|ZAHRA|❤';
         
         const sequence = `|#countdown ${countdownValue}|${sequenceText}|#gift|`;
-        S.UI.simulate(sequence);
+        window.S.UI.simulate(sequence);
 
-        S.Drawing.init('.canvas');
+        window.S.Drawing.init('.canvas');
         document.body.classList.add('body--ready');
 
-        S.Drawing.loop(function () {
-            S.Shape.render();
+        window.S.Drawing.loop(function () {
+            window.S.Shape.render();
         });
     }
 };
 
-S.Drawing = (function () {
+window.S.Drawing = (function () {
     var canvas, context, renderFn,
         requestFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.msRequestAnimationFrame || function (callback) { window.setTimeout(callback, 1000 / 60); };
 
@@ -124,7 +130,7 @@ S.Drawing = (function () {
             if(!canvas) return;
             context = canvas.getContext('2d');
             this.adjustCanvas();
-            window.addEventListener('resize', () => S.Drawing.adjustCanvas());
+            window.addEventListener('resize', () => window.S.Drawing.adjustCanvas());
         },
         loop: function (fn) {
             renderFn = !renderFn ? fn : renderFn;
@@ -156,7 +162,7 @@ S.Drawing = (function () {
     };
 }());
 
-S.UI = (function () {
+window.S.UI = (function () {
     var interval, currentAction, time, maxShapeSize = 30, sequence = [], cmd = '#';
 
     function formatTime(date) {
@@ -191,7 +197,7 @@ S.UI = (function () {
         clearInterval(interval);
         sequence = [];
         time = null;
-        destroy && S.Shape.switchShape(S.ShapeBuilder.letter(''));
+        destroy && window.S.Shape.switchShape(window.S.ShapeBuilder.letter(''));
     }
 
     function performAction(value) {
@@ -199,6 +205,7 @@ S.UI = (function () {
         sequence = typeof (value) === 'object' ? value : sequence.concat(value.split('|'));
 
         function getDynamicDelay(str) {
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
             const base = isMobile ? 1700 : 1900;
             if (!str || typeof str !== 'string') return base;
             if (str.trim().startsWith('#')) return base;
@@ -215,27 +222,28 @@ S.UI = (function () {
                 case 'countdown':
                     value = parseInt(value) || 10;
                     value = value > 0 ? value : 10;
+                    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
                     timedAction(function (index) {
                         if (index === 0) {
-                            if (sequence.length === 0) S.Shape.switchShape(S.ShapeBuilder.letter(''));
+                            if (sequence.length === 0) window.S.Shape.switchShape(window.S.ShapeBuilder.letter(''));
                             else performAction(sequence);
                         } else {
-                            S.Shape.switchShape(S.ShapeBuilder.letter(index), true);
+                            window.S.Shape.switchShape(window.S.ShapeBuilder.letter(index), true);
                         }
                     }, isMobile ? 1300 : 1400, value, true);
                     break;
                 case 'circle':
                     value = parseInt(value) || maxShapeSize;
                     value = Math.min(value, maxShapeSize);
-                    S.Shape.switchShape(S.ShapeBuilder.circle(value));
+                    window.S.Shape.switchShape(window.S.ShapeBuilder.circle(value));
                     break;
                 case 'time':
                     var t = formatTime(new Date());
-                    if (sequence.length > 0) S.Shape.switchShape(S.ShapeBuilder.letter(t));
+                    if (sequence.length > 0) window.S.Shape.switchShape(window.S.ShapeBuilder.letter(t));
                     else {
                         timedAction(function () {
                             t = formatTime(new Date());
-                            if (t !== time) { time = t; S.Shape.switchShape(S.ShapeBuilder.letter(time)); }
+                            if (t !== time) { time = t; window.S.Shape.switchShape(window.S.ShapeBuilder.letter(time)); }
                         }, 1000);
                     }
                     break;
@@ -244,8 +252,8 @@ S.UI = (function () {
                     const giftImage = document.getElementById('gift-image');
                     const matrixCanvas = document.getElementById('matrix-rain');
 
-                    showStars();
-                    showFloatingHearts();
+                    if (typeof showStars === 'function') showStars();
+                    if (typeof showFloatingHearts === 'function') showFloatingHearts();
 
                     const currentSettings = window.settings || {};
 
@@ -286,8 +294,7 @@ S.UI = (function () {
                                 if (currentSettings.enableBook) {
                                     if (canvas) canvas.style.display = 'none'; 
                                     if (matrixCanvas) matrixCanvas.style.display = 'none';
-                                    showBook();
-                                    // Book will handle the next phase when it's closed/finished
+                                    if (typeof showBook === 'function') showBook();
                                     window.onBookFinished = proceedSequence;
                                 } else proceedSequence();
                             } 
@@ -296,8 +303,7 @@ S.UI = (function () {
                                 if (currentSettings.enableHeart) {
                                     if (canvas) canvas.style.display = 'none'; 
                                     if (matrixCanvas) matrixCanvas.style.display = 'none';
-                                    startHeartEffect();
-                                    // Hearts usually finish the animation, but we can still proceed
+                                    if (typeof startHeartEffect === 'function') startHeartEffect();
                                     setTimeout(proceedSequence, 5000);
                                 } else proceedSequence();
                             }
@@ -310,11 +316,9 @@ S.UI = (function () {
                             }
                         }
 
-                        // Start the first phase
                         executePhase(phaseSequence[0]);
                     }
 
-                    // Show Gift Box First
                     if (giftImage && giftImage.src && giftImage.src !== window.location.href && giftImage.src !== '') {
                         giftImage.style.display = 'block';
                         giftImage.style.animation = 'giftCelebration 2s ease-in-out';
@@ -327,14 +331,16 @@ S.UI = (function () {
                     }
                     break;
                 default:
-                    S.Shape.switchShape(S.ShapeBuilder.letter(current[0] === cmd ? 'What?' : current));
+                    window.S.Shape.switchShape(window.S.ShapeBuilder.letter(current[0] === cmd ? 'What?' : current));
             }
         }, getDynamicDelay(sequence[0]), sequence.length);
     }
 
     return {
         simulate: function (action) {
-            if (isLandscape || !/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+            const isLandscape = window.innerWidth > window.innerHeight;
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            if (isLandscape || !isMobile) {
                 performAction(action);
             }
         },
@@ -342,32 +348,35 @@ S.UI = (function () {
     };
 }());
 
-S.Point = function (args) {
+window.S.Point = function (args) {
     this.x = args.x; this.y = args.y; this.z = args.z; this.a = args.a; this.h = args.h;
 };
-S.Color = function (r, g, b, a) {
+window.S.Color = function (r, g, b, a) {
     this.r = r; this.g = g; this.b = b; this.a = a;
 };
-S.Color.prototype = { render: function () { return 'rgba(' + this.r + ',' + this.g + ',' + this.b + ',' + this.a + ')'; } };
+window.S.Color.prototype = { render: function () { return 'rgba(' + this.r + ',' + this.g + ',' + this.b + ',' + this.a + ')'; } };
 
-S.Dot = function (x, y) {
-    this.p = new S.Point({ x: x, y: y, z: this.getDotSize(), a: 1, h: 0 });
+window.S.Dot = function (x, y) {
+    this.p = new window.S.Point({ x: x, y: y, z: this.getDotSize(), a: 1, h: 0 });
     this.e = 0.07;
     this.s = true;
     const currentSettings = window.settings || {sequenceColor: '#ff69b4'};
     const rgb = hexToRgb(currentSettings.sequenceColor);
-    this.c = new S.Color(rgb.r, rgb.g, rgb.b, this.p.a);
+    this.c = new window.S.Color(rgb.r, rgb.g, rgb.b, this.p.a);
     this.t = this.clone();
     this.q = [];
 };
-S.Dot.prototype = {
-    getDotSize: function () { return isMobile ? 2 : 4; },
-    clone: function () { return new S.Point({ x: this.x, y: this.y, z: this.z, a: this.a, h: this.h }); },
+window.S.Dot.prototype = {
+    getDotSize: function () { 
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        return isMobile ? 2 : 4; 
+    },
+    clone: function () { return new window.S.Point({ x: this.x, y: this.y, z: this.z, a: this.a, h: this.h }); },
     _draw: function () {
         const currentSettings = window.settings || {sequenceColor: '#ff69b4'};
         const rgb = hexToRgb(currentSettings.sequenceColor);
         this.c.r = rgb.r; this.c.g = rgb.g; this.c.b = rgb.b; this.c.a = this.p.a;
-        S.Drawing.drawCircle(this.p, this.c);
+        window.S.Drawing.drawCircle(this.p, this.c);
     },
     _moveTowards: function (n) {
         var details = this.distanceTo(n, true), dx = details[0], dy = details[1], d = details[2], e = this.e * d;
@@ -382,10 +391,11 @@ S.Dot.prototype = {
             if (p) { this.t.x = p.x || this.p.x; this.t.y = p.y || this.p.y; this.t.z = p.z || this.p.z; this.t.a = p.a || this.p.a; this.p.h = p.h || 0; }
             else {
                 if (this.s) {
+                    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
                     const amplitude = isMobile ? 0.1 : 3.142;
                     this.p.x -= Math.sin(Math.random() * amplitude); this.p.y -= Math.sin(Math.random() * amplitude);
                 } else {
-                    this.move(new S.Point({ x: this.p.x + (Math.random() * 50) - 25, y: this.p.y + (Math.random() * 50) - 25 }));
+                    this.move(new window.S.Point({ x: this.p.x + (Math.random() * 50) - 25, y: this.p.y + (Math.random() * 50) - 25 }));
                 }
             }
         }
@@ -404,9 +414,12 @@ S.Dot.prototype = {
     render: function () { this._update(); this._draw(); }
 };
 
-S.ShapeBuilder = (function () {
+window.S.ShapeBuilder = (function () {
     var shapeCanvas = document.createElement('canvas'), shapeContext = shapeCanvas.getContext('2d'), fontFamily = 'Avenir, Helvetica Neue, Helvetica, Arial, sans-serif';
-    function getGap() { return isMobile ? 4 : 8; }
+    function getGap() { 
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        return isMobile ? 4 : 8; 
+    }
     function fit() {
         const gap = getGap();
         shapeCanvas.width = Math.floor(window.innerWidth / gap) * gap;
@@ -418,7 +431,7 @@ S.ShapeBuilder = (function () {
         var pixels = shapeContext.getImageData(0, 0, shapeCanvas.width, shapeCanvas.height).data, dots = [], x = 0, y = 0, fx = shapeCanvas.width, fy = shapeCanvas.height, w = 0, h = 0;
         for (var p = 0; p < pixels.length; p += (4 * gap)) {
             if (pixels[p + 3] > 0) {
-                dots.push(new S.Point({ x: x, y: y }));
+                dots.push(new window.S.Point({ x: x, y: y }));
                 w = x > w ? x : w; h = y > h ? y : h; fx = x < fx ? x : fx; fy = y < fy ? y : fy;
             }
             x += gap;
@@ -439,7 +452,9 @@ S.ShapeBuilder = (function () {
             return processCanvas();
         },
         letter: function (l) {
-            var s = 0; const isSmallScreen = window.innerWidth < 768; const baseFontSize = (isMobile || isSmallScreen) ? 250 : 500;
+            var s = 0; const isSmallScreen = window.innerWidth < 768; 
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            const baseFontSize = (isMobile || isSmallScreen) ? 250 : 500;
             setFontSize(baseFontSize);
             s = Math.min(baseFontSize, (shapeCanvas.width / shapeContext.measureText(l).width) * 0.8 * baseFontSize, (shapeCanvas.height / baseFontSize) * (isNumber(l) ? 0.8 : 0.35) * baseFontSize);
             setFontSize(s);
@@ -450,6 +465,59 @@ S.ShapeBuilder = (function () {
     };
 }());
 
-S.Shape = (function () {
+window.S.Shape = (function () {
     var dots = [], width = 0, height = 0, cx = 0, cy = 0;
-    function compensate() { var a = S.Drawing.getArea(); cx = a.w /
+    function compensate() { var a = window.S.Drawing.getArea(); cx = a.w / 2 - width / 2; cy = a.h / 2 - height / 2; }
+    function getDotCreationParams() {
+        const isSmallScreen = window.innerWidth < 768;
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        if (isMobile || isSmallScreen) return { minSize: 1, maxSize: 4, minZ: 2, maxZ: 3 };
+        else return { minSize: 3, maxSize: 12, minZ: 4, maxZ: 8 };
+    }
+
+    return {
+        switchShape: function (n, fast) {
+            var size, a = window.S.Drawing.getArea();
+            width = n.w; height = n.h;
+            compensate();
+            const params = getDotCreationParams();
+
+            if (n.dots.length > dots.length) {
+                size = n.dots.length - dots.length;
+                for (var d = 1; d <= size; d++) dots.push(new window.S.Dot(a.w / 2, a.h / 2));
+            }
+
+            var d = 0, i = 0;
+            while (n.dots.length > 0) {
+                i = Math.floor(Math.random() * n.dots.length);
+                const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                dots[d].e = isMobile ? 0.35 : 0.11;
+
+                if (dots[d].s) {
+                    dots[d].move(new window.S.Point({ z: Math.random() * (params.maxSize - params.minSize) + params.minSize, a: Math.random(), h: 18 }));
+                } else {
+                    dots[d].move(new window.S.Point({ z: Math.random() * (params.minZ) + params.minZ, h: fast ? 18 : 30 }));
+                }
+
+                dots[d].s = true;
+                dots[d].move(new window.S.Point({ x: n.dots[i].x + cx, y: n.dots[i].y + cy, a: 1, z: params.minZ, h: 0 }));
+                n.dots = n.dots.slice(0, i).concat(n.dots.slice(i + 1));
+                d++;
+            }
+
+            for (var i = d; i < dots.length; i++) {
+                if (dots[i].s) {
+                    dots[i].move(new window.S.Point({ z: Math.random() * (params.maxSize - params.minSize) + params.minSize, a: Math.random(), h: 20 }));
+                    dots[i].s = false; dots[i].e = 0.04;
+                    dots[i].move(new window.S.Point({ x: Math.random() * a.w, y: Math.random() * a.h, a: 0.3, z: Math.random() * params.minZ, h: 0 }));
+                }
+            }
+        },
+        render: function () { for (var d = 0; d < dots.length; d++) dots[d].render(); }
+    };
+}());
+
+function hexToRgb(hex) {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? { r: parseInt(result[1], 16), g: parseInt(result[2], 16), b: parseInt(result[3], 16) } : { r: 211, g: 155, b: 155 };
+}
