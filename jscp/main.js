@@ -234,14 +234,14 @@ function playMatrixAnimation() {
 }
 
 window.playNextSequence = function() {
-    if (!window.effectQueue || window.effectQueue.length === 0) return;
+    if(!window.effectQueue || window.effectQueue.length === 0) return;
     
     let nextEffect = window.effectQueue.shift();
-    while (nextEffect === 'none' && window.effectQueue.length > 0) {
+    while(nextEffect === 'none' && window.effectQueue.length > 0) {
         nextEffect = window.effectQueue.shift();
     }
     
-    // সমস্ত ক্যানভাস হাইড করে নিচ্ছি (যাতে একটার উপর আরেকটা ওভারল্যাপ না হয়)
+    // সমস্ত ক্যানভাস হাইড করে নিচ্ছি
     const mcScreen = document.getElementById('memory-card-screen');
     const matrixCanvas = document.getElementById('matrix-rain');
     const mainCanvas = document.querySelector('.canvas');
@@ -262,22 +262,32 @@ window.playNextSequence = function() {
         if (mcScreen) {
             mcScreen.style.display = 'flex';
             
-            // 🎯 ফিক্স: মেমোরি কার্ড টাইপিং এনিমেশন শুরু হবে
+            // 🎯 ফিক্সড: একদম রিয়েলিস্টিক টাইপিং এনিমেশন
             const mcTitle = document.getElementById('mcDisplayTitle');
-            if (mcTitle && window.mcTitleTextToType) {
-                mcTitle.innerHTML = '';
+            const currentSettings = window.settings || {};
+            const textToType = currentSettings.memoryCard?.title || 'Hyy Baby ❤️';
+            
+            if (mcTitle) {
+                mcTitle.innerHTML = ''; // প্রথমে সব মুছে ফেলবে
+                mcTitle.style.borderRight = '2px solid #ff1493'; // টাইপিংয়ের কার্সর (|) যোগ করবে
+                mcTitle.style.display = 'inline-block'; // কার্সর যেন লেখার ঠিক পাশেই থাকে
+                
                 let i = 0;
-                function typeTitle() {
-                    if (i < window.mcTitleTextToType.length) {
-                        mcTitle.innerHTML += window.mcTitleTextToType.charAt(i);
+                function typeWriter() {
+                    if (i < textToType.length) {
+                        mcTitle.innerHTML = textToType.substring(0, i + 1);
                         i++;
-                        setTimeout(typeTitle, 150); 
+                        setTimeout(typeWriter, 150); // টাইপিংয়ের স্পিড (প্রতি অক্ষরে ১৫০ মিলি-সেকেন্ড)
                     } else {
-                        mcTitle.style.borderRight = 'none'; 
+                        // লেখা শেষ হলে কার্সরটিকে ২ সেকেন্ড ব্লিংক করতে দিবে, তারপর রিমুভ করে দিবে
+                        setTimeout(() => {
+                            mcTitle.style.borderRight = 'none';
+                        }, 2000);
                     }
                 }
-                typeTitle();
-                window.mcTitleTextToType = null; 
+                
+                // স্ক্রিন ওপেন হওয়ার আধা সেকেন্ড পর টাইপিং শুরু হবে
+                setTimeout(typeWriter, 500);
             }
         } else {
             window.playNextSequence(); 
@@ -309,7 +319,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
-
 
 S = {
     initialized: false,
