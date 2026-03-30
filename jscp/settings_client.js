@@ -1,5 +1,5 @@
 // ==========================================
-// 🎈 CLIENT SETTINGS (For surprise.html Magic Link)
+// 🎈 CLIENT SETTINGS (For surprise.html)
 // ==========================================
 
 const defaultSettings = {
@@ -11,33 +11,24 @@ const defaultSettings = {
     sequence: 'HAPPY|BIRTHDAY|ZAHRA|❤',
     sequenceColor: '#ff69b4',
     gift: '',
-    
-    // 🎯 নতুন যুক্ত হওয়া ডিফল্ট সেটিংস
-    effectSequence: ['memory', 'book', 'hearts'], 
-    memoryCard: {
-        title: 'Hyy Baby ❤️',
-        message: 'Today is your special day! Let me celebrate the incredible person you are. This is my gift to you - a little journey through our most cherished moments.',
-        image: './image/Birthday!/cover.jpg',
-        btnText: 'Open Memories ✨'
-    },
-    
+    enableBook: true,
+    enableHeart: true,
     colorTheme: 'pink',
+    effectSequence: ['memory', 'matrix', 'book', 'hearts'],
     pages: [
-        { image: './image/Birthday!/cover.jpg', content: '' }, 
+        { image: './image/Birthday!/cover.jpg', content: '', isCover: true }, 
         { image: './image/Birthday!/photo1.jpg', content: 'Dear Zahra, you bring so much joy and happiness! 💕' },
-        { image: './image/Birthday!/9.jpg', content: '' }
+        { image: './image/Birthday!/cover.jpg', content: '', isCover: true }
     ]
 };
 
-// 🪄 ম্যাজিক লিংক বা লোকাল স্টোরেজ থেকে সেটিংস লোড করা
 async function loadSettings() {
     const urlParams = new URLSearchParams(window.location.search);
-    const dbId = urlParams.get('id'); // লিংক থেকে ডাটাবেস আইডি বের করা (যেমন: ?id=65c3f...)
+    const dbId = urlParams.get('id'); 
 
     if (dbId) {
         try {
             console.log("Fetching data from Database... ⏳");
-            // JSONbin থেকে ডেটা রিড করা
             const response = await fetch(`https://api.jsonbin.io/v3/b/${dbId}`);
             const data = await response.json();
             
@@ -55,57 +46,42 @@ async function loadSettings() {
             fallbackToLocalOrDefaults();
         }
     } else {
-        // ডিরেক্ট ওপেন করলে লোকাল স্টোরেজ চেক করবে (প্রিভিউ মোড)
         fallbackToLocalOrDefaults();
     }
 }
 
-// ডাটাবেস না পেলে লোকাল স্টোরেজ বা ডিফল্ট সেটিংস লোড করা
 function fallbackToLocalOrDefaults() {
     const savedSettings = localStorage.getItem("birthdaySettings");
     if (savedSettings) {
         window.settings = JSON.parse(savedSettings);
-        console.log("✅ Local Storage Loaded (Preview Mode)");
+        console.log("✅ Local Storage Loaded (Admin Preview Mode)");
     } else {
         window.settings = defaultSettings;
-        console.log("⚠️ No DB or Local Storage found. Loading defaults.");
+        console.log("⚠️ No DB or Local Storage. Loading defaults.");
     }
     applyLoadedSettings();
 }
 
-// সেটিংস অ্যাপ্লাই করা
 function applyLoadedSettings() {
     const settings = window.settings;
     
-    // গান সেট করা
     const birthdayAudio = document.getElementById('birthdayAudio');
-    if (birthdayAudio) {
-        birthdayAudio.src = settings.music;
-    }
+    if (birthdayAudio) birthdayAudio.src = settings.music;
 
-    // গিফট ইমেজ সেট করা (যদি থাকে)
     const giftImageElement = document.getElementById('gift-image');
-    if (giftImageElement && settings.gift) {
-        giftImageElement.src = settings.gift;
-    }
+    if (giftImageElement && settings.gift) giftImageElement.src = settings.gift;
 
-    // ম্যাট্রিক্স রেইন এর টেক্সট সেট করা
-    if (typeof matrixChars !== 'undefined') {
-        matrixChars = settings.matrixText.split('');
-    }
+    if (typeof matrixChars !== 'undefined') matrixChars = settings.matrixText.split('');
 
-    // থ্রিডি বই তৈরি করা
     createPages();
 }
 
-// বইয়ের পেজ তৈরি করার ফাংশন
 function createPages() {
     const book = document.getElementById('book');
     if(!book) return;
     
     book.innerHTML = '';
     const pages = window.settings.pages || [];
-    
     if (pages.length === 0) return;
 
     const totalPhysicalPages = Math.ceil(pages.length / 2);
@@ -118,7 +94,7 @@ function createPages() {
         const frontLogicalIndex = physicalPageIndex * 2;
         const backLogicalIndex = frontLogicalIndex + 1;
 
-        // Front Page
+        // ================= Front Page =================
         const front = document.createElement('div');
         front.classList.add('page-front');
 
@@ -137,22 +113,22 @@ function createPages() {
                 front.appendChild(textDiv);
             }
             
-            if(!frontPageData.image && !frontPageData.content) {
-                front.classList.add('empty-page');
-                front.textContent = 'Empty';
+            // ছবি বা টেক্সট না থাকলে ব্যাকগ্রাউন্ড সাদা থাকবে, কোনো লেখা দেখাবে না
+            if (!frontPageData.image && !frontPageData.content) {
+                front.style.background = "#fff"; 
             }
         } else {
-            front.classList.add('empty-page');
-            front.textContent = 'Empty';
+            front.style.background = "#fff";
         }
 
-        // Back Page
+        // ================= Back Page =================
         const back = document.createElement('div');
         back.classList.add('page-back');
 
         if (backLogicalIndex < pages.length && pages[backLogicalIndex]) {
             const backPageData = pages[backLogicalIndex];
 
+            // 🎯 লজিক ফিক্স: যদি এটি একেবারে শেষ পেজ হয় এবং কভার হয়, তবে কভার ইমেজ দেখাবে
             if (backPageData.image && backPageData.image.trim() !== "") {
                 const backImg = document.createElement('img');
                 backImg.src = backPageData.image;
@@ -164,34 +140,27 @@ function createPages() {
                 textDiv.textContent = backPageData.content;
                 back.appendChild(textDiv);
             }
-            
-            if(!backPageData.image && !backPageData.content) {
-                back.classList.add('empty-page');
-                back.textContent = 'Empty';
+
+            if (!backPageData.image && !backPageData.content) {
+                back.style.background = "#fff";
             }
         } else {
-            const img = document.createElement('img');
-            img.src = './image/theend.jpg';
-            img.onerror = () => {
-                back.classList.add('empty-page');
-                back.textContent = 'The End';
-            };
-            back.appendChild(img);
+            // 🎯 লজিক ফিক্স: কোনো এক্সট্রা পেজ থাকলে শুধু সাদা ব্যাকগ্রাউন্ড দেখাবে, "The End" দেখাবে না
+            back.style.background = "#fff";
         }
 
         page.appendChild(front);
         page.appendChild(back);
         book.appendChild(page);
 
-        // ফিপিং লজিক
+        // Flipping Logic
         page.addEventListener('click', (e) => {
             if (typeof isFlipping !== 'undefined' && !isFlipping) {
                 const rect = page.getBoundingClientRect();
                 const clickX = e.clientX - rect.left;
-                const pageWidth = rect.width;
-                if (clickX < pageWidth / 2 && page.classList.contains('flipped')) {
+                if (clickX < rect.width / 2 && page.classList.contains('flipped')) {
                     if (typeof prevPage === 'function') prevPage();
-                } else if (clickX >= pageWidth / 2 && !page.classList.contains('flipped')) {
+                } else if (clickX >= rect.width / 2 && !page.classList.contains('flipped')) {
                     if (typeof nextPage === 'function') nextPage();
                 }
             }
@@ -201,29 +170,18 @@ function createPages() {
     if (typeof photoUrls !== 'undefined') {
         photoUrls = pages.filter(page => page.image && page.image.trim() !== "").map(page => page.image);
     }
-    
     if (typeof calculatePageZIndexes === 'function') calculatePageZIndexes();
 }
 
-// পেজ লোড হলে এনিমেশন শুরু করা
 document.addEventListener('DOMContentLoaded', async function () {
     const book = document.getElementById('book');
     const bookContainer = document.querySelector('.book-container');
-    if (book) {
-        book.style.display = 'none';
-        book.classList.remove('show');
-    }
-    if (bookContainer) {
-        bookContainer.style.display = 'none';
-        bookContainer.classList.remove('show');
-    }
+    if (book) { book.style.display = 'none'; book.classList.remove('show'); }
+    if (bookContainer) { bookContainer.style.display = 'none'; bookContainer.classList.remove('show'); }
 
-    // ⏳ ডেটাবেস থেকে ডেটা লোড হওয়া পর্যন্ত অপেক্ষা করবে
     await loadSettings();
-
     window.isWebsiteReady = true;
 
-    // ডেটা লোড হলে এনিমেশন রেডি করবে
     if (typeof tryStartWebsiteWhenLandscape === 'function') {
         tryStartWebsiteWhenLandscape();
     } else if (typeof startWebsite === 'function') {
