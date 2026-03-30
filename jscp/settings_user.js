@@ -16,7 +16,98 @@ const musicOptions = [
     { value: './music/zahra.mp3', label: 'Zahra Birthday Music' },
     { value: './music/happy-birthday.mp3', label: 'Happy Birthday (Miễn phí)' }
 ];
-const gifOptions = [ { value: '', label: 'None' }, { value: './gif/happy.gif', label: 'Gif1' } ];
+const sequenceOptions = [
+    { value: 'none', label: 'None (Disable)' },
+    { value: 'matrix', label: '🌧️ Matrix Rain' },
+    { value: 'memory', label: '💌 Memory Card' },
+    { value: 'book', label: '📖 3D Book' },
+    { value: 'hearts', label: '💖 Floating Hearts' }
+];
+
+const musicPreviewButton = document.getElementById('musicPreviewButton');
+const musicPreviewStatus = document.getElementById('musicPreviewStatus');
+const musicPreviewAudio = new Audio();
+let currentPreviewTrack = '';
+
+function getSelectedMusicLabel() {
+    const musicSelect = document.getElementById('backgroundMusic');
+    if (!musicSelect) return '';
+    return musicSelect.options[musicSelect.selectedIndex]?.textContent || '';
+}
+
+function stopMusicPreview(customMessage) {
+    musicPreviewAudio.pause();
+    musicPreviewAudio.currentTime = 0;
+    currentPreviewTrack = '';
+    if (musicPreviewButton) musicPreviewButton.textContent = '▶ Play';
+    if (musicPreviewStatus) musicPreviewStatus.textContent = customMessage || getSelectedMusicLabel();
+}
+
+function handleMusicPreview() {
+    const musicSelect = document.getElementById('backgroundMusic');
+    if (!musicSelect || !musicSelect.value) return;
+
+    const selectedSrc = musicSelect.value;
+    if (currentPreviewTrack === selectedSrc && !musicPreviewAudio.paused) {
+        stopMusicPreview(); return;
+    }
+
+    currentPreviewTrack = selectedSrc;
+    musicPreviewAudio.pause();
+    musicPreviewAudio.src = selectedSrc;
+    musicPreviewAudio.play().then(() => {
+        if (musicPreviewButton) musicPreviewButton.textContent = '⏸ Stop';
+        if (musicPreviewStatus) musicPreviewStatus.textContent = `Playing: ${getSelectedMusicLabel()}`;
+    }).catch(error => {
+        stopMusicPreview('Error playing preview.');
+    });
+}
+
+if (musicPreviewButton) musicPreviewButton.addEventListener('click', handleMusicPreview);
+musicPreviewAudio.addEventListener('ended', () => stopMusicPreview());
+
+// Theme Handling
+const colorThemes = {
+    pink: { matrixColor1: '#ff69b4', matrixColor2: '#ff1493', sequenceColor: '#ff69b4' },
+    blue: { matrixColor1: '#87ceeb', matrixColor2: '#4169e1', sequenceColor: '#1e90ff' },
+    purple: { matrixColor1: '#dda0dd', matrixColor2: '#9370db', sequenceColor: '#8a2be2' },
+    custom: { matrixColor1: '#ffb6c1', matrixColor2: '#ffc0cb', sequenceColor: '#d39b9b' }
+};
+
+function handleColorThemeChange(selectedTheme) {
+    const matrixColor1Input = document.getElementById('matrixColor1');
+    const matrixColor2Input = document.getElementById('matrixColor2');
+    const sequenceColorInput = document.getElementById('sequenceColor');
+    const customColorSection = document.getElementById('customColorSection');
+    const sequenceColorSection = document.getElementById('sequenceColorSection');
+    
+    settings.colorTheme = selectedTheme;
+    document.querySelectorAll('.color-theme-btn').forEach(btn => btn.classList.remove('active'));
+    
+    const activeButton = document.querySelector(`[data-theme="${selectedTheme}"]`);
+    if (activeButton) activeButton.classList.add('active');
+    
+    if (selectedTheme === 'custom') {
+        if (customColorSection) customColorSection.style.display = 'flex';
+        if (sequenceColorSection) sequenceColorSection.style.display = 'block';
+    } else {
+        if (customColorSection) customColorSection.style.display = 'none';
+        if (sequenceColorSection) sequenceColorSection.style.display = 'none';
+        
+        const theme = colorThemes[selectedTheme];
+        if (theme && matrixColor1Input && matrixColor2Input && sequenceColorInput) {
+            matrixColor1Input.value = theme.matrixColor1;
+            matrixColor2Input.value = theme.matrixColor2;
+            sequenceColorInput.value = theme.sequenceColor;
+        }
+    }
+}
+
+document.querySelectorAll('.color-theme-btn').forEach(button => {
+    button.addEventListener('click', function() {
+        handleColorThemeChange(this.getAttribute('data-theme'));
+    });
+});
 
 function loadSettingsForAdmin() {
     const savedSettings = localStorage.getItem(userStorageKey);
@@ -27,12 +118,11 @@ function loadSettingsForAdmin() {
     } else {
         settings = {
             music: './music/zahra.mp3', countdown: 3, matrixText: 'HAPPYBIRTHDAY',
-            sequence: 'HAPPY|BIRTHDAY|TO|YOU|❤', gift: '',
-            effectSequence: ['memory', 'book', 'hearts', 'matrix'], // 🎯 4 Default Sequences
-            memoryCard: {
-                title: 'Hyy Baby ❤️', message: 'Today is your special day!', image: '', btnText: 'Open Memories ✨'
-            },
-            pages: [ { image: '', content: 'Message 1...' }, { image: '', content: 'Message 2...' } ]
+            sequence: 'HAPPY|BIRTHDAY|TO|YOU|❤',
+            effectSequence: ['memory', 'matrix', 'book', 'hearts'], 
+            memoryCard: { title: 'Hyy Baby ❤️', message: 'Today is your special day!', image: '', btnText: 'Open Memories ✨' },
+            pages: [ { image: '', content: 'Message 1...' }, { image: '', content: 'Message 2...' } ],
+            colorTheme: 'pink'
         };
     }
 }
@@ -43,21 +133,18 @@ function populateAdminForm() {
     document.getElementById('backgroundMusic').innerHTML = musicOptions.map(opt => `<option value="${opt.value}">${opt.label}</option>`).join('');
     document.getElementById('backgroundMusic').value = settings.music || musicOptions[0].value;
     
-    document.getElementById('giftImage').innerHTML = gifOptions.map(opt => `<option value="${opt.value}">${opt.label}</option>`).join('');
-    document.getElementById('giftImage').value = settings.gift || '';
-
     document.getElementById('matrixText').value = settings.matrixText || 'HAPPYBIRTHDAY';
     document.getElementById('sequenceText').value = settings.sequence || 'HAPPY|BIRTHDAY';
     document.getElementById('countdownTime').value = settings.countdown || 3;
 
-    // 🎯 Populate 4 Effect Sequences
-    const defaultSeq = settings.effectSequence || ['memory', 'book', 'hearts', 'none'];
-    document.getElementById('seq1').value = defaultSeq[0] || 'none';
-    document.getElementById('seq2').value = defaultSeq[1] || 'none';
-    document.getElementById('seq3').value = defaultSeq[2] || 'none';
-    document.getElementById('seq4').value = defaultSeq[3] || 'none';
+    handleColorThemeChange(settings.colorTheme || 'pink');
 
-    // Populate Memory Card
+    const seqHtml = sequenceOptions.map(opt => `<option value="${opt.value}">${opt.label}</option>`).join('');
+    ['seq1', 'seq2', 'seq3', 'seq4'].forEach((id, i) => {
+        document.getElementById(id).innerHTML = seqHtml;
+        document.getElementById(id).value = settings.effectSequence[i] || 'none';
+    });
+
     document.getElementById('mcTitle').value = settings.memoryCard?.title || '';
     document.getElementById('mcMessage').value = settings.memoryCard?.message || '';
     document.getElementById('mcBtnText').value = settings.memoryCard?.btnText || '';
@@ -65,7 +152,7 @@ function populateAdminForm() {
         document.getElementById('mcPreviewBox').innerHTML = `<img src="${settings.memoryCard.image}" style="max-width:100%;max-height:100%;object-fit:cover;">`;
     }
 
-    renderPagesForm(); // কল করে দিলাম
+    renderPagesForm();
 }
 
 async function uploadToImgBB(file, targetKey, index = null) {
@@ -93,13 +180,10 @@ document.getElementById('mcImageFile').addEventListener('change', e => {
     if(e.target.files[0]) uploadToImgBB(e.target.files[0], 'memory');
 });
 
-// 🎯 Book Pages Rendering
 function renderPagesForm() {
     const pageConfigs = document.getElementById('pageConfigs');
     if (!pageConfigs) return;
     pageConfigs.innerHTML = '';
-
-    if(!settings.pages) settings.pages = [];
 
     settings.pages.forEach((page, index) => {
         const pageDiv = document.createElement('div');
@@ -109,12 +193,15 @@ function renderPagesForm() {
                 <h4 style="margin: 0; color: #ff1493;">Page ${index + 1}</h4>
                 ${settings.pages.length > 1 ? `<button type="button" onclick="removePage(${index})" style="background: #ff4444; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">Remove</button>` : ''}
             </div>
+            <!-- 🎯 ImgBB লেখা মুছে ফেলা হয়েছে -->
+            <label style="display: block; margin-bottom: 5px; font-weight: bold;">Upload Photo for Book Page:</label>
             <input type="file" id="pageFile${index}" accept="image/*" style="width: 100%; padding: 8px; margin-bottom: 5px;">
             <div class="image-preview-box" id="previewBox${index}" style="width: 100%; height: 150px; border: 2px dashed #ddd; border-radius: 8px; display: flex; justify-content: center; align-items: center; overflow: hidden; background: #f9f9f9; position: relative;">
                 <div class="upload-status" id="uploadStatus${index}" style="position: absolute; background: rgba(0,0,0,0.7); color: white; padding: 5px 10px; border-radius: 4px; font-size: 12px; display: none;"></div>
                 ${page.image ? `<img src="${page.image}" style="max-width: 100%; max-height: 100%; object-fit: cover;">` : '<span style="color:#aaa; font-size: 12px;">No Image</span>'}
             </div>
-            <textarea id="pageContent${index}" style="width: 100%; padding: 8px; margin-top: 10px; border: 1px solid #ddd; border-radius: 4px; min-height: 60px;" placeholder="Write a message...">${page.content || ''}</textarea>
+            <label style="display: block; margin-top: 15px; margin-bottom: 5px; font-weight: bold;">Text Content (Optional):</label>
+            <textarea id="pageContent${index}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; min-height: 60px;" placeholder="Write a message...">${page.content || ''}</textarea>
         `;
         pageConfigs.appendChild(pageDiv);
         
@@ -125,7 +212,7 @@ function renderPagesForm() {
 
     if (settings.pages.length < 18) { 
         const addBtn = document.createElement('button');
-        addBtn.type = "button"; // Prevent form submission
+        addBtn.type = "button"; 
         addBtn.textContent = '+ Add New Page'; 
         addBtn.onclick = addNewPage;
         addBtn.style.cssText = 'background: #4caf50; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer;';
@@ -143,14 +230,18 @@ function saveFormDataLocally() {
     });
 }
 
-// Save & Generate
 if (applySettingsButton) {
     applySettingsButton.addEventListener('click', async () => {
         settings.music = document.getElementById('backgroundMusic').value;
         settings.matrixText = document.getElementById('matrixText').value;
         settings.sequence = document.getElementById('sequenceText').value;
         settings.countdown = parseInt(document.getElementById('countdownTime').value) || 3;
-        settings.gift = document.getElementById('giftImage').value;
+        
+        // Color Themes
+        settings.colorTheme = document.querySelector('.color-theme-btn.active')?.getAttribute('data-theme') || 'pink';
+        settings.matrixColor1 = document.getElementById('matrixColor1').value;
+        settings.matrixColor2 = document.getElementById('matrixColor2').value;
+        settings.sequenceColor = document.getElementById('sequenceColor').value;
         
         // 🎯 4 Sequences Saved
         settings.effectSequence = [
@@ -170,7 +261,6 @@ if (applySettingsButton) {
         let finalSettings = JSON.parse(JSON.stringify(settings)); 
         finalSettings.pages = finalSettings.pages.filter(p => (p.image && p.image.trim() !== '') || (p.content && p.content.trim() !== ''));
         
-        // Auto add covers
         finalSettings.pages.unshift({ image: './image/Birthday!/cover.jpg', content: '', isCover: true });
         finalSettings.pages.push({ image: './image/Birthday!/cover.jpg', content: '', isCover: true });
 
@@ -201,13 +291,3 @@ if (applySettingsButton) {
 }
 
 document.addEventListener('DOMContentLoaded', populateAdminForm);
-
-// Music Preview Play Logic
-document.getElementById('musicPreviewButton').addEventListener('click', () => {
-    const audio = document.getElementById('backgroundMusic').value;
-    if(audio) {
-        musicPreviewAudio.src = audio;
-        musicPreviewAudio.play();
-        document.getElementById('musicPreviewStatus').textContent = "Playing...";
-    }
-});
