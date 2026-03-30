@@ -1,5 +1,5 @@
 // ==========================================
-// 🎈 CLIENT SETTINGS (For surprise.html)
+// 🎈 CLIENT SETTINGS (For surprise.html Magic Link)
 // ==========================================
 
 const defaultSettings = {
@@ -11,10 +11,14 @@ const defaultSettings = {
     sequence: 'HAPPY|BIRTHDAY|ZAHRA|❤',
     sequenceColor: '#ff69b4',
     gift: '',
-    enableBook: true,
-    enableHeart: true,
+    effectSequence: ['memory', 'matrix', 'book', 'hearts'], 
+    memoryCard: {
+        title: 'Hyy Baby ❤️',
+        message: 'Today is your special day! Let me celebrate the incredible person you are. This is my gift to you - a little journey through our most cherished moments.',
+        image: './image/Birthday!/cover.jpg',
+        btnText: 'Open Memories ✨'
+    },
     colorTheme: 'pink',
-    effectSequence: ['memory', 'matrix', 'book', 'hearts'],
     pages: [
         { image: './image/Birthday!/cover.jpg', content: '', isCover: true }, 
         { image: './image/Birthday!/photo1.jpg', content: 'Dear Zahra, you bring so much joy and happiness! 💕' },
@@ -24,7 +28,7 @@ const defaultSettings = {
 
 async function loadSettings() {
     const urlParams = new URLSearchParams(window.location.search);
-    const dbId = urlParams.get('id'); 
+    const dbId = urlParams.get('id');
 
     if (dbId) {
         try {
@@ -54,10 +58,10 @@ function fallbackToLocalOrDefaults() {
     const savedSettings = localStorage.getItem("birthdaySettings");
     if (savedSettings) {
         window.settings = JSON.parse(savedSettings);
-        console.log("✅ Local Storage Loaded (Admin Preview Mode)");
+        console.log("✅ Local Storage Loaded (Preview Mode)");
     } else {
         window.settings = defaultSettings;
-        console.log("⚠️ No DB or Local Storage. Loading defaults.");
+        console.log("⚠️ No DB or Local Storage found. Loading defaults.");
     }
     applyLoadedSettings();
 }
@@ -76,13 +80,23 @@ function applyLoadedSettings() {
     createPages();
 }
 
+// 🎯 বইয়ের পেজ তৈরি করার ফাংশন (১০০% ফিক্সড)
 function createPages() {
     const book = document.getElementById('book');
     if(!book) return;
     
     book.innerHTML = '';
     const pages = window.settings.pages || [];
+    
     if (pages.length === 0) return;
+
+    // 🎯 ফিক্স: জোড় পেজ বানানোর জন্য যদি পাতা বিজোড় হয়, তবে শেষে একটি ফাঁকা পাতা যোগ করা হবে (যাতে কভার ঠিক থাকে)
+    if (pages.length % 2 !== 0) {
+        // ব্যাক কভারের ঠিক আগে একটি ফাঁকা পাতা যোগ করা হচ্ছে
+        const backCover = pages.pop();
+        pages.push({ image: '', content: '' });
+        pages.push(backCover);
+    }
 
     const totalPhysicalPages = Math.ceil(pages.length / 2);
 
@@ -94,7 +108,9 @@ function createPages() {
         const frontLogicalIndex = physicalPageIndex * 2;
         const backLogicalIndex = frontLogicalIndex + 1;
 
-        // ================= Front Page =================
+        // =======================
+        // 📖 FRONT PAGE LOGIC
+        // =======================
         const front = document.createElement('div');
         front.classList.add('page-front');
 
@@ -113,22 +129,21 @@ function createPages() {
                 front.appendChild(textDiv);
             }
             
-            // ছবি বা টেক্সট না থাকলে ব্যাকগ্রাউন্ড সাদা থাকবে, কোনো লেখা দেখাবে না
-            if (!frontPageData.image && !frontPageData.content) {
-                front.style.background = "#fff"; 
+            // ছবি বা টেক্সট কিছুই না থাকলে ফাঁকা দেখাবে (কোনো Empty বা The End লেখা থাকবে না)
+            if(!frontPageData.image && !frontPageData.content) {
+                front.classList.add('empty-page');
             }
-        } else {
-            front.style.background = "#fff";
         }
 
-        // ================= Back Page =================
+        // =======================
+        // 📖 BACK PAGE LOGIC
+        // =======================
         const back = document.createElement('div');
         back.classList.add('page-back');
 
         if (backLogicalIndex < pages.length && pages[backLogicalIndex]) {
             const backPageData = pages[backLogicalIndex];
 
-            // 🎯 লজিক ফিক্স: যদি এটি একেবারে শেষ পেজ হয় এবং কভার হয়, তবে কভার ইমেজ দেখাবে
             if (backPageData.image && backPageData.image.trim() !== "") {
                 const backImg = document.createElement('img');
                 backImg.src = backPageData.image;
@@ -140,46 +155,53 @@ function createPages() {
                 textDiv.textContent = backPageData.content;
                 back.appendChild(textDiv);
             }
-
-            if (!backPageData.image && !backPageData.content) {
-                back.style.background = "#fff";
+            
+            if(!backPageData.image && !backPageData.content) {
+                back.classList.add('empty-page');
             }
-        } else {
-            // 🎯 লজিক ফিক্স: কোনো এক্সট্রা পেজ থাকলে শুধু সাদা ব্যাকগ্রাউন্ড দেখাবে, "The End" দেখাবে না
-            back.style.background = "#fff";
         }
 
         page.appendChild(front);
         page.appendChild(back);
         book.appendChild(page);
 
-        // Flipping Logic
+        // 🎯 ফিপিং লজিক (ক্লিক করলে পাতা উল্টাবে)
         page.addEventListener('click', (e) => {
             if (typeof isFlipping !== 'undefined' && !isFlipping) {
                 const rect = page.getBoundingClientRect();
                 const clickX = e.clientX - rect.left;
-                if (clickX < rect.width / 2 && page.classList.contains('flipped')) {
+                const pageWidth = rect.width;
+                if (clickX < pageWidth / 2 && page.classList.contains('flipped')) {
                     if (typeof prevPage === 'function') prevPage();
-                } else if (clickX >= rect.width / 2 && !page.classList.contains('flipped')) {
+                } else if (clickX >= pageWidth / 2 && !page.classList.contains('flipped')) {
                     if (typeof nextPage === 'function') nextPage();
                 }
             }
         });
     }
 
+    // 🎯 ফিক্স: হার্ট ইফেক্টের জন্য কভার ইমেজগুলো ফিল্টার করে বাদ দেওয়া হয়েছে
     if (typeof photoUrls !== 'undefined') {
-        photoUrls = pages.filter(page => page.image && page.image.trim() !== "").map(page => page.image);
+        photoUrls = pages.filter(page => !page.isCover && page.image && page.image.trim() !== "").map(page => page.image);
     }
+    
     if (typeof calculatePageZIndexes === 'function') calculatePageZIndexes();
 }
 
 document.addEventListener('DOMContentLoaded', async function () {
     const book = document.getElementById('book');
     const bookContainer = document.querySelector('.book-container');
-    if (book) { book.style.display = 'none'; book.classList.remove('show'); }
-    if (bookContainer) { bookContainer.style.display = 'none'; bookContainer.classList.remove('show'); }
+    if (book) {
+        book.style.display = 'none';
+        book.classList.remove('show');
+    }
+    if (bookContainer) {
+        bookContainer.style.display = 'none';
+        bookContainer.classList.remove('show');
+    }
 
     await loadSettings();
+
     window.isWebsiteReady = true;
 
     if (typeof tryStartWebsiteWhenLandscape === 'function') {
