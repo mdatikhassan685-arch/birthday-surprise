@@ -152,7 +152,6 @@ function populateAdminForm() {
     document.getElementById('mcGifSelect').value = settings.memoryCard?.defaultGif || './gif/anime1.gif';
 
     if(settings.memoryCard?.image && !settings.memoryCard.image.includes('.gif')) {
-        // যদি ইউজার ছবি আপলোড করে থাকে
         document.getElementById('mcPreviewBox').innerHTML = `<img src="${settings.memoryCard.image}" style="max-width:100%;max-height:100%;object-fit:cover;">`;
     }
 
