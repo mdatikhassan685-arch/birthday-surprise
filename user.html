@@ -64,52 +64,49 @@
                 <div><label>Countdown Time (seconds):</label><input type="number" id="countdownTime" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></div>
             </div>
 
-            <!-- Effect Sequence Section -->
             <div class="settings-section" style="background: #fff0f5; border: 2px dashed #ffb3c6;">
                 <h3 style="color: #d81b60;">🪄 Effect Sequence (কোনটার পর কোনটা আসবে?)</h3>
-                <p style="font-size: 13px; color: #555; margin-bottom: 15px;">Set the order of effects. Select "None" to disable an effect.</p>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                    <div>
-                        <label style="font-weight: bold; color: #d81b60;">1st Effect:</label>
-                        <select id="seq1" class="seq-select"></select>
-                    </div>
-                    <div>
-                        <label style="font-weight: bold; color: #d81b60;">2nd Effect:</label>
-                        <select id="seq2" class="seq-select"></select>
-                    </div>
-                    <div>
-                        <label style="font-weight: bold; color: #d81b60;">3rd Effect:</label>
-                        <select id="seq3" class="seq-select"></select>
-                    </div>
-                    <div>
-                        <label style="font-weight: bold; color: #d81b60;">4th Effect:</label>
-                        <select id="seq4" class="seq-select"></select>
-                    </div>
+                    <div><label style="font-weight: bold; color: #d81b60;">1st Effect:</label><select id="seq1" class="seq-select"></select></div>
+                    <div><label style="font-weight: bold; color: #d81b60;">2nd Effect:</label><select id="seq2" class="seq-select"></select></div>
+                    <div><label style="font-weight: bold; color: #d81b60;">3rd Effect:</label><select id="seq3" class="seq-select"></select></div>
+                    <div><label style="font-weight: bold; color: #d81b60;">4th Effect:</label><select id="seq4" class="seq-select"></select></div>
                 </div>
             </div>
 
-            <!-- Memory Card Settings -->
+            <!-- 🎯 Memory Card Settings (Updated with GIF) -->
             <div class="settings-section">
                 <h3>💌 Memory Card Settings</h3>
                 <div style="margin-bottom: 10px;"><label>Title (e.g., Hyy Baby ❤️):</label><input type="text" id="mcTitle" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></div>
                 <div style="margin-bottom: 10px;"><label>Message:</label><textarea id="mcMessage" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; min-height: 80px;"></textarea></div>
-                <div style="margin-bottom: 10px;"><label>Button Text:</label><input type="text" id="mcBtnText" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></div>
+                <div style="margin-bottom: 15px;"><label>Button Text:</label><input type="text" id="mcBtnText" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></div>
+                
+                <hr style="border: none; border-top: 1px dashed #ddd; margin-bottom: 15px;">
+
+                <div style="margin-bottom: 15px;">
+                    <label style="color: #ff1493; font-weight: bold;">Option 1: Choose an Anime GIF</label>
+                    <p style="font-size: 12px; color: #777;">If you don't upload a photo, this GIF will be used automatically.</p>
+                    <select id="mcGifSelect" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                        <option value="./gif/anime1.gif">Anime GIF 1</option>
+                        <option value="./gif/anime2.gif">Anime GIF 2</option>
+                        <option value="./gif/anime3.gif">Anime GIF 3</option>
+                    </select>
+                </div>
+
                 <div>
-                    <!-- ImgBB লেখা মুছে ফেলা হয়েছে -->
-                    <label>Upload Photo for Memory Card:</label>
+                    <label style="color: #4caf50; font-weight: bold;">Option 2: Upload Custom Photo</label>
+                    <p style="font-size: 12px; color: #777;">If you upload a photo, the GIF will be ignored.</p>
                     <input type="file" id="mcImageFile" accept="image/*" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
                     <div class="image-preview-box" id="mcPreviewBox">
                         <div class="upload-status" id="mcUploadStatus"></div>
-                        <span style="color:#aaa; font-size: 12px;" id="mcNoImg">No Image</span>
+                        <span style="color:#aaa; font-size: 12px;" id="mcNoImg">No Photo Uploaded</span>
                     </div>
                 </div>
             </div>
 
             <!-- Book Pages Settings -->
             <div class="settings-section" id="bookSettingsSection">
-                <h3>📖 Book Pages (Photos & Texts)</h3>
-                <!-- ImgBB লেখা মুছে ফেলা হয়েছে -->
-                <p style="font-size: 12px; color: #666; margin-bottom: 15px;">Add photos and messages to create a beautiful 3D flipping book.</p>
+                <h3>📖 Book Pages (Upload Photos)</h3>
                 <div id="pageConfigs"></div>
             </div>
 
@@ -118,37 +115,16 @@
                 <h3>🎨 Choose Color Theme</h3>
                 <div class="form-group">
                     <div class="color-theme-buttons">
-                        <button type="button" class="color-theme-btn active" data-theme="pink">
-                            <div class="color-preview pink-preview"></div>
-                            <span>Sweet Pink</span>
-                        </button>
-                        <button type="button" class="color-theme-btn" data-theme="blue">
-                            <div class="color-preview blue-preview"></div>
-                            <span>Cool Blue</span>
-                        </button>
-                        <button type="button" class="color-theme-btn" data-theme="purple">
-                            <div class="color-preview purple-preview"></div>
-                            <span>Dreamy Purple</span>
-                        </button>
-                        <button type="button" class="color-theme-btn" data-theme="custom">
-                            <div class="color-preview custom-preview"></div>
-                            <span>Custom Color</span>
-                        </button>
+                        <button type="button" class="color-theme-btn active" data-theme="pink"><div class="color-preview pink-preview"></div><span>Sweet Pink</span></button>
+                        <button type="button" class="color-theme-btn" data-theme="blue"><div class="color-preview blue-preview"></div><span>Cool Blue</span></button>
+                        <button type="button" class="color-theme-btn" data-theme="purple"><div class="color-preview purple-preview"></div><span>Dreamy Purple</span></button>
+                        <button type="button" class="color-theme-btn" data-theme="custom"><div class="color-preview custom-preview"></div><span>Custom Color</span></button>
                     </div>
                 </div>
                 <div class="form-row" id="customColorSection" style="display: none; margin-top: 15px;">
-                    <div class="form-group" style="flex: 1; margin-right: 10px;">
-                        <label>Matrix color 1:</label>
-                        <input type="color" id="matrixColor1" value="#ff69b4" style="width: 100%; height: 40px; border: none; border-radius: 5px;">
-                    </div>
-                    <div class="form-group" style="flex: 1;">
-                        <label>Matrix color 2:</label>
-                        <input type="color" id="matrixColor2" value="#ff1493" style="width: 100%; height: 40px; border: none; border-radius: 5px;">
-                    </div>
-                    <div class="form-group" id="sequenceColorSection" style="display: none; flex: 1; margin-left: 10px;">
-                        <label>Text color:</label>
-                        <input type="color" id="sequenceColor" value="#ff69b4" style="width: 100%; height: 40px; border: none; border-radius: 5px;">
-                    </div>
+                    <div class="form-group" style="flex: 1; margin-right: 10px;"><label>Matrix color 1:</label><input type="color" id="matrixColor1" value="#ff69b4" style="width: 100%; height: 40px; border: none; border-radius: 5px;"></div>
+                    <div class="form-group" style="flex: 1;"><label>Matrix color 2:</label><input type="color" id="matrixColor2" value="#ff1493" style="width: 100%; height: 40px; border: none; border-radius: 5px;"></div>
+                    <div class="form-group" id="sequenceColorSection" style="display: none; flex: 1; margin-left: 10px;"><label>Text color:</label><input type="color" id="sequenceColor" value="#ff69b4" style="width: 100%; height: 40px; border: none; border-radius: 5px;"></div>
                 </div>
             </div>
 
