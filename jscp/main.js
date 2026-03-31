@@ -1017,13 +1017,19 @@ function createHeartPhotoCentered(idx, total) {
     });
 }
 
+// ===============================================
+// 🎯 Floating Hearts Image Sequence (Fixed)
+// ===============================================
+
 function spawnHeartPhotosCentered() {
     heartPhotosCreated = 0;
+    
     const validPhotoUrls = photoUrls.filter(url => !url.includes('cover.jpg') && !url.includes('theend.jpg'));
     if(validPhotoUrls.length === 0) return; 
     
     validPhotoUrls.forEach(url => preloadPhoto(url));
     let currentIndex = 0;
+    const allPhotoElements = []; // সব ছবির লিস্ট সেভ রাখা হলো
     
     function spawnNext() {
         if (currentIndex < maxHeartPhotos) {
@@ -1049,6 +1055,9 @@ function spawnHeartPhotosCentered() {
             photo.style.transition = 'all 1.5s ease-out'; 
             document.body.appendChild(photo);
             
+            // ছবিগুলো সেভ করে রাখা হলো যাতে পরে রিমুভ করা যায়
+            allPhotoElements.push(photo); 
+            
             requestAnimationFrame(() => {
                 photo.style.opacity = '1';
                 photo.style.transform = 'translate(-50%, -50%) scale(1)';
@@ -1058,11 +1067,42 @@ function spawnHeartPhotosCentered() {
             
             currentIndex++;
             setTimeout(() => { requestAnimationFrame(spawnNext); }, 80); 
+        } else {
+            // 🎯 সব ছবি আসার পর কিছুক্ষণ স্ক্রিনে থাকবে, তারপর একটা একটা করে গায়েব হয়ে যাবে
+            setTimeout(() => removeHeartPhotos(allPhotoElements), 4000); // ৪ সেকেন্ড পর গায়েব হওয়া শুরু হবে
         }
     }
     spawnNext();
 }
 
+// 🎯 ছবিগুলো একটা একটা করে গায়েব করার ফাংশন
+function removeHeartPhotos(photoElements) {
+    let removeIndex = 0;
+    
+    function removeNext() {
+        if (removeIndex < photoElements.length) {
+            const photo = photoElements[removeIndex];
+            photo.style.transition = 'all 1s ease-in';
+            photo.style.opacity = '0'; // ধীরে ধীরে অদৃশ্য হবে
+            photo.style.transform = 'translate(-50%, -50%) scale(0)'; // ছোট হয়ে যাবে
+            
+            setTimeout(() => {
+                photo.remove(); // DOM থেকে পুরোপুরি ডিলিট করে দেওয়া
+            }, 1000);
+            
+            removeIndex++;
+            setTimeout(() => requestAnimationFrame(removeNext), 80); // যে স্পিডে এসেছিল, সেই স্পিডেই যাবে
+        } else {
+            // সব ছবি গায়েব হওয়ার পর সিকোয়েন্স ইঞ্জিনকে পরের ইফেক্ট প্লে করতে বলবে
+            setTimeout(() => {
+                window.playNextSequence();
+            }, 1000);
+        }
+    }
+    removeNext();
+}
+
+// 🎯 হার্ট ইফেক্ট স্টার্টার
 function startHeartEffect() {
     const book = document.getElementById('book');
     const bookContainer = document.querySelector('.book-container');
@@ -1076,8 +1116,8 @@ function startHeartEffect() {
         setTimeout(() => showConfetti(), 100);
         setTimeout(() => showFirework(), 200);
         setTimeout(() => {
-            spawnHeartPhotosCentered();
             showFloatingHearts();
+            spawnHeartPhotosCentered(); 
         }, 300);
     });
 }
