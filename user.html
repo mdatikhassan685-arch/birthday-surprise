@@ -74,7 +74,7 @@
                 </div>
             </div>
 
-            <!-- 🎯 Memory Card Settings (Your Requested Design) -->
+            <!-- 🎯 Memory Card Settings -->
             <div class="settings-section">
                 <h3>💌 Memory Card Settings</h3>
                 <div style="margin-bottom: 10px;"><label>Title (e.g., Hyy Baby ❤️):</label><input type="text" id="mcTitle" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></div>
@@ -83,18 +83,23 @@
                 
                 <hr style="border: none; border-top: 1px dashed #ddd; margin-bottom: 15px;">
 
-                <!-- 🎯 Upload Photo -->
+                <!-- 🎯 Upload Photo Fix -->
                 <div style="margin-bottom: 15px;">
-                    <label style="color: #4caf50; font-weight: bold;">Upload Photo:</label>
-                    <p style="font-size: 12px; color: #777;">If you upload a photo, the GIF will not be shown.</p>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                        <label style="color: #4caf50; font-weight: bold; margin: 0;">Upload Photo for Memory Card:</label>
+                        <button type="button" id="mcRemoveImgBtn" style="display: none; background: #ff4444; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 12px; cursor: pointer;">Remove Photo</button>
+                    </div>
+                    <p style="font-size: 12px; color: #777; margin-top: 0;">If you upload a photo, the GIF will not be shown.</p>
+                    
                     <input type="file" id="mcImageFile" accept="image/*" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                    
                     <div class="image-preview-box" id="mcPreviewBox">
                         <div class="upload-status" id="mcUploadStatus"></div>
                         <span style="color:#aaa; font-size: 12px;" id="mcNoImg">No Photo Uploaded</span>
                     </div>
                 </div>
 
-                <!-- 🎯 Choose GIF -->
+                <!-- Choose GIF -->
                 <div>
                     <label style="color: #ff1493; font-weight: bold;">Or Choose an Anime GIF:</label>
                     <p style="font-size: 12px; color: #777;">If you don't upload a photo, this GIF will be used automatically.</p>
