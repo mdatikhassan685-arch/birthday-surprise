@@ -74,40 +74,51 @@
                 </div>
             </div>
 
-            <!-- 🎯 Memory Card Settings -->
+            <!-- 🎯 Step 1: Memory Card Front Settings -->
             <div class="settings-section">
-                <h3>💌 Memory Card Settings</h3>
+                <h3 style="color: #ff1493;">💌 Memory Card (Front Screen)</h3>
+                <p style="font-size: 12px; color: #666; margin-bottom: 15px;">This is the first screen with floating image.</p>
                 <div style="margin-bottom: 10px;"><label>Title (e.g., Hyy Baby ❤️):</label><input type="text" id="mcTitle" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></div>
                 <div style="margin-bottom: 10px;"><label>Message:</label><textarea id="mcMessage" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; min-height: 80px;"></textarea></div>
                 <div style="margin-bottom: 15px;"><label>Button Text:</label><input type="text" id="mcBtnText" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></div>
                 
                 <hr style="border: none; border-top: 1px dashed #ddd; margin-bottom: 15px;">
 
-                <!-- 🎯 Upload Photo Fix -->
                 <div style="margin-bottom: 15px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
-                        <label style="color: #4caf50; font-weight: bold; margin: 0;">Upload Photo for Memory Card:</label>
+                        <label style="color: #4caf50; font-weight: bold; margin: 0;">Upload Photo:</label>
                         <button type="button" id="mcRemoveImgBtn" style="display: none; background: #ff4444; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 12px; cursor: pointer;">Remove Photo</button>
                     </div>
-                    <p style="font-size: 12px; color: #777; margin-top: 0;">If you upload a photo, the GIF will not be shown.</p>
-                    
                     <input type="file" id="mcImageFile" accept="image/*" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
-                    
                     <div class="image-preview-box" id="mcPreviewBox">
                         <div class="upload-status" id="mcUploadStatus"></div>
                         <span style="color:#aaa; font-size: 12px;" id="mcNoImg">No Photo Uploaded</span>
                     </div>
                 </div>
 
-                <!-- Choose GIF -->
                 <div>
                     <label style="color: #ff1493; font-weight: bold;">Or Choose an Anime GIF:</label>
-                    <p style="font-size: 12px; color: #777;">If you don't upload a photo, this GIF will be used automatically.</p>
                     <select id="mcGifSelect" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
                         <option value="./gif/anime1.gif">Anime GIF 1</option>
                         <option value="./gif/anime2.gif">Anime GIF 2</option>
                         <option value="./gif/anime3.gif">Anime GIF 3</option>
                     </select>
+                </div>
+            </div>
+
+            <!-- 🎯 Step 2: Inner Memory Collage (6 Photos) -->
+            <div class="settings-section" style="background: #fffafa; border: 2px dashed #ff69b4;">
+                <h3 style="color: #ff1493;">🖼️ Inner Memory (6 Photos Collage)</h3>
+                <p style="font-size: 12px; color: #666; margin-bottom: 15px;">This screen opens when user clicks the button on the front screen.</p>
+                
+                <div style="margin-bottom: 10px;"><label>Inner Title (e.g., Birthday Memories):</label><input type="text" id="innerMcTitle" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></div>
+                <div style="margin-bottom: 10px;"><label>Inner Message:</label><textarea id="innerMcMessage" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; min-height: 80px;"></textarea></div>
+                <div style="margin-bottom: 15px;"><label>Final Button Text (e.g., Read My Heart):</label><input type="text" id="innerMcBtnText" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></div>
+
+                <hr style="border: none; border-top: 1px dashed #ffb3c6; margin-bottom: 15px;">
+                <label style="font-weight: bold; color: #ff1493;">Upload 6 Photos for Collage:</label>
+                <div id="innerPhotosGrid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
+                    <!-- JS will populate 6 boxes here -->
                 </div>
             </div>
 
