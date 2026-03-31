@@ -145,7 +145,7 @@ function populateAdminForm() {
         document.getElementById(id).value = settings.effectSequence[i] || 'none';
     });
 
-    // 🎯 Populate Memory Card Settings
+    // Populate Memory Card Settings
     document.getElementById('mcTitle').value = settings.memoryCard?.title || '';
     document.getElementById('mcMessage').value = settings.memoryCard?.message || '';
     document.getElementById('mcBtnText').value = settings.memoryCard?.btnText || '';
@@ -153,6 +153,9 @@ function populateAdminForm() {
 
     if(settings.memoryCard?.image && !settings.memoryCard.image.includes('.gif')) {
         document.getElementById('mcPreviewBox').innerHTML = `<img src="${settings.memoryCard.image}" style="max-width:100%;max-height:100%;object-fit:cover;">`;
+        document.getElementById('mcRemoveImgBtn').style.display = 'block'; // 🎯 Show remove button
+    } else {
+        document.getElementById('mcRemoveImgBtn').style.display = 'none'; // 🎯 Hide remove button
     }
 
     renderPagesForm();
@@ -161,6 +164,7 @@ function populateAdminForm() {
 async function uploadToImgBB(file, targetKey, index = null) {
     const statusText = index !== null ? document.getElementById(`uploadStatus${index}`) : document.getElementById('mcUploadStatus');
     const previewBox = index !== null ? document.getElementById(`previewBox${index}`) : document.getElementById('mcPreviewBox');
+    const removeBtn = targetKey === 'memory' ? document.getElementById('mcRemoveImgBtn') : null;
     
     statusText.style.display = 'block'; statusText.textContent = 'Uploading... ⏳';
     const formData = new FormData(); formData.append('image', file);
@@ -169,8 +173,12 @@ async function uploadToImgBB(file, targetKey, index = null) {
         const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: 'POST', body: formData });
         const data = await response.json();
         if (data.success) {
-            if(targetKey === 'memory') settings.memoryCard.image = data.data.url;
-            else settings.pages[index].image = data.data.url;
+            if(targetKey === 'memory') {
+                settings.memoryCard.image = data.data.url;
+                if(removeBtn) removeBtn.style.display = 'block'; // 🎯 Show remove button on success
+            } else {
+                settings.pages[index].image = data.data.url;
+            }
             
             statusText.textContent = 'Success! ✅';
             setTimeout(() => statusText.style.display = 'none', 2000);
@@ -178,6 +186,14 @@ async function uploadToImgBB(file, targetKey, index = null) {
         }
     } catch (error) { statusText.textContent = 'Error! ❌'; }
 }
+
+// 🎯 Remove Memory Card Photo Event
+document.getElementById('mcRemoveImgBtn').addEventListener('click', () => {
+    settings.memoryCard.image = ''; // ক্লিয়ার করে দেওয়া হলো
+    document.getElementById('mcImageFile').value = ''; // ইনপুট বক্স ক্লিয়ার
+    document.getElementById('mcPreviewBox').innerHTML = '<span style="color:#aaa; font-size: 12px;" id="mcNoImg">No Photo Uploaded</span>';
+    document.getElementById('mcRemoveImgBtn').style.display = 'none'; // বাটন হাইড
+});
 
 document.getElementById('mcImageFile').addEventListener('change', e => {
     if(e.target.files[0]) uploadToImgBB(e.target.files[0], 'memory');
@@ -196,9 +212,15 @@ function renderPagesForm() {
         pageDiv.innerHTML = `
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                 <h4 style="margin: 0; color: #ff1493;">Page ${index + 1}</h4>
-                ${settings.pages.length > 1 ? `<button type="button" onclick="removePage(${index})" style="background: #ff4444; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">Remove</button>` : ''}
+                ${settings.pages.length > 1 ? `<button type="button" onclick="removePage(${index})" style="background: #ff4444; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">Remove Page</button>` : ''}
             </div>
-            <label style="display: block; margin-bottom: 5px; font-weight: bold;">Upload Photo for Book Page:</label>
+            
+            <!-- 🎯 Page Upload with Remove Image Feature -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                <label style="font-weight: bold; margin: 0;">Upload Photo for Book Page:</label>
+                <button type="button" id="pageRemoveBtn${index}" style="display: ${page.image ? 'block' : 'none'}; background: #ff4444; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 12px; cursor: pointer;">Remove Photo</button>
+            </div>
+            
             <input type="file" id="pageFile${index}" accept="image/*" style="width: 100%; padding: 8px; margin-bottom: 5px;">
             <div class="image-preview-box" id="previewBox${index}" style="width: 100%; height: 150px; border: 2px dashed #ddd; border-radius: 8px; display: flex; justify-content: center; align-items: center; overflow: hidden; background: #f9f9f9; position: relative;">
                 <div class="upload-status" id="uploadStatus${index}" style="position: absolute; background: rgba(0,0,0,0.7); color: white; padding: 5px 10px; border-radius: 4px; font-size: 12px; display: none;"></div>
@@ -209,8 +231,20 @@ function renderPagesForm() {
         `;
         pageConfigs.appendChild(pageDiv);
         
+        // 🎯 Remove Page Image Event
+        document.getElementById(`pageRemoveBtn${index}`).addEventListener('click', () => {
+            settings.pages[index].image = '';
+            document.getElementById(`pageFile${index}`).value = '';
+            document.getElementById(`previewBox${index}`).innerHTML = '<span style="color:#aaa; font-size: 12px;">No Image</span>';
+            document.getElementById(`pageRemoveBtn${index}`).style.display = 'none';
+        });
+
         document.getElementById(`pageFile${index}`).addEventListener('change', e => {
-            if (e.target.files[0]) uploadToImgBB(e.target.files[0], 'page', index);
+            if (e.target.files[0]) {
+                uploadToImgBB(e.target.files[0], 'page', index).then(() => {
+                    document.getElementById(`pageRemoveBtn${index}`).style.display = 'block';
+                });
+            }
         });
     });
 
@@ -259,7 +293,6 @@ if (applySettingsButton) {
         settings.memoryCard.btnText = document.getElementById('mcBtnText').value;
         settings.memoryCard.defaultGif = document.getElementById('mcGifSelect').value;
 
-        // 🎯 লজিক: ইউজার ছবি আপলোড না করলে জিফ দেখাবে
         if (!settings.memoryCard.image || settings.memoryCard.image === '') {
             settings.memoryCard.finalImageToShow = settings.memoryCard.defaultGif;
         } else {
