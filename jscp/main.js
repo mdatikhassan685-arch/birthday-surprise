@@ -205,30 +205,159 @@ function playMatrixAnimation() {
     const currentSettings = window.settings || {};
     const matrixCanvas = document.getElementById('matrix-rain');
     const mainCanvas = document.querySelector('.canvas');
-    
-    if (matrixCanvas) matrixCanvas.style.display = 'block';
-    if (mainCanvas) mainCanvas.style.display = 'block';
+    if(matrixCanvas) matrixCanvas.style.display = 'block';
+    if(mainCanvas) mainCanvas.style.display = 'block';
 
-    if (!matrixInterval) {
-        initMatrixRain();
-    }
-    
-    if (typeof S !== 'undefined' && S.UI) {
-        S.UI.reset(true);
-    }
+    if (!matrixInterval) initMatrixRain();
+    if (typeof S !== 'undefined' && S.UI) S.UI.reset(true);
     
     const countdownValue = currentSettings.countdown || 3;
     const sequenceText = currentSettings.sequence || 'HAPPY|BIRTHDAY|ZAHRA|❤';
-    
     const sequence = `|#countdown ${countdownValue}|${sequenceText}|#next|`;
     
     S.UI.simulate(sequence);
     S.Drawing.init('.canvas');
     document.body.classList.add('body--ready');
-    S.Drawing.loop(function () {
-        S.Shape.render();
-    });
+    S.Drawing.loop(function () { S.Shape.render(); });
 }
+
+window.playNextSequence = function() {
+    if(!window.effectQueue || window.effectQueue.length === 0) return;
+    
+    let nextEffect = window.effectQueue.shift();
+    while(nextEffect === 'none' && window.effectQueue.length > 0) {
+        nextEffect = window.effectQueue.shift();
+    }
+    
+    const mcScreen = document.getElementById('memory-card-screen');
+    const innerMcScreen = document.getElementById('inner-memory-screen');
+    const matrixCanvas = document.getElementById('matrix-rain');
+    const mainCanvas = document.querySelector('.canvas');
+    const bookContainer = document.querySelector('.book-container');
+    const contentDisplay = document.getElementById('contentDisplay');
+
+    if (mcScreen) mcScreen.style.display = 'none';
+    if (innerMcScreen) innerMcScreen.style.display = 'none';
+    if (matrixCanvas) matrixCanvas.style.display = 'none';
+    if (mainCanvas) mainCanvas.style.display = 'none';
+    if (bookContainer) { bookContainer.style.display = 'none'; bookContainer.classList.remove('show'); }
+    if (contentDisplay) contentDisplay.classList.remove('show');
+
+    if (nextEffect === 'memory') {
+        if (mcScreen) {
+            mcScreen.style.display = 'flex';
+            
+            const mcTitle = document.getElementById('mcDisplayTitle');
+            const currentSettings = window.settings || {};
+            const textToType = currentSettings.memoryCard?.title || 'Hyy Baby ❤️';
+            
+            if (mcTitle) {
+                mcTitle.innerHTML = ''; 
+                mcTitle.style.borderRight = '2px solid #ff1493'; 
+                mcTitle.style.display = 'inline-block'; 
+                
+                let i = 0;
+                function typeWriter() {
+                    if (i < textToType.length) {
+                        mcTitle.innerHTML = textToType.substring(0, i + 1);
+                        i++;
+                        setTimeout(typeWriter, 150); 
+                    } else {
+                        setTimeout(() => { mcTitle.style.borderRight = 'none'; }, 2000);
+                    }
+                }
+                setTimeout(typeWriter, 500);
+            }
+        } else {
+            window.playNextSequence(); 
+        }
+    } 
+    else if (nextEffect === 'matrix') { playMatrixAnimation(); }
+    else if (nextEffect === 'book') { showBook(); } 
+    else if (nextEffect === 'hearts') {
+        startHeartEffect();
+        setTimeout(() => { window.playNextSequence(); }, 6000); 
+    } else {
+        window.playNextSequence();
+    }
+}
+
+// 🎯 Button Click Logic (Front -> Inner -> Sequence)
+document.addEventListener('DOMContentLoaded', () => {
+    const mcBtn = document.getElementById('mcDisplayBtn');
+    const inBtn = document.getElementById('inDisplayBtn');
+    const mcScreen = document.getElementById('memory-card-screen');
+    const innerMcScreen = document.getElementById('inner-memory-screen');
+
+    // Front Card Button Click
+    if(mcBtn) {
+        mcBtn.addEventListener('click', () => {
+            mcScreen.style.display = 'none';
+            // Show inner screen
+            if(innerMcScreen) innerMcScreen.style.display = 'flex';
+        });
+    }
+
+    // Inner Card Button Click
+    if(inBtn) {
+        inBtn.addEventListener('click', () => {
+            innerMcScreen.style.display = 'none';
+            // Start the next actual animation (Matrix, Book, etc.)
+            window.playNextSequence(); 
+        });
+    }
+});
+
+S = {
+    initialized: false,
+    init: function () {
+        const currentSettings = window.settings || {};
+        window.effectQueue = currentSettings.effectSequence ? [...currentSettings.effectSequence] : ['memory', 'matrix', 'book', 'hearts'];
+
+        // Load Front Card Data
+        if (currentSettings.memoryCard) {
+            const mcTitle = document.getElementById('mcDisplayTitle');
+            const mcMsg = document.getElementById('mcDisplayMsg');
+            const mcBtn = document.getElementById('mcDisplayBtn');
+            const mcImg = document.getElementById('mcDisplayImg');
+            
+            if (mcTitle) window.mcTitleTextToType = currentSettings.memoryCard.title || 'Hyy Baby ❤️';
+            if (mcMsg) mcMsg.textContent = currentSettings.memoryCard.message || '';
+            if (mcBtn) mcBtn.textContent = currentSettings.memoryCard.btnText || 'Open Memories ✨';
+            
+            if (mcImg) {
+                if (currentSettings.memoryCard.finalImageToShow && currentSettings.memoryCard.finalImageToShow.trim() !== '') {
+                    mcImg.src = currentSettings.memoryCard.finalImageToShow;
+                    mcImg.style.display = 'block';
+                } else { mcImg.style.display = 'none'; }
+            }
+        }
+
+        // 🎯 Load Inner Card Data (6 Photos & Text)
+        if (currentSettings.innerMemory) {
+            const inTitle = document.getElementById('inDisplayTitle');
+            const inMsg = document.getElementById('inDisplayMsg');
+            const inBtn = document.getElementById('inDisplayBtn');
+            const inPhotoGrid = document.getElementById('innerPhotoGrid');
+
+            if (inTitle) inTitle.textContent = currentSettings.innerMemory.title || '';
+            if (inMsg) inMsg.textContent = currentSettings.innerMemory.message || '';
+            if (inBtn) inBtn.textContent = currentSettings.innerMemory.btnText || '';
+
+            if (inPhotoGrid && currentSettings.innerMemory.photos) {
+                inPhotoGrid.innerHTML = '';
+                currentSettings.innerMemory.photos.forEach(url => {
+                    if (url && url.trim() !== '') {
+                        const polaroid = document.createElement('div');
+                        polaroid.className = 'polaroid';
+                        polaroid.innerHTML = `<img src="${url}" alt="Memory">`;
+                        inPhotoGrid.appendChild(polaroid);
+                    }
+                });
+            }
+        }
+    }
+};
 
 // 🎯 Sequence Engine Controller
 window.playNextSequence = function() {
