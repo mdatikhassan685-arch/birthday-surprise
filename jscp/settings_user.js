@@ -120,7 +120,7 @@ function loadSettingsForAdmin() {
             music: './music/zahra.mp3', countdown: 3, matrixText: 'HAPPYBIRTHDAY',
             sequence: 'HAPPY|BIRTHDAY|TO|YOU|❤',
             effectSequence: ['memory', 'matrix', 'book', 'hearts'], 
-            memoryCard: { title: 'Hyy Baby ❤️', message: 'Today is your special day!', image: '', btnText: 'Open Memories ✨' },
+            memoryCard: { title: 'Hyy Baby ❤️', message: 'Today is your special day!', image: '', defaultGif: './gif/anime1.gif', btnText: 'Open Memories ✨' },
             pages: [ { image: '', content: 'Message 1...' }, { image: '', content: 'Message 2...' } ],
             colorTheme: 'pink'
         };
@@ -145,10 +145,14 @@ function populateAdminForm() {
         document.getElementById(id).value = settings.effectSequence[i] || 'none';
     });
 
+    // 🎯 Populate Memory Card Settings
     document.getElementById('mcTitle').value = settings.memoryCard?.title || '';
     document.getElementById('mcMessage').value = settings.memoryCard?.message || '';
     document.getElementById('mcBtnText').value = settings.memoryCard?.btnText || '';
-    if(settings.memoryCard?.image) {
+    document.getElementById('mcGifSelect').value = settings.memoryCard?.defaultGif || './gif/anime1.gif';
+
+    if(settings.memoryCard?.image && !settings.memoryCard.image.includes('.gif')) {
+        // যদি ইউজার ছবি আপলোড করে থাকে
         document.getElementById('mcPreviewBox').innerHTML = `<img src="${settings.memoryCard.image}" style="max-width:100%;max-height:100%;object-fit:cover;">`;
     }
 
@@ -185,6 +189,8 @@ function renderPagesForm() {
     if (!pageConfigs) return;
     pageConfigs.innerHTML = '';
 
+    if(!settings.pages) settings.pages = [];
+
     settings.pages.forEach((page, index) => {
         const pageDiv = document.createElement('div');
         pageDiv.style.cssText = "border:1px solid #ddd; padding:15px; margin-bottom:15px; border-radius:8px; background:#fff;";
@@ -193,7 +199,6 @@ function renderPagesForm() {
                 <h4 style="margin: 0; color: #ff1493;">Page ${index + 1}</h4>
                 ${settings.pages.length > 1 ? `<button type="button" onclick="removePage(${index})" style="background: #ff4444; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">Remove</button>` : ''}
             </div>
-            <!-- 🎯 ImgBB লেখা মুছে ফেলা হয়েছে -->
             <label style="display: block; margin-bottom: 5px; font-weight: bold;">Upload Photo for Book Page:</label>
             <input type="file" id="pageFile${index}" accept="image/*" style="width: 100%; padding: 8px; margin-bottom: 5px;">
             <div class="image-preview-box" id="previewBox${index}" style="width: 100%; height: 150px; border: 2px dashed #ddd; border-radius: 8px; display: flex; justify-content: center; align-items: center; overflow: hidden; background: #f9f9f9; position: relative;">
@@ -201,7 +206,7 @@ function renderPagesForm() {
                 ${page.image ? `<img src="${page.image}" style="max-width: 100%; max-height: 100%; object-fit: cover;">` : '<span style="color:#aaa; font-size: 12px;">No Image</span>'}
             </div>
             <label style="display: block; margin-top: 15px; margin-bottom: 5px; font-weight: bold;">Text Content (Optional):</label>
-            <textarea id="pageContent${index}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; min-height: 60px;" placeholder="Write a message...">${page.content || ''}</textarea>
+            <textarea id="pageContent${index}" style="width: 100%; padding: 8px; margin-top: 10px; border: 1px solid #ddd; border-radius: 4px; min-height: 60px;" placeholder="Write a message...">${page.content || ''}</textarea>
         `;
         pageConfigs.appendChild(pageDiv);
         
@@ -237,13 +242,11 @@ if (applySettingsButton) {
         settings.sequence = document.getElementById('sequenceText').value;
         settings.countdown = parseInt(document.getElementById('countdownTime').value) || 3;
         
-        // Color Themes
         settings.colorTheme = document.querySelector('.color-theme-btn.active')?.getAttribute('data-theme') || 'pink';
         settings.matrixColor1 = document.getElementById('matrixColor1').value;
         settings.matrixColor2 = document.getElementById('matrixColor2').value;
         settings.sequenceColor = document.getElementById('sequenceColor').value;
         
-        // 🎯 4 Sequences Saved
         settings.effectSequence = [
             document.getElementById('seq1').value,
             document.getElementById('seq2').value,
@@ -255,6 +258,14 @@ if (applySettingsButton) {
         settings.memoryCard.title = document.getElementById('mcTitle').value;
         settings.memoryCard.message = document.getElementById('mcMessage').value;
         settings.memoryCard.btnText = document.getElementById('mcBtnText').value;
+        settings.memoryCard.defaultGif = document.getElementById('mcGifSelect').value;
+
+        // 🎯 লজিক: ইউজার ছবি আপলোড না করলে জিফ দেখাবে
+        if (!settings.memoryCard.image || settings.memoryCard.image === '') {
+            settings.memoryCard.finalImageToShow = settings.memoryCard.defaultGif;
+        } else {
+            settings.memoryCard.finalImageToShow = settings.memoryCard.image;
+        }
 
         saveFormDataLocally(); 
 
