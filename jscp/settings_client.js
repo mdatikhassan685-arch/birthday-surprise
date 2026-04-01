@@ -12,12 +12,23 @@ const defaultSettings = {
     sequenceColor: '#ff69b4',
     gift: '',
     effectSequence: ['memory', 'matrix', 'book', 'hearts'], 
+    
+    // Front Memory Card
     memoryCard: {
         title: 'Hyy Baby ❤️',
-        message: 'Today is your special day! Let me celebrate the incredible person you are. This is my gift to you - a little journey through our most cherished moments.',
+        message: 'Today is your special day! Let me celebrate the incredible person you are.',
         image: './image/Birthday!/cover.jpg',
         btnText: 'Open Memories ✨'
     },
+    
+    // Inner Memory Card (6 Photos)
+    innerMemory: {
+        title: 'Birthday Memories',
+        message: 'These are the moments that make you the most beautiful person to me.',
+        btnText: 'Read My Heart 💌',
+        photos: ['', '', '', '', '', '']
+    },
+
     colorTheme: 'pink',
     pages: [
         { image: './image/Birthday!/cover.jpg', content: '', isCover: true }, 
@@ -78,9 +89,47 @@ function applyLoadedSettings() {
     if (typeof matrixChars !== 'undefined') matrixChars = settings.matrixText.split('');
 
     createPages();
+    createInnerMemoryScreen();
 }
 
-// 🎯 বইয়ের পেজ তৈরি করার ফাংশন (১০০% ফিক্সড)
+// 🎯 নতুন: ৬ ছবির কোলাজ স্ক্রিন তৈরি করার ফাংশন
+function createInnerMemoryScreen() {
+    const currentSettings = window.settings || {};
+    
+    if (currentSettings.innerMemory) {
+        const inTitle = document.getElementById('inDisplayTitle');
+        const inMsg = document.getElementById('inDisplayMsg');
+        const inBtn = document.getElementById('inDisplayBtn');
+        const inPhotoGrid = document.getElementById('innerPhotoGrid');
+
+        if (inTitle) inTitle.textContent = currentSettings.innerMemory.title || '';
+        if (inMsg) inMsg.textContent = currentSettings.innerMemory.message || '';
+        if (inBtn) inBtn.textContent = currentSettings.innerMemory.btnText || '';
+
+        if (inPhotoGrid && currentSettings.innerMemory.photos) {
+            inPhotoGrid.innerHTML = '';
+            
+            currentSettings.innerMemory.photos.forEach((url, index) => {
+                if (url && url.trim() !== '') {
+                    const polaroid = document.createElement('div');
+                    polaroid.className = 'polaroid';
+                    
+                    // 🎯 ফিক্স: মোবাইলের টাচ এনিমেশন যেন সুন্দরভাবে কাজ করে তার জন্য ontouchstart যোগ করা হলো
+                    polaroid.setAttribute('ontouchstart', ''); 
+                    
+                    // জোড় ছবি ডানে বাঁকবে, বিজোড় বামে
+                    const rotation = index % 2 === 0 ? '3deg' : '-3deg';
+                    polaroid.style.transform = `rotate(${rotation})`;
+                    
+                    polaroid.innerHTML = `<img src="${url}" alt="Memory">`;
+                    inPhotoGrid.appendChild(polaroid);
+                }
+            });
+        }
+    }
+}
+
+// বইয়ের পেজ তৈরি করার ফাংশন
 function createPages() {
     const book = document.getElementById('book');
     if(!book) return;
@@ -90,9 +139,7 @@ function createPages() {
     
     if (pages.length === 0) return;
 
-    // 🎯 ফিক্স: জোড় পেজ বানানোর জন্য যদি পাতা বিজোড় হয়, তবে শেষে একটি ফাঁকা পাতা যোগ করা হবে (যাতে কভার ঠিক থাকে)
     if (pages.length % 2 !== 0) {
-        // ব্যাক কভারের ঠিক আগে একটি ফাঁকা পাতা যোগ করা হচ্ছে
         const backCover = pages.pop();
         pages.push({ image: '', content: '' });
         pages.push(backCover);
@@ -108,9 +155,7 @@ function createPages() {
         const frontLogicalIndex = physicalPageIndex * 2;
         const backLogicalIndex = frontLogicalIndex + 1;
 
-        // =======================
-        // 📖 FRONT PAGE LOGIC
-        // =======================
+        // Front Page
         const front = document.createElement('div');
         front.classList.add('page-front');
 
@@ -129,15 +174,12 @@ function createPages() {
                 front.appendChild(textDiv);
             }
             
-            // ছবি বা টেক্সট কিছুই না থাকলে ফাঁকা দেখাবে (কোনো Empty বা The End লেখা থাকবে না)
             if(!frontPageData.image && !frontPageData.content) {
                 front.classList.add('empty-page');
             }
         }
 
-        // =======================
-        // 📖 BACK PAGE LOGIC
-        // =======================
+        // Back Page
         const back = document.createElement('div');
         back.classList.add('page-back');
 
@@ -165,7 +207,6 @@ function createPages() {
         page.appendChild(back);
         book.appendChild(page);
 
-        // 🎯 ফিপিং লজিক (ক্লিক করলে পাতা উল্টাবে)
         page.addEventListener('click', (e) => {
             if (typeof isFlipping !== 'undefined' && !isFlipping) {
                 const rect = page.getBoundingClientRect();
@@ -180,7 +221,6 @@ function createPages() {
         });
     }
 
-    // 🎯 ফিক্স: হার্ট ইফেক্টের জন্য কভার ইমেজগুলো ফিল্টার করে বাদ দেওয়া হয়েছে
     if (typeof photoUrls !== 'undefined') {
         photoUrls = pages.filter(page => !page.isCover && page.image && page.image.trim() !== "").map(page => page.image);
     }
