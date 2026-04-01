@@ -230,7 +230,6 @@ function playMatrixAnimation() {
     });
 }
 
-// 🎯 Sequence Engine Controller
 window.playNextSequence = function() {
     if (!window.effectQueue || window.effectQueue.length === 0) return;
     
@@ -241,7 +240,9 @@ window.playNextSequence = function() {
     
     const mcScreen = document.getElementById('memory-card-screen');
     const innerMcScreen = document.getElementById('inner-memory-screen');
-    const noteScreen = document.getElementById('love-note-screen'); // 🎯 3rd Screen
+    const noteScreen = document.getElementById('love-note-screen');
+    const mysteryScreen = document.getElementById('mystery-cards-screen');
+    
     const matrixCanvas = document.getElementById('matrix-rain');
     const mainCanvas = document.querySelector('.canvas');
     const bookContainer = document.querySelector('.book-container');
@@ -251,6 +252,8 @@ window.playNextSequence = function() {
     if (mcScreen) mcScreen.style.display = 'none';
     if (innerMcScreen) innerMcScreen.style.display = 'none';
     if (noteScreen) noteScreen.style.display = 'none';
+    if (mysteryScreen) mysteryScreen.style.display = 'none';
+    
     if (matrixCanvas) matrixCanvas.style.display = 'none';
     if (mainCanvas) mainCanvas.style.display = 'none';
     if (bookContainer) {
@@ -304,21 +307,27 @@ window.playNextSequence = function() {
     }
 }
 
-// 🎯 Button Click Logic (Front -> Inner -> Love Note -> Sequence)
+// 🎯 Button Click Chain (Screen 1 -> 2 -> 3 -> 4 -> Main Animation)
 document.addEventListener('DOMContentLoaded', () => {
     const mcBtn = document.getElementById('mcDisplayBtn');
     const inBtn = document.getElementById('inDisplayBtn');
-    const noteBtn = document.getElementById('noteDisplayBtn'); 
+    const noteBtn = document.getElementById('noteDisplayBtn');
+    const mysteryNextBtn = document.getElementById('mysteryNextBtn');
 
     const mcScreen = document.getElementById('memory-card-screen');
     const innerMcScreen = document.getElementById('inner-memory-screen');
     const noteScreen = document.getElementById('love-note-screen');
+    const mysteryScreen = document.getElementById('mystery-cards-screen');
 
     // 1st Screen -> 2nd Screen
     if (mcBtn) {
         mcBtn.addEventListener('click', () => {
             if (mcScreen) mcScreen.style.display = 'none';
-            if (innerMcScreen) innerMcScreen.style.display = 'flex';
+            if (innerMcScreen) {
+                innerMcScreen.style.display = 'flex';
+                // 🎯 Initialize polaroid interactions when screen opens
+                if(typeof setupPolaroidInteractions === 'function') setupPolaroidInteractions();
+            }
         });
     }
 
@@ -330,10 +339,18 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 3rd Screen -> Main Sequence
+    // 3rd Screen -> 4th Screen (Mystery Cards Game)
     if (noteBtn) {
         noteBtn.addEventListener('click', () => {
             if (noteScreen) noteScreen.style.display = 'none';
+            if (mysteryScreen) mysteryScreen.style.display = 'flex'; 
+        });
+    }
+
+    // 4th Screen -> Main Sequence Engine
+    if (mysteryNextBtn) {
+        mysteryNextBtn.addEventListener('click', () => {
+            if (mysteryScreen) mysteryScreen.style.display = 'none';
             window.playNextSequence(); 
         });
     }
@@ -373,25 +390,10 @@ S = {
             const inTitle = document.getElementById('inDisplayTitle');
             const inMsg = document.getElementById('inDisplayMsg');
             const inBtn = document.getElementById('inDisplayBtn');
-            const inPhotoGrid = document.getElementById('innerPhotoGrid');
-
+            
             if (inTitle) inTitle.textContent = currentSettings.innerMemory.title || '';
             if (inMsg) inMsg.textContent = currentSettings.innerMemory.message || '';
             if (inBtn) inBtn.textContent = currentSettings.innerMemory.btnText || '';
-
-            if (inPhotoGrid && currentSettings.innerMemory.photos) {
-                inPhotoGrid.innerHTML = '';
-                currentSettings.innerMemory.photos.forEach((url, index) => {
-                    if (url && url.trim() !== '') {
-                        const polaroid = document.createElement('div');
-                        polaroid.className = 'polaroid';
-                        const rotation = index % 2 === 0 ? '3deg' : '-3deg';
-                        polaroid.style.transform = `rotate(${rotation})`;
-                        polaroid.innerHTML = `<img src="${url}" alt="Memory">`;
-                        inPhotoGrid.appendChild(polaroid);
-                    }
-                });
-            }
         }
 
         // 🎯 3rd Screen (Love Note) Data Load
@@ -405,6 +407,17 @@ S = {
             if(lTitle) lTitle.textContent = currentSettings.loveNote.title || '';
             if(lSub) lSub.textContent = currentSettings.loveNote.subText || '';
             if(lBtn) lBtn.textContent = currentSettings.loveNote.btnText || '';
+        }
+
+        // 🎯 4th Screen (Mystery Cards) Header Data Load
+        if (currentSettings.mysteryCards) {
+            const mTitle = document.getElementById('mysteryDisplayTitle');
+            const mSub = document.getElementById('mysteryDisplaySub');
+            const mBtn = document.getElementById('mysteryNextBtn');
+            
+            if(mTitle) mTitle.textContent = currentSettings.mysteryCards.title || '';
+            if(mSub) mSub.textContent = currentSettings.mysteryCards.subText || '';
+            if(mBtn) mBtn.textContent = currentSettings.mysteryCards.btnText || '';
         }
     }
 };
@@ -1043,6 +1056,10 @@ function preloadPhoto(url) {
     return img;
 }
 
+// ===============================================
+// 🎯 Floating Hearts Image Sequence 
+// ===============================================
+
 function spawnHeartPhotosCentered() {
     heartPhotosCreated = 0;
     const validPhotoUrls = photoUrls.filter(url => !url.includes('cover.jpg') && !url.includes('theend.jpg'));
@@ -1136,8 +1153,8 @@ function startHeartEffect() {
         setTimeout(() => showConfetti(), 100);
         setTimeout(() => showFirework(), 200);
         setTimeout(() => {
+            spawnHeartPhotosCentered();
             showFloatingHearts();
-            spawnHeartPhotosCentered(); 
         }, 300);
     });
 }
@@ -1395,6 +1412,12 @@ document.addEventListener('keydown', (e) => {
         prevPage();
     }
 });
+
+if(bookElem) {
+    bookElem.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+    });
+}
 
 const musicControl = document.getElementById('musicControl');
 const birthdayAudio = document.getElementById('birthdayAudio');
