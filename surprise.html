@@ -14,112 +14,80 @@
         .phone-icon img { width: 120px; height: auto; object-fit: contain; }
         @keyframes pulseBtn { 0% { transform: scale(1); box-shadow: 0 0 20px rgba(255, 105, 180, 0.5); } 50% { transform: scale(1.08); box-shadow: 0 0 35px rgba(255, 105, 180, 0.9); } 100% { transform: scale(1); box-shadow: 0 0 20px rgba(255, 105, 180, 0.5); } }
         
-        /* 💌 1st & 2nd Screens Styling */
-        #memory-card-screen, #inner-memory-screen { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle, #ffe6ea 0%, #ffb3c6 100%); z-index: 10005; justify-content: center; align-items: center; }
+        /* Shared Styles */
+        .full-screen-layer { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle, #ffe6ea 0%, #ffb3c6 100%); z-index: 10005; justify-content: center; align-items: center; overflow-y: auto;}
+        .memory-btn { background: linear-gradient(135deg, #ff69b4, #ff1493); color: white; border: none; padding: 12px 30px; font-size: 15px; font-weight: bold; border-radius: 30px; cursor: pointer; box-shadow: 0 5px 15px rgba(255, 105, 180, 0.4); transition: 0.3s; display: inline-block; }
+        .memory-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(255, 105, 180, 0.6); }
+        @keyframes popIn { 0% { opacity: 0; transform: scale(0.8) translateY(30px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
+
+        /* Screen 1: Front Card */
         .memory-layout { display: flex; align-items: center; justify-content: center; gap: 40px; max-width: 900px; width: 90%; animation: popIn 0.8s ease; }
         .memory-card { background: rgba(255, 255, 255, 0.95); border-radius: 20px; padding: 35px 30px; width: 400px; box-shadow: 0 15px 40px rgba(255, 105, 180, 0.2); text-align: left; }
         .memory-text h2 { color: #ff1493; font-family: 'Pacifico', cursive; margin-bottom: 15px; font-size: 36px; display: inline-block; border-right: 2px solid #ff1493; white-space: nowrap; overflow: hidden; margin-top: 0; }
         .memory-text p { color: #555; font-size: 15px; line-height: 1.6; margin-bottom: 25px; font-family: 'Arial', sans-serif; }
-        .memory-btn { background: linear-gradient(135deg, #ff69b4, #ff1493); color: white; border: none; padding: 12px 30px; font-size: 15px; font-weight: bold; border-radius: 30px; cursor: pointer; box-shadow: 0 5px 15px rgba(255, 105, 180, 0.4); transition: 0.3s; display: inline-block; }
-        .memory-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(255, 105, 180, 0.6); }
         .memory-image { width: 300px; height: 200px; border-radius: 15px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.15); animation: floatImage 4s ease-in-out infinite; }
         .memory-image img { width: 100%; height: 100%; object-fit: cover; }
         @keyframes floatImage { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
-        @keyframes popIn { 0% { opacity: 0; transform: scale(0.8) translateY(30px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
         
+        /* Screen 2: Inner Collage */
         .inner-layout { display: flex; align-items: center; justify-content: center; gap: 30px; max-width: 1000px; width: 95%; animation: popIn 0.8s ease; }
         .photo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; width: 60%; perspective: 1000px; }
-        
-        /* 🎯 পোলারয়েড ইমেজের বেসিক স্টাইল */
-        .polaroid { 
-            background: white; 
-            padding: 8px 8px 20px 8px; 
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2); 
-            border-radius: 4px; 
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-            cursor: pointer; 
-            transform-origin: center center;
-            user-select: none; 
-            -webkit-user-select: none;
-            -webkit-touch-callout: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-        
+        .polaroid { background: white; padding: 8px 8px 20px 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); border-radius: 4px; transition: all 0.4s ease; cursor: pointer; user-select: none; }
         .polaroid:nth-child(even) { transform: rotate(3deg); }
         .polaroid:nth-child(odd) { transform: rotate(-3deg); }
         .polaroid img { width: 100%; aspect-ratio: 1/1; object-fit: cover; pointer-events: none; }
-        
-        /* 🎯 হোভার (Hover) ইফেক্ট - মাউস নিলে একটু বড় হবে */
-        .polaroid:hover { 
-            transform: scale(1.05) rotate(0deg); 
-            z-index: 10; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3); 
-        }
-
-        /* 🎯 অ্যাক্টিভ (Active) ইফেক্ট - চাপ দিয়ে ধরলে অনেক বড় হবে এবং বাঁকবে */
-        .polaroid:active {
-            transform: scale(1.3) rotate(-5deg) translateY(-10px) !important;
-            z-index: 50 !important;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5) !important;
-        }
-
+        .polaroid:hover { transform: scale(1.05) rotate(0deg); z-index: 10; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+        .polaroid.active-pop { transform: scale(1.3) rotate(-5deg) translateY(-10px) !important; z-index: 50 !important; box-shadow: 0 20px 50px rgba(0,0,0,0.5) !important; }
         .inner-card { background: rgba(255, 255, 255, 0.95); border-radius: 20px; padding: 40px; width: 35%; box-shadow: 0 15px 40px rgba(255, 105, 180, 0.2); text-align: center; }
         .inner-card h2 { color: #ff1493; font-family: 'Pacifico', cursive; margin-top: 0; margin-bottom: 20px; font-size: 32px; }
         .inner-card p { color: #555; font-size: 16px; line-height: 1.6; margin-bottom: 30px; font-family: 'Arial', sans-serif; }
 
-        /* 🎯 3rd Screen: Love Note Styling (TikTok Style) */
-        #love-note-screen { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle, #ffe6ea 0%, #ffb3c6 100%); z-index: 10007; justify-content: center; align-items: center; }
+        /* Screen 3: Love Note */
+        #love-note-screen { z-index: 10007; }
         .note-layout { display: flex; align-items: stretch; justify-content: center; gap: 30px; max-width: 900px; width: 95%; animation: popIn 0.8s ease; height: 350px; }
-        
-        .note-paper { 
-            background: #fff8eb; 
-            width: 60%; 
-            padding: 30px 40px; 
-            border-radius: 5px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
-            background-image: repeating-linear-gradient(transparent, transparent 31px, #ffb3c6 31px, #ffb3c6 32px); 
-            line-height: 32px; 
-            font-family: 'Dancing Script', cursive; 
-            font-size: 24px; 
-            color: #555;
-            position: relative;
-            overflow-y: auto;
-        }
+        .note-paper { background: #fff8eb; width: 60%; padding: 30px 40px; border-radius: 5px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); background-image: repeating-linear-gradient(transparent, transparent 31px, #ffb3c6 31px, #ffb3c6 32px); line-height: 32px; font-family: 'Dancing Script', cursive; font-size: 24px; color: #555; position: relative; overflow-y: auto; }
         .note-paper::before { content: ''; position: absolute; top: 0; bottom: 0; left: 30px; width: 2px; background: rgba(255, 105, 180, 0.4); }
-
-        .note-sidebar { 
-            background: rgba(255,255,255,0.6); 
-            width: 30%; 
-            border-radius: 15px; 
-            padding: 30px 20px; 
-            text-align: center; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: space-between;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-        }
+        .note-sidebar { background: rgba(255,255,255,0.6); width: 30%; border-radius: 15px; padding: 30px 20px; text-align: center; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
         .note-sidebar h2 { font-family: 'Pacifico', cursive; color: #ff1493; font-size: 32px; margin: 0 0 10px 0; line-height: 1.2; }
         .note-sidebar p { font-family: 'Arial', sans-serif; color: #666; font-size: 13px; line-height: 1.5; margin-bottom: 20px;}
 
+        /* 🎯 Screen 4: Mystery Cards (Game) */
+        #mystery-cards-screen { z-index: 10008; flex-direction: column; }
+        .mystery-header { background: white; padding: 15px 30px; border-radius: 30px; text-align: center; box-shadow: 0 10px 30px rgba(255, 105, 180, 0.2); margin-bottom: 30px; animation: popIn 0.8s ease; }
+        .mystery-header h2 { color: #ff1493; font-family: 'Pacifico', cursive; font-size: 32px; margin: 0; }
+        .mystery-header p { color: #666; font-family: 'Arial', sans-serif; font-size: 14px; margin: 5px 0 0 0; }
+        
+        .mystery-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; max-width: 600px; width: 90%; margin-bottom: 30px; perspective: 1000px; animation: popIn 1s ease; }
+        
+        .flip-card { background-color: transparent; width: 100%; aspect-ratio: 1/1; cursor: pointer; }
+        .flip-card-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s; transform-style: preserve-3d; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-radius: 15px; }
+        .flip-card.flipped .flip-card-inner { transform: rotateY(180deg); }
+        
+        .flip-card-front, .flip-card-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 15px; display: flex; align-items: center; justify-content: center; padding: 10px; }
+        
+        .flip-card-front { background: linear-gradient(135deg, #ffb3c6, #ff69b4); color: white; font-family: 'Pacifico', cursive; font-size: 40px; }
+        .flip-card-back { background: white; color: #ff1493; transform: rotateY(180deg); font-family: 'Dancing Script', cursive; font-size: 20px; font-weight: bold; border: 2px solid #ffb3c6; line-height: 1.3; }
+
         @media (max-width: 768px) {
-            .memory-layout { flex-direction: column-reverse; gap: 20px; }
+            .memory-layout { flex-direction: column-reverse; gap: 20px; padding: 20px 0;}
             .memory-card { width: 100%; text-align: center; padding: 25px 20px; }
             .memory-image { width: 80%; height: 180px; }
-            .inner-layout { flex-direction: column; gap: 20px; margin-top: 20px; }
+            .inner-layout { flex-direction: column; gap: 20px; margin-top: 20px; padding: 20px 0;}
             .photo-grid { grid-template-columns: repeat(3, 1fr); width: 100%; gap: 10px; }
             .polaroid { padding: 4px 4px 15px 4px; }
+            .polaroid.active-pop { transform: scale(1.5) rotate(-5deg) translateY(-5px) !important; }
             .inner-card { width: 100%; padding: 20px; }
             .inner-card h2 { font-size: 26px; }
-            
-            .note-layout { flex-direction: column; height: auto; gap: 15px; }
+            .note-layout { flex-direction: column; height: auto; gap: 15px; padding: 20px 0;}
             .note-paper { width: 100%; height: 250px; font-size: 20px; padding: 20px 20px 20px 40px; }
             .note-sidebar { width: 100%; padding: 20px; }
             .note-sidebar h2 { font-size: 26px; }
-
-            /* 🎯 মোবাইলে চাপ দিয়ে ধরলে আরও বেশি বড় হবে */
-            .polaroid:active {
-                transform: scale(1.5) rotate(-5deg) translateY(-5px) !important;
-            }
+            
+            /* Mystery Cards Mobile */
+            .mystery-grid { gap: 8px; }
+            .flip-card-front { font-size: 28px; }
+            .flip-card-back { font-size: 14px; padding: 5px; }
+            .mystery-header h2 { font-size: 24px; }
         }
     </style>
 </head>
@@ -128,52 +96,62 @@
     <canvas id="matrix-rain" style="display: none;"></canvas>
     <canvas style="position:absolute;width:100%;height:100%;z-index:9999;display:none;" class="canvas"></canvas>
     
-    <div id="start-screen" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 999995; flex-direction: column; justify-content: center; align-items: center;">
+    <div id="start-screen" class="full-screen-layer" style="background: #000; z-index: 999995;">
         <button id="startSurpriseBtn" style="background: linear-gradient(135deg, #ff69b4, #ff1493); color: white; border: none; padding: 15px 40px; font-size: 26px; font-family: 'Pacifico', cursive; border-radius: 50px; cursor: pointer; animation: pulseBtn 1.5s infinite; outline: none;">
             Tap to Start Surprise 🎁
         </button>
     </div>
 
-    <!-- 💌 1st Screen: Front Memory Card -->
-    <div id="memory-card-screen">
+    <!-- 💌 Screen 1: Front Memory Card -->
+    <div id="memory-card-screen" class="full-screen-layer">
         <div class="memory-layout">
             <div class="memory-card">
                 <div class="memory-text">
                     <h2 id="mcDisplayTitle"></h2>
                     <p id="mcDisplayMsg"></p>
-                    <button class="memory-btn" id="mcDisplayBtn">Open Memories ✨</button>
+                    <button class="memory-btn" id="mcDisplayBtn"></button>
                 </div>
             </div>
             <div class="memory-image"><img id="mcDisplayImg" src="" alt="Memory"></div>
         </div>
     </div>
 
-    <!-- 💌 2nd Screen: Inner Memory Collage -->
-    <div id="inner-memory-screen">
+    <!-- 💌 Screen 2: Inner Memory Collage -->
+    <div id="inner-memory-screen" class="full-screen-layer">
         <div class="inner-layout">
             <div class="photo-grid" id="innerPhotoGrid"></div>
             <div class="inner-card">
                 <h2 id="inDisplayTitle"></h2>
                 <p id="inDisplayMsg"></p>
-                <button class="memory-btn" id="inDisplayBtn">Read My Heart 💌</button>
+                <button class="memory-btn" id="inDisplayBtn"></button>
             </div>
         </div>
     </div>
 
-    <!-- 💌 3rd Screen: Love Note -->
-    <div id="love-note-screen">
+    <!-- 💌 Screen 3: Love Note -->
+    <div id="love-note-screen" class="full-screen-layer">
         <div class="note-layout">
-            <div class="note-paper" id="noteDisplayLetter" style="white-space: pre-wrap;">
-                <!-- Letter Content -->
-            </div>
+            <div class="note-paper" id="noteDisplayLetter" style="white-space: pre-wrap;"></div>
             <div class="note-sidebar">
                 <div>
                     <h2 id="noteDisplayTitle"></h2>
                     <p id="noteDisplaySub"></p>
                 </div>
-                <button class="memory-btn" id="noteDisplayBtn">Let's Play a Game!</button>
+                <button class="memory-btn" id="noteDisplayBtn"></button>
             </div>
         </div>
+    </div>
+
+    <!-- 🎯 Screen 4: Mystery Cards Game -->
+    <div id="mystery-cards-screen" class="full-screen-layer">
+        <div class="mystery-header">
+            <h2 id="mysteryDisplayTitle"></h2>
+            <p id="mysteryDisplaySub"></p>
+        </div>
+        <div class="mystery-grid" id="mysteryGrid">
+            <!-- JS will generate 9 cards here -->
+        </div>
+        <button class="memory-btn" id="mysteryNextBtn"></button>
     </div>
 
     <div class="overlay">
@@ -197,5 +175,18 @@
     <script src="./jscp/settings_client.js"></script>
     <script src="./jscp/main.js"></script>
 
+    <script>
+        function setupPolaroidInteractions() {
+            const polaroids = document.querySelectorAll('.polaroid');
+            polaroids.forEach(p => {
+                p.addEventListener('mousedown', function() { this.classList.add('active-pop'); });
+                p.addEventListener('mouseup', function() { this.classList.remove('active-pop'); });
+                p.addEventListener('mouseleave', function() { this.classList.remove('active-pop'); });
+                p.addEventListener('touchstart', function(e) { e.preventDefault(); this.classList.add('active-pop'); });
+                p.addEventListener('touchend', function() { this.classList.remove('active-pop'); });
+                p.addEventListener('touchcancel', function() { this.classList.remove('active-pop'); });
+            });
+        }
+    </script>
 </body>
 </html>
