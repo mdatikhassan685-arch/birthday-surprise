@@ -10,6 +10,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
+        /* 🎯 ইউনিভার্সাল টেক্সট র‍্যাপিং (যেকোনো বক্সের বাইরে লেখা যাওয়া বন্ধ করবে) */
+        * {
+            word-wrap: break-word !important;
+            overflow-wrap: break-word !important;
+            white-space: pre-wrap !important;
+        }
+
         #settingsButton, .settings-hint, #settingsModal { display: none !important; pointer-events: none !important; }
         .phone-icon img { width: 120px; height: auto; object-fit: contain; }
         @keyframes pulseBtn { 0% { transform: scale(1); box-shadow: 0 0 20px rgba(255, 105, 180, 0.5); } 50% { transform: scale(1.08); box-shadow: 0 0 35px rgba(255, 105, 180, 0.9); } 100% { transform: scale(1); box-shadow: 0 0 20px rgba(255, 105, 180, 0.5); } }
@@ -22,7 +29,7 @@
         /* Screen 1: Front Card */
         .memory-layout { display: flex; align-items: center; justify-content: center; gap: 40px; max-width: 900px; width: 90%; animation: popIn 0.8s ease; }
         .memory-card { background: rgba(255, 255, 255, 0.95); border-radius: 20px; padding: 35px 30px; width: 400px; box-shadow: 0 15px 40px rgba(255, 105, 180, 0.2); text-align: left; }
-        .memory-text h2 { color: #ff1493; font-family: 'Pacifico', cursive; margin-bottom: 15px; font-size: 36px; display: inline-block; border-right: 2px solid #ff1493; white-space: nowrap; overflow: hidden; margin-top: 0; }
+        .memory-text h2 { color: #ff1493; font-family: 'Pacifico', cursive; margin-bottom: 15px; font-size: 36px; display: inline-block; border-right: 2px solid #ff1493; white-space: nowrap !important; overflow: hidden; margin-top: 0; }
         .memory-text p { color: #555; font-size: 15px; line-height: 1.6; margin-bottom: 25px; font-family: 'Arial', sans-serif; }
         .memory-image { width: 300px; height: 200px; border-radius: 15px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.15); animation: floatImage 4s ease-in-out infinite; }
         .memory-image img { width: 100%; height: 100%; object-fit: cover; }
@@ -50,11 +57,11 @@
         .note-sidebar h2 { font-family: 'Pacifico', cursive; color: #ff1493; font-size: 32px; margin: 0 0 10px 0; line-height: 1.2; }
         .note-sidebar p { font-family: 'Arial', sans-serif; color: #666; font-size: 13px; line-height: 1.5; margin-bottom: 20px;}
 
-        /* 🎯 Screen 4: Mystery Cards (Game) - 100% Fixed for TikTok style */
+        /* 🎯 Screen 4: Mystery Cards (Game) - Update for wider cards */
         #mystery-cards-screen { 
             z-index: 10008; 
             flex-direction: column; 
-            justify-content: flex-start; /* 🎯 Fix: Center করলে বড় হলে কেটে যায়, তাই flex-start দেওয়া হলো */
+            justify-content: center; 
             align-items: center;
             padding: 40px 20px;
         }
@@ -67,7 +74,6 @@
             box-shadow: 0 10px 30px rgba(255, 105, 180, 0.2); 
             margin-bottom: 25px; 
             animation: popIn 0.8s ease; 
-            flex-shrink: 0;
         }
         .mystery-header h2 { color: #ff1493; font-family: 'Pacifico', cursive; font-size: 28px; margin: 0; }
         .mystery-header p { color: #666; font-family: 'Arial', sans-serif; font-size: 14px; margin: 5px 0 0 0; }
@@ -76,18 +82,19 @@
             display: grid; 
             grid-template-columns: repeat(3, 1fr); 
             gap: 15px; 
-            max-width: 650px; 
-            width: 100%; 
+            /* 🎯 ফিক্স: কার্ডগুলোকে চওড়া করার জন্য গ্রিডের ম্যাক্স-উইডথ বাড়ানো হলো */
+            max-width: 800px; 
+            width: 95%; 
             margin-bottom: 30px; 
             perspective: 1000px; 
             animation: popIn 1s ease; 
-            flex-shrink: 0;
         }
         
         .flip-card { 
             background-color: transparent; 
             width: 100%; 
-            aspect-ratio: 4/3; /* 🎯 Fix: স্কয়ার না হয়ে টিকটকের মতো চ্যাপ্টা (Rectangle) হবে */
+            /* 🎯 ফিক্স: কার্ডকে আরো চওড়া (Wide/Rectangle) করা হলো */
+            aspect-ratio: 2/1; 
             cursor: pointer; 
         }
         .flip-card-inner { 
@@ -111,18 +118,18 @@
             display: flex; 
             align-items: center; 
             justify-content: center; 
-            padding: 10px;
+            padding: 15px;
             box-sizing: border-box;
+            overflow-y: auto; /* যদি খুব বেশি লেখা হয়, তবে স্ক্রল হবে কিন্তু বাইরে যাবে না */
         }
         
-        /* 🎯 Front: Pink Gradient with White ? */
         .flip-card-front { 
             background: linear-gradient(135deg, #ffb3c6, #ff69b4); 
             color: white; 
             font-family: 'Pacifico', cursive; 
             font-size: 35px; 
         }
-        /* 🎯 Back: White background with pink text */
+        
         .flip-card-back { 
             background: white; 
             color: #ff1493; 
@@ -131,12 +138,12 @@
             font-size: 14px; 
             font-weight: bold; 
             border: 2px solid #ffb3c6; 
-            line-height: 1.3; 
+            line-height: 1.4; 
         }
 
         #mysteryNextBtn {
-            flex-shrink: 0;
-            margin-bottom: 40px; /* নিচের দিকে একটু জায়গা রাখা হলো */
+            margin-top: 10px;
+            margin-bottom: 20px; 
         }
 
         @media (max-width: 768px) {
@@ -153,18 +160,25 @@
             .note-paper { width: 100%; height: 250px; font-size: 20px; padding: 20px 20px 20px 40px; }
             .note-sidebar { width: 100%; padding: 20px; }
             .note-sidebar h2 { font-size: 26px; }
+            
+            /* Mystery Cards Mobile Fixes */
+            .mystery-grid { gap: 10px; max-width: 100%; }
+            .flip-card { aspect-ratio: 16/9; } /* মোবাইলেও চওড়া দেখাবে */
+            .flip-card-front { font-size: 28px; }
+            .flip-card-back { font-size: 12px; padding: 8px; }
+            .mystery-header h2 { font-size: 24px; }
         }
 
         /* 🎯 Mobile Landscape Fix for Mystery Cards */
         @media (max-height: 500px) and (orientation: landscape) {
             #mystery-cards-screen { padding: 15px 10px; }
-            .mystery-header { padding: 10px 20px; margin-bottom: 15px; }
+            .mystery-header { padding: 10px 20px; margin-bottom: 10px; }
             .mystery-header h2 { font-size: 20px; }
-            .mystery-grid { gap: 10px; max-width: 450px; margin-bottom: 15px; }
-            .flip-card { aspect-ratio: 2/1; } /* 🎯 কার্ডগুলো আরও চ্যাপ্টা হয়ে স্ক্রিনে ফিট হবে */
-            .flip-card-front { font-size: 24px; }
+            .mystery-grid { gap: 8px; max-width: 550px; margin-bottom: 10px; }
+            .flip-card { aspect-ratio: 5/2; } /* ল্যান্ডস্কেপে আরো বেশি চওড়া হবে */
+            .flip-card-front { font-size: 22px; }
             .flip-card-back { font-size: 11px; padding: 5px; }
-            #mysteryNextBtn { padding: 8px 20px; font-size: 14px; margin-bottom: 20px;}
+            #mysteryNextBtn { padding: 8px 20px; font-size: 14px; margin-top: 5px; margin-bottom: 10px;}
         }
     </style>
 </head>
@@ -179,6 +193,7 @@
         </button>
     </div>
 
+    <!-- 💌 Screen 1: Front Memory Card -->
     <div id="memory-card-screen" class="full-screen-layer">
         <div class="memory-layout">
             <div class="memory-card">
@@ -192,6 +207,7 @@
         </div>
     </div>
 
+    <!-- 💌 Screen 2: Inner Memory Collage -->
     <div id="inner-memory-screen" class="full-screen-layer">
         <div class="inner-layout">
             <div class="photo-grid" id="innerPhotoGrid"></div>
@@ -203,6 +219,7 @@
         </div>
     </div>
 
+    <!-- 💌 Screen 3: Love Note -->
     <div id="love-note-screen" class="full-screen-layer">
         <div class="note-layout">
             <div class="note-paper" id="noteDisplayLetter" style="white-space: pre-wrap;"></div>
