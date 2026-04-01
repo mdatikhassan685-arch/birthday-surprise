@@ -15,76 +15,8 @@ document.addEventListener('DOMContentLoaded', () => {
 const musicOptions = [ { value: './music/zahra.mp3', label: 'Zahra Birthday Music' }, { value: './music/happy-birthday.mp3', label: 'Happy Birthday (Miễn phí)' } ];
 const sequenceOptions = [
     { value: 'none', label: 'None (Disable)' }, { value: 'matrix', label: '🌧️ Matrix Rain' },
-    { value: 'memory', label: '💌 Memory Card' }, { value: 'book', label: '📖 3D Book' }, { value: 'hearts', label: '💖 Floating Hearts' }
+    { value: 'memory', label: '💌 Memory Card (3 Screens)' }, { value: 'book', label: '📖 3D Book' }, { value: 'hearts', label: '💖 Floating Hearts' }
 ];
-
-const musicPreviewButton = document.getElementById('musicPreviewButton');
-const musicPreviewStatus = document.getElementById('musicPreviewStatus');
-const musicPreviewAudio = new Audio();
-let currentPreviewTrack = '';
-
-function getSelectedMusicLabel() {
-    const musicSelect = document.getElementById('backgroundMusic');
-    if (!musicSelect) return '';
-    return musicSelect.options[musicSelect.selectedIndex]?.textContent || '';
-}
-
-function stopMusicPreview(customMessage) {
-    musicPreviewAudio.pause(); musicPreviewAudio.currentTime = 0; currentPreviewTrack = '';
-    if (musicPreviewButton) musicPreviewButton.textContent = '▶ Play';
-    if (musicPreviewStatus) musicPreviewStatus.textContent = customMessage || getSelectedMusicLabel();
-}
-
-function handleMusicPreview() {
-    const musicSelect = document.getElementById('backgroundMusic');
-    if (!musicSelect || !musicSelect.value) return;
-    const selectedSrc = musicSelect.value;
-    if (currentPreviewTrack === selectedSrc && !musicPreviewAudio.paused) { stopMusicPreview(); return; }
-
-    currentPreviewTrack = selectedSrc; musicPreviewAudio.pause(); musicPreviewAudio.src = selectedSrc;
-    musicPreviewAudio.play().then(() => {
-        if (musicPreviewButton) musicPreviewButton.textContent = '⏸ Stop';
-        if (musicPreviewStatus) musicPreviewStatus.textContent = `Playing: ${getSelectedMusicLabel()}`;
-    }).catch(error => { stopMusicPreview('Error playing preview.'); });
-}
-if (musicPreviewButton) musicPreviewButton.addEventListener('click', handleMusicPreview);
-musicPreviewAudio.addEventListener('ended', () => stopMusicPreview());
-
-const colorThemes = {
-    pink: { matrixColor1: '#ff69b4', matrixColor2: '#ff1493', sequenceColor: '#ff69b4' },
-    blue: { matrixColor1: '#87ceeb', matrixColor2: '#4169e1', sequenceColor: '#1e90ff' },
-    purple: { matrixColor1: '#dda0dd', matrixColor2: '#9370db', sequenceColor: '#8a2be2' },
-    custom: { matrixColor1: '#ffb6c1', matrixColor2: '#ffc0cb', sequenceColor: '#d39b9b' }
-};
-
-function handleColorThemeChange(selectedTheme) {
-    const matrixColor1Input = document.getElementById('matrixColor1');
-    const matrixColor2Input = document.getElementById('matrixColor2');
-    const sequenceColorInput = document.getElementById('sequenceColor');
-    const customColorSection = document.getElementById('customColorSection');
-    const sequenceColorSection = document.getElementById('sequenceColorSection');
-    
-    settings.colorTheme = selectedTheme;
-    document.querySelectorAll('.color-theme-btn').forEach(btn => btn.classList.remove('active'));
-    const activeButton = document.querySelector(`[data-theme="${selectedTheme}"]`);
-    if (activeButton) activeButton.classList.add('active');
-    
-    if (selectedTheme === 'custom') {
-        if (customColorSection) customColorSection.style.display = 'flex';
-        if (sequenceColorSection) sequenceColorSection.style.display = 'block';
-    } else {
-        if (customColorSection) customColorSection.style.display = 'none';
-        if (sequenceColorSection) sequenceColorSection.style.display = 'none';
-        const theme = colorThemes[selectedTheme];
-        if (theme && matrixColor1Input && matrixColor2Input && sequenceColorInput) {
-            matrixColor1Input.value = theme.matrixColor1; matrixColor2Input.value = theme.matrixColor2; sequenceColorInput.value = theme.sequenceColor;
-        }
-    }
-}
-
-document.querySelectorAll('.color-theme-btn').forEach(button => {
-    button.addEventListener('click', function() { handleColorThemeChange(this.getAttribute('data-theme')); });
-});
 
 function loadSettingsForAdmin() {
     const savedSettings = localStorage.getItem(userStorageKey);
@@ -97,14 +29,15 @@ function loadSettingsForAdmin() {
             music: './music/zahra.mp3', countdown: 3, matrixText: 'HAPPYBIRTHDAY', sequence: 'HAPPY|BIRTHDAY|TO|YOU|❤',
             effectSequence: ['memory', 'matrix', 'book', 'hearts'], 
             memoryCard: { title: 'Hyy Baby ❤️', message: 'Today is your special day!', image: '', defaultGif: './gif/anime1.gif', btnText: 'Open Memories ✨' },
-            // 🎯 নতুন: Inner Memory ডেটা 
-            innerMemory: { title: 'Birthday Memories', message: 'These are the moments that make you the most beautiful person to me.', btnText: 'Read My Heart 💌', photos: ['', '', '', '', '', ''] },
+            innerMemory: { title: 'Birthday Memories', message: 'These are the moments...', btnText: 'Read My Heart 💌', photos: ['', '', '', '', '', ''] },
+            // 🎯 নতুন: Love Note Data
+            loveNote: { letter: 'My Dearest,\n\nOn your special day, I want you to know how much you mean to me...', title: 'A Love Note', subText: 'A few words from the bottom of my heart.', btnText: "Let's Play a Game!" },
             pages: [ { image: '', content: 'Message 1...' }, { image: '', content: 'Message 2...' } ],
             colorTheme: 'pink'
         };
     }
-    if(!settings.innerMemory) {
-        settings.innerMemory = { title: 'Birthday Memories', message: 'These are the moments...', btnText: 'Read My Heart 💌', photos: ['', '', '', '', '', ''] };
+    if(!settings.loveNote) {
+        settings.loveNote = { letter: 'My Dearest...', title: 'A Love Note', subText: 'A few words...', btnText: "Let's Play a Game!" };
     }
 }
 
@@ -113,12 +46,9 @@ function populateAdminForm() {
 
     document.getElementById('backgroundMusic').innerHTML = musicOptions.map(opt => `<option value="${opt.value}">${opt.label}</option>`).join('');
     document.getElementById('backgroundMusic').value = settings.music || musicOptions[0].value;
-    
     document.getElementById('matrixText').value = settings.matrixText || 'HAPPYBIRTHDAY';
     document.getElementById('sequenceText').value = settings.sequence || 'HAPPY|BIRTHDAY';
     document.getElementById('countdownTime').value = settings.countdown || 3;
-
-    handleColorThemeChange(settings.colorTheme || 'pink');
 
     const seqHtml = sequenceOptions.map(opt => `<option value="${opt.value}">${opt.label}</option>`).join('');
     ['seq1', 'seq2', 'seq3', 'seq4'].forEach((id, i) => {
@@ -142,6 +72,12 @@ function populateAdminForm() {
     document.getElementById('innerMcMessage').value = settings.innerMemory?.message || '';
     document.getElementById('innerMcBtnText').value = settings.innerMemory?.btnText || '';
     renderInnerPhotosGrid();
+
+    // 🎯 Populate Love Note
+    document.getElementById('loveNoteMessage').value = settings.loveNote?.letter || '';
+    document.getElementById('loveNoteTitle').value = settings.loveNote?.title || '';
+    document.getElementById('loveNoteSub').value = settings.loveNote?.subText || '';
+    document.getElementById('loveNoteBtn').value = settings.loveNote?.btnText || '';
 
     renderPagesForm();
 }
@@ -187,7 +123,6 @@ document.getElementById('mcImageFile').addEventListener('change', e => {
     if(e.target.files[0]) uploadToImgBB(e.target.files[0], 'memory');
 });
 
-// 🎯 Render Inner Memory (6 Photos)
 function renderInnerPhotosGrid() {
     const grid = document.getElementById('innerPhotosGrid');
     grid.innerHTML = '';
@@ -243,7 +178,7 @@ function renderPagesForm() {
                 ${page.image ? `<img src="${page.image}" style="max-width: 100%; max-height: 100%; object-fit: cover;">` : '<span style="color:#aaa; font-size: 12px;">No Image</span>'}
             </div>
             <label style="display: block; margin-top: 15px; margin-bottom: 5px; font-weight: bold;">Text Content (Optional):</label>
-            <textarea id="pageContent${index}" style="width: 100%; padding: 8px; margin-top: 10px; border: 1px solid #ddd; border-radius: 4px; min-height: 60px;" placeholder="Write a message...">${page.content || ''}</textarea>
+            <textarea id="pageContent${index}" style="width: 100%; padding: 8px; margin-top: 10px; border: 1px solid #ddd; border-radius: 4px; min-height: 60px;">${page.content || ''}</textarea>
         `;
         pageConfigs.appendChild(pageDiv);
         
@@ -285,11 +220,6 @@ if (applySettingsButton) {
         settings.sequence = document.getElementById('sequenceText').value;
         settings.countdown = parseInt(document.getElementById('countdownTime').value) || 3;
         
-        settings.colorTheme = document.querySelector('.color-theme-btn.active')?.getAttribute('data-theme') || 'pink';
-        settings.matrixColor1 = document.getElementById('matrixColor1').value;
-        settings.matrixColor2 = document.getElementById('matrixColor2').value;
-        settings.sequenceColor = document.getElementById('sequenceColor').value;
-        
         settings.effectSequence = [ document.getElementById('seq1').value, document.getElementById('seq2').value, document.getElementById('seq3').value, document.getElementById('seq4').value ];
 
         if(!settings.memoryCard) settings.memoryCard = {};
@@ -297,17 +227,21 @@ if (applySettingsButton) {
         settings.memoryCard.message = document.getElementById('mcMessage').value;
         settings.memoryCard.btnText = document.getElementById('mcBtnText').value;
         settings.memoryCard.defaultGif = document.getElementById('mcGifSelect').value;
-
         if (!settings.memoryCard.image || settings.memoryCard.image === '') {
             settings.memoryCard.finalImageToShow = settings.memoryCard.defaultGif;
         } else {
             settings.memoryCard.finalImageToShow = settings.memoryCard.image;
         }
 
-        // Save Inner Memory Settings
         settings.innerMemory.title = document.getElementById('innerMcTitle').value;
         settings.innerMemory.message = document.getElementById('innerMcMessage').value;
         settings.innerMemory.btnText = document.getElementById('innerMcBtnText').value;
+
+        // 🎯 Save Love Note Data
+        settings.loveNote.letter = document.getElementById('loveNoteMessage').value;
+        settings.loveNote.title = document.getElementById('loveNoteTitle').value;
+        settings.loveNote.subText = document.getElementById('loveNoteSub').value;
+        settings.loveNote.btnText = document.getElementById('loveNoteBtn').value;
 
         saveFormDataLocally(); 
 
@@ -340,5 +274,4 @@ if (applySettingsButton) {
         } catch (error) { magicLinkInput.value = "Error! ❌"; }
     });
 }
-
 document.addEventListener('DOMContentLoaded', populateAdminForm);
