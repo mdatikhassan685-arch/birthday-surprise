@@ -28,22 +28,6 @@ const defaultSettings = {
         btnText: 'Read My Heart 💌',
         photos: ['', '', '', '', '', '']
     },
-    
-    // Love Note
-    loveNote: { 
-        letter: 'My Dearest,\n\nOn your special day, I want you to know how much you mean to me...', 
-        title: 'A Love Note', 
-        subText: 'A few words from the bottom of my heart.', 
-        btnText: "Let's Play a Game!" 
-    },
-    
-    // 🎯 Default Mystery Cards (9 Images Setup)
-    mysteryCards: { 
-        title: "Why You're Special 🎂", 
-        subText: "Click on the cards to reveal!", 
-        btnText: "Next ➔", 
-        photos: Array(9).fill('') 
-    },
 
     colorTheme: 'pink',
     pages: [
@@ -106,15 +90,22 @@ function applyLoadedSettings() {
 
     createPages();
     createInnerMemoryScreen();
-    createMysteryCardsScreen(); // 🎯 Generate 9 Photo Cards
 }
 
-// 🎯 ৬ ছবির কোলাজ স্ক্রিন তৈরি করার ফাংশন
+// 🎯 নতুন: ৬ ছবির কোলাজ স্ক্রিন তৈরি করার ফাংশন
 function createInnerMemoryScreen() {
     const currentSettings = window.settings || {};
     
     if (currentSettings.innerMemory) {
+        const inTitle = document.getElementById('inDisplayTitle');
+        const inMsg = document.getElementById('inDisplayMsg');
+        const inBtn = document.getElementById('inDisplayBtn');
         const inPhotoGrid = document.getElementById('innerPhotoGrid');
+
+        if (inTitle) inTitle.textContent = currentSettings.innerMemory.title || '';
+        if (inMsg) inMsg.textContent = currentSettings.innerMemory.message || '';
+        if (inBtn) inBtn.textContent = currentSettings.innerMemory.btnText || '';
+
         if (inPhotoGrid && currentSettings.innerMemory.photos) {
             inPhotoGrid.innerHTML = '';
             
@@ -122,54 +113,17 @@ function createInnerMemoryScreen() {
                 if (url && url.trim() !== '') {
                     const polaroid = document.createElement('div');
                     polaroid.className = 'polaroid';
+                    
+                    // 🎯 ফিক্স: মোবাইলের টাচ এনিমেশন যেন সুন্দরভাবে কাজ করে তার জন্য ontouchstart যোগ করা হলো
                     polaroid.setAttribute('ontouchstart', ''); 
                     
+                    // জোড় ছবি ডানে বাঁকবে, বিজোড় বামে
                     const rotation = index % 2 === 0 ? '3deg' : '-3deg';
                     polaroid.style.transform = `rotate(${rotation})`;
                     
                     polaroid.innerHTML = `<img src="${url}" alt="Memory">`;
                     inPhotoGrid.appendChild(polaroid);
                 }
-            });
-        }
-    }
-}
-
-// 🎯 ৯টি মিস্ট্রি কার্ড (ছবিসহ) তৈরি করার ফাংশন
-function createMysteryCardsScreen() {
-    const currentSettings = window.settings || {};
-    
-    if(!currentSettings.mysteryCards) {
-        currentSettings.mysteryCards = defaultSettings.mysteryCards;
-    }
-    
-    if(currentSettings.mysteryCards) {
-        const grid = document.getElementById('mysteryGrid');
-        if(grid && currentSettings.mysteryCards.photos) {
-            grid.innerHTML = '';
-            
-            currentSettings.mysteryCards.photos.forEach((url) => {
-                const card = document.createElement('div');
-                card.className = 'flip-card';
-                
-                // 🎯 যদি ইউজার ছবি আপলোড করে তবে ছবি দেখাবে, না করলে হার্ট দেখাবে
-                const backContent = (url && url.trim() !== '') 
-                    ? `<img src="${url}" alt="Memory">` 
-                    : `<span style="font-size: 30px;">❤️</span>`;
-                
-                card.innerHTML = `
-                    <div class="flip-card-inner">
-                        <div class="flip-card-front">?</div>
-                        <div class="flip-card-back">${backContent}</div>
-                    </div>
-                `;
-                
-                // Click to flip the card
-                card.addEventListener('click', function() {
-                    this.classList.toggle('flipped');
-                });
-                
-                grid.appendChild(card);
             });
         }
     }
@@ -274,7 +228,6 @@ function createPages() {
     if (typeof calculatePageZIndexes === 'function') calculatePageZIndexes();
 }
 
-// পেজ লোড হলে এনিমেশন শুরু করা
 document.addEventListener('DOMContentLoaded', async function () {
     const book = document.getElementById('book');
     const bookContainer = document.querySelector('.book-container');
@@ -287,12 +240,10 @@ document.addEventListener('DOMContentLoaded', async function () {
         bookContainer.classList.remove('show');
     }
 
-    // ⏳ ডেটাবেস থেকে ডেটা লোড হওয়া পর্যন্ত অপেক্ষা করবে
     await loadSettings();
 
     window.isWebsiteReady = true;
 
-    // ডেটা লোড হলে এনিমেশন রেডি করবে
     if (typeof tryStartWebsiteWhenLandscape === 'function') {
         tryStartWebsiteWhenLandscape();
     } else if (typeof startWebsite === 'function') {
