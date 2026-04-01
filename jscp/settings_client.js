@@ -1,5 +1,5 @@
 // ==========================================
-// 🎈 CLIENT SETTINGS (For surprise.html)
+// 🎈 CLIENT SETTINGS (For surprise.html Magic Link)
 // ==========================================
 
 const defaultSettings = {
@@ -9,7 +9,12 @@ const defaultSettings = {
     innerMemory: { title: 'Birthday Memories', message: 'These are the moments...', btnText: 'Read My Heart 💌', photos: ['', '', '', '', '', ''] },
     loveNote: { letter: 'My Dearest...', title: 'A Love Note', subText: 'A few words...', btnText: "Let's Play a Game!" },
     // 🎯 Default Mystery Cards
-    mysteryCards: { title: "Why You're Special 🎂", subText: "Click on the cards to reveal!", btnText: "Next ➔", cards: ["You are kind", "You are beautiful", "You inspire me", "You are smart", "You are funny", "I love your smile", "You are caring", "You are my world", "I love you!"] },
+    mysteryCards: { 
+        title: "Why You're Special 🎂", 
+        subText: "Click on the cards to reveal!", 
+        btnText: "Next ➔", 
+        cards: ["You are kind", "You are beautiful", "You inspire me", "You are smart", "You are funny", "I love your smile", "You are caring", "You are my world", "I love you!"] 
+    },
     colorTheme: 'pink', pages: []
 };
 
@@ -68,9 +73,15 @@ function createInnerMemoryScreen() {
     }
 }
 
-// 🎯 Generate 9 Mystery Cards
+// 🎯 Generate 9 Mystery Cards Logic
 function createMysteryCardsScreen() {
     const currentSettings = window.settings || {};
+    
+    // যদি ডাটাবেস থেকে ডেটা না পায়, তবে ডিফল্ট ডেটা সেট করে দিবে
+    if(!currentSettings.mysteryCards) {
+        currentSettings.mysteryCards = defaultSettings.mysteryCards;
+    }
+    
     if(currentSettings.mysteryCards) {
         const grid = document.getElementById('mysteryGrid');
         if(grid && currentSettings.mysteryCards.cards) {
