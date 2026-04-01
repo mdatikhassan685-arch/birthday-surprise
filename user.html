@@ -48,7 +48,6 @@
 
         <div class="user-body">
             
-            <!-- Music & Text Settings -->
             <div class="settings-section">
                 <h3>🎵 Music Settings</h3>
                 <div class="form-group" style="display:flex; gap:10px;">
@@ -66,7 +65,7 @@
             </div>
 
             <div class="settings-section" style="background: #fff0f5; border: 2px dashed #ffb3c6;">
-                <h3 style="color: #d81b60;">🪄 Effect Sequence</h3>
+                <h3 style="color: #d81b60;">🪄 Effect Sequence (কোনটার পর কোনটা আসবে?)</h3>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                     <div><label style="font-weight: bold; color: #d81b60;">1st Effect:</label><select id="seq1" class="seq-select"></select></div>
                     <div><label style="font-weight: bold; color: #d81b60;">2nd Effect:</label><select id="seq2" class="seq-select"></select></div>
@@ -75,72 +74,86 @@
                 </div>
             </div>
 
-            <!-- Screen 1: Memory Card -->
+            <!-- 🎯 Step 1: Memory Card Front Settings -->
             <div class="settings-section">
-                <h3 style="color: #ff1493;">💌 Screen 1: Memory Card</h3>
-                <div style="margin-bottom: 10px;"><label>Title:</label><input type="text" id="mcTitle" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></div>
-                <div style="margin-bottom: 10px;"><label>Message:</label><textarea id="mcMessage" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; min-height: 60px;"></textarea></div>
+                <h3 style="color: #ff1493;">💌 Screen 1: Memory Card (Front Screen)</h3>
+                <div style="margin-bottom: 10px;"><label>Title (e.g., Hyy Baby ❤️):</label><input type="text" id="mcTitle" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></div>
+                <div style="margin-bottom: 10px;"><label>Message:</label><textarea id="mcMessage" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; min-height: 80px;"></textarea></div>
                 <div style="margin-bottom: 15px;"><label>Button Text:</label><input type="text" id="mcBtnText" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></div>
+                
                 <hr style="border: none; border-top: 1px dashed #ddd; margin-bottom: 15px;">
+
                 <div style="margin-bottom: 15px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
                         <label style="color: #4caf50; font-weight: bold; margin: 0;">Upload Photo:</label>
                         <button type="button" id="mcRemoveImgBtn" style="display: none; background: #ff4444; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 12px; cursor: pointer;">Remove Photo</button>
                     </div>
+                    <p style="font-size: 12px; color: #777; margin-top: 0;">If you upload a photo, the GIF will not be shown.</p>
                     <input type="file" id="mcImageFile" accept="image/*" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
                     <div class="image-preview-box" id="mcPreviewBox">
-                        <div class="upload-status" id="mcUploadStatus"></div><span style="color:#aaa; font-size: 12px;" id="mcNoImg">No Photo Uploaded</span>
+                        <div class="upload-status" id="mcUploadStatus"></div>
+                        <span style="color:#aaa; font-size: 12px;" id="mcNoImg">No Photo Uploaded</span>
                     </div>
                 </div>
+
                 <div>
                     <label style="color: #ff1493; font-weight: bold;">Or Choose an Anime GIF:</label>
                     <select id="mcGifSelect" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
-                        <option value="./gif/anime1.gif">Anime GIF 1</option><option value="./gif/anime2.gif">Anime GIF 2</option><option value="./gif/anime3.gif">Anime GIF 3</option>
+                        <option value="./gif/anime1.gif">Anime GIF 1</option>
+                        <option value="./gif/anime2.gif">Anime GIF 2</option>
+                        <option value="./gif/anime3.gif">Anime GIF 3</option>
                     </select>
                 </div>
             </div>
 
-            <!-- Screen 2: Inner Memory Collage -->
+            <!-- 🎯 Step 2: Inner Memory Collage (6 Photos) -->
             <div class="settings-section" style="background: #fffafa; border: 2px dashed #ff69b4;">
                 <h3 style="color: #ff1493;">🖼️ Screen 2: Inner Memory (6 Photos)</h3>
+                
                 <div style="margin-bottom: 10px;"><label>Inner Title:</label><input type="text" id="innerMcTitle" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></div>
-                <div style="margin-bottom: 10px;"><label>Inner Message:</label><textarea id="innerMcMessage" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; min-height: 60px;"></textarea></div>
-                <div style="margin-bottom: 15px;"><label>Button Text:</label><input type="text" id="innerMcBtnText" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></div>
+                <div style="margin-bottom: 10px;"><label>Inner Message:</label><textarea id="innerMcMessage" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; min-height: 80px;"></textarea></div>
+                <div style="margin-bottom: 15px;"><label>Final Button Text:</label><input type="text" id="innerMcBtnText" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></div>
+
                 <hr style="border: none; border-top: 1px dashed #ffb3c6; margin-bottom: 15px;">
                 <label style="font-weight: bold; color: #ff1493;">Upload 6 Photos for Collage:</label>
-                <div id="innerPhotosGrid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;"></div>
+                <div id="innerPhotosGrid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
+                    <!-- JS will populate 6 boxes here -->
+                </div>
             </div>
 
-            <!-- Screen 3: Love Note -->
+            <!-- 🎯 Step 3: NEW Love Note Screen -->
             <div class="settings-section" style="background: #fff5f8; border: 2px solid #ff1493;">
                 <h3 style="color: #d81b60;">💌 Screen 3: A Love Note</h3>
-                <div style="margin-bottom: 10px;"><label>Write your Love Letter:</label><textarea id="loveNoteMessage" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; min-height: 120px;"></textarea></div>
-                <div style="margin-bottom: 10px;"><label>Card Title:</label><input type="text" id="loveNoteTitle" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></div>
-                <div style="margin-bottom: 10px;"><label>Card Subtext:</label><input type="text" id="loveNoteSub" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></div>
-                <div style="margin-bottom: 10px;"><label>Button Text:</label><input type="text" id="loveNoteBtn" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></div>
+                <p style="font-size: 12px; color: #666; margin-bottom: 15px;">This beautiful letter will appear after the photo collage.</p>
+                
+                <div style="margin-bottom: 10px;">
+                    <label>Write your Love Letter:</label>
+                    <textarea id="loveNoteMessage" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; min-height: 120px;" placeholder="My Dearest..."></textarea>
+                </div>
+                
+                <div style="margin-bottom: 10px;">
+                    <label>Right Card Title (e.g., A Love Note):</label>
+                    <input type="text" id="loveNoteTitle" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                </div>
+                
+                <div style="margin-bottom: 10px;">
+                    <label>Right Card Subtext:</label>
+                    <input type="text" id="loveNoteSub" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                </div>
+                
+                <div style="margin-bottom: 10px;">
+                    <label>Final Button Text (e.g., Let's Play a Game!):</label>
+                    <input type="text" id="loveNoteBtn" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                </div>
             </div>
 
-            <!-- 🎯 NEW: Screen 4: Mystery Cards (Upload Photos) -->
-            <div class="settings-section" style="background: #fff0f5; border: 2px dashed #d81b60;">
-                <h3 style="color: #c2185b;">❓ Screen 4: Mystery Cards (Photos)</h3>
-                <p style="font-size: 12px; color: #666; margin-bottom: 15px;">Upload 9 photos. When the user clicks on a box, it will flip and reveal the photo!</p>
-                
-                <div style="margin-bottom: 10px;"><label>Header Title:</label><input type="text" id="mysteryTitle" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;" value="Why You're Special 🎂"></div>
-                <div style="margin-bottom: 15px;"><label>Header Subtitle:</label><input type="text" id="mysterySub" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;" value="Click on the cards to reveal!"></div>
-                
-                <label style="font-weight: bold; color: #c2185b;">Upload 9 Photos:</label>
-                <!-- JS will generate 9 upload boxes here -->
-                <div id="mysteryUploadGrid" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 10px;"></div>
-                
-                <div style="margin-top: 15px;"><label>Final Next Button:</label><input type="text" id="mysteryBtn" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;" value="Next ➔"></div>
-            </div>
-
-            <!-- Book Pages & Theme Settings -->
+            <!-- Book Pages Settings -->
             <div class="settings-section" id="bookSettingsSection">
                 <h3>📖 Book Pages (Upload Photos)</h3>
                 <div id="pageConfigs"></div>
             </div>
 
+            <!-- Color Theme Settings -->
             <div class="settings-section">
                 <h3>🎨 Choose Color Theme</h3>
                 <div class="form-group">
