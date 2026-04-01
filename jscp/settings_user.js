@@ -99,19 +99,13 @@ function loadSettingsForAdmin() {
             memoryCard: { title: 'Hyy Baby ❤️', message: 'Today is your special day!', image: '', defaultGif: './gif/anime1.gif', btnText: 'Open Memories ✨' },
             innerMemory: { title: 'Birthday Memories', message: 'These are the moments that make you...', btnText: 'Read My Heart 💌', photos: ['', '', '', '', '', ''] },
             loveNote: { letter: 'My Dearest...', title: 'A Love Note', subText: 'A few words...', btnText: "Let's Play a Game!" },
-            // 🎯 নতুন: Mystery Cards Data
-            mysteryCards: {
-                title: "Why You're Special 🎂", subText: "Click on the cards to reveal why you're the best!", btnText: "Next ➔",
-                cards: ["You make me smile", "You have a kind heart", "You are so beautiful", "You inspire me", "You are my best friend", "I love your voice", "You are so caring", "You make life magical", "I love you forever!"]
-            },
+            // 🎯 Mystery Cards Data
+            mysteryCards: { title: "Why You're Special 🎂", subText: "Click on the cards to reveal!", btnText: "Next ➔", photos: Array(9).fill('') },
             pages: [ { image: '', content: 'Message 1...' }, { image: '', content: 'Message 2...' } ],
             colorTheme: 'pink'
         };
     }
-    
-    if(!settings.mysteryCards) {
-        settings.mysteryCards = { title: "Why You're Special 🎂", subText: "Click on the cards...", btnText: "Next ➔", cards: ["1","2","3","4","5","6","7","8","9"] };
-    }
+    if(!settings.mysteryCards) settings.mysteryCards = { title: "Why You're Special 🎂", subText: "Click on the cards...", btnText: "Next ➔", photos: Array(9).fill('') };
 }
 
 function populateAdminForm() {
@@ -149,13 +143,11 @@ function populateAdminForm() {
     document.getElementById('loveNoteSub').value = settings.loveNote?.subText || '';
     document.getElementById('loveNoteBtn').value = settings.loveNote?.btnText || '';
 
-    // 🎯 Populate Mystery Cards
+    // 🎯 Populate Mystery Cards Header & Grid (Fix)
     document.getElementById('mysteryTitle').value = settings.mysteryCards?.title || '';
     document.getElementById('mysterySub').value = settings.mysteryCards?.subText || '';
     document.getElementById('mysteryBtn').value = settings.mysteryCards?.btnText || '';
-    for(let i=0; i<9; i++) {
-        document.getElementById(`cardMsg${i}`).value = settings.mysteryCards?.cards[i] || '';
-    }
+    renderMysteryPhotosGrid();
 
     renderPagesForm();
 }
@@ -166,6 +158,8 @@ async function uploadToImgBB(file, targetKey, index = null) {
         statusText = document.getElementById('mcUploadStatus'); previewBox = document.getElementById('mcPreviewBox'); removeBtn = document.getElementById('mcRemoveImgBtn');
     } else if (targetKey === 'innerMemory') {
         statusText = document.getElementById(`inUploadStatus${index}`); previewBox = document.getElementById(`inPreviewBox${index}`); removeBtn = document.getElementById(`inRemoveBtn${index}`);
+    } else if (targetKey === 'mysteryCards') {
+        statusText = document.getElementById(`mysUploadStatus${index}`); previewBox = document.getElementById(`mysPreviewBox${index}`); removeBtn = document.getElementById(`mysRemoveBtn${index}`);
     } else {
         statusText = document.getElementById(`uploadStatus${index}`); previewBox = document.getElementById(`previewBox${index}`);
     }
@@ -177,15 +171,10 @@ async function uploadToImgBB(file, targetKey, index = null) {
         const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: 'POST', body: formData });
         const data = await response.json();
         if (data.success) {
-            if(targetKey === 'memory') {
-                settings.memoryCard.image = data.data.url;
-                if(removeBtn) removeBtn.style.display = 'block';
-            } else if (targetKey === 'innerMemory') {
-                settings.innerMemory.photos[index] = data.data.url;
-                if(removeBtn) removeBtn.style.display = 'block';
-            } else {
-                settings.pages[index].image = data.data.url;
-            }
+            if(targetKey === 'memory') { settings.memoryCard.image = data.data.url; if(removeBtn) removeBtn.style.display = 'block'; } 
+            else if (targetKey === 'innerMemory') { settings.innerMemory.photos[index] = data.data.url; if(removeBtn) removeBtn.style.display = 'block'; } 
+            else if (targetKey === 'mysteryCards') { settings.mysteryCards.photos[index] = data.data.url; if(removeBtn) removeBtn.style.display = 'block'; }
+            else { settings.pages[index].image = data.data.url; }
             statusText.textContent = 'Success! ✅'; setTimeout(() => statusText.style.display = 'none', 2000);
             previewBox.innerHTML = `<img src="${data.data.url}" style="max-width:100%;max-height:100%;object-fit:cover;">`;
         }
@@ -194,12 +183,10 @@ async function uploadToImgBB(file, targetKey, index = null) {
 
 document.getElementById('mcRemoveImgBtn').addEventListener('click', () => {
     settings.memoryCard.image = ''; document.getElementById('mcImageFile').value = '';
-    document.getElementById('mcPreviewBox').innerHTML = '<span style="color:#aaa; font-size: 12px;">No Photo Uploaded</span>';
+    document.getElementById('mcPreviewBox').innerHTML = '<span style="color:#aaa; font-size: 12px;" id="mcNoImg">No Photo Uploaded</span>';
     document.getElementById('mcRemoveImgBtn').style.display = 'none';
 });
-document.getElementById('mcImageFile').addEventListener('change', e => {
-    if(e.target.files[0]) uploadToImgBB(e.target.files[0], 'memory');
-});
+document.getElementById('mcImageFile').addEventListener('change', e => { if(e.target.files[0]) uploadToImgBB(e.target.files[0], 'memory'); });
 
 function renderInnerPhotosGrid() {
     const grid = document.getElementById('innerPhotosGrid');
@@ -214,16 +201,13 @@ function renderInnerPhotosGrid() {
                 <button type="button" id="inRemoveBtn${i}" style="display: ${url ? 'block' : 'none'}; background: #ff4444; color: white; border: none; padding: 2px 6px; border-radius: 4px; font-size: 10px; cursor: pointer;">X</button>
             </div>
             <input type="file" id="inFile${i}" accept="image/*" style="width: 100%; font-size: 10px; margin-bottom: 5px;">
-            <div class="image-preview-box" id="inPreviewBox${i}" style="height: 80px; border-radius: 4px;">
-                <div class="upload-status" id="inUploadStatus${i}"></div>
+            <div class="image-preview-box" id="inPreviewBox${i}" style="height: 80px; border-radius: 4px; display:flex; justify-content:center; align-items:center; overflow:hidden; border:2px dashed #ddd;">
+                <div class="upload-status" id="inUploadStatus${i}" style="position:absolute; background:rgba(0,0,0,0.7); color:white; padding:5px; font-size:10px; display:none;"></div>
                 ${url ? `<img src="${url}" style="max-width:100%;max-height:100%;object-fit:cover;">` : '<span style="font-size:10px;color:#aaa;">Empty</span>'}
             </div>
         `;
         grid.appendChild(div);
-
-        document.getElementById(`inFile${i}`).addEventListener('change', e => {
-            if(e.target.files[0]) uploadToImgBB(e.target.files[0], 'innerMemory', i);
-        });
+        document.getElementById(`inFile${i}`).addEventListener('change', e => { if(e.target.files[0]) uploadToImgBB(e.target.files[0], 'innerMemory', i); });
         document.getElementById(`inRemoveBtn${i}`).addEventListener('click', () => {
             settings.innerMemory.photos[i] = ''; document.getElementById(`inFile${i}`).value = '';
             document.getElementById(`inPreviewBox${i}`).innerHTML = '<span style="font-size:10px;color:#aaa;">Empty</span>';
@@ -232,6 +216,37 @@ function renderInnerPhotosGrid() {
     }
 }
 
+// 🎯 Render 9 Mystery Cards Upload Grid (Fix)
+function renderMysteryPhotosGrid() {
+    const grid = document.getElementById('mysteryUploadGrid');
+    if(!grid) return;
+    grid.innerHTML = '';
+    for(let i = 0; i < 9; i++) {
+        const url = settings.mysteryCards.photos[i] || '';
+        const div = document.createElement('div');
+        div.style.cssText = "border: 1px solid #ddd; padding: 10px; border-radius: 8px; background: white; text-align: center;";
+        div.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+                <span style="font-size:12px; font-weight:bold; color:#c2185b;">Box ${i+1}</span>
+                <button type="button" id="mysRemoveBtn${i}" style="display: ${url ? 'block' : 'none'}; background: #ff4444; color: white; border: none; padding: 2px 6px; border-radius: 4px; font-size: 10px; cursor: pointer;">X</button>
+            </div>
+            <input type="file" id="mysFile${i}" accept="image/*" style="width: 100%; font-size: 10px; margin-bottom: 5px;">
+            <div class="image-preview-box" id="mysPreviewBox${i}" style="height: 80px; border-radius: 4px; display:flex; justify-content:center; align-items:center; overflow:hidden; border:2px dashed #ddd;">
+                <div class="upload-status" id="mysUploadStatus${i}" style="position:absolute; background:rgba(0,0,0,0.7); color:white; padding:5px; font-size:10px; display:none;"></div>
+                ${url ? `<img src="${url}" style="max-width:100%;max-height:100%;object-fit:cover;">` : '<span style="font-size:10px;color:#aaa;">Empty</span>'}
+            </div>
+        `;
+        grid.appendChild(div);
+        document.getElementById(`mysFile${i}`).addEventListener('change', e => { if(e.target.files[0]) uploadToImgBB(e.target.files[0], 'mysteryCards', i); });
+        document.getElementById(`mysRemoveBtn${i}`).addEventListener('click', () => {
+            settings.mysteryCards.photos[i] = ''; document.getElementById(`mysFile${i}`).value = '';
+            document.getElementById(`mysPreviewBox${i}`).innerHTML = '<span style="font-size:10px;color:#aaa;">Empty</span>';
+            document.getElementById(`mysRemoveBtn${i}`).style.display = 'none';
+        });
+    }
+}
+
+// 🎯 Book Pages Form Rendering (Fix)
 function renderPagesForm() {
     const pageConfigs = document.getElementById('pageConfigs');
     if (!pageConfigs) return;
@@ -265,6 +280,7 @@ function renderPagesForm() {
             document.getElementById(`previewBox${index}`).innerHTML = '<span style="color:#aaa; font-size: 12px;">No Image</span>';
             document.getElementById(`pageRemoveBtn${index}`).style.display = 'none';
         });
+
         document.getElementById(`pageFile${index}`).addEventListener('change', e => {
             if (e.target.files[0]) {
                 uploadToImgBB(e.target.files[0], 'page', index).then(() => { document.getElementById(`pageRemoveBtn${index}`).style.display = 'block'; });
@@ -322,13 +338,9 @@ if (applySettingsButton) {
         settings.loveNote.subText = document.getElementById('loveNoteSub').value;
         settings.loveNote.btnText = document.getElementById('loveNoteBtn').value;
 
-        // 🎯 Save Mystery Cards Data
         settings.mysteryCards.title = document.getElementById('mysteryTitle').value;
         settings.mysteryCards.subText = document.getElementById('mysterySub').value;
         settings.mysteryCards.btnText = document.getElementById('mysteryBtn').value;
-        for(let i=0; i<9; i++) {
-            settings.mysteryCards.cards[i] = document.getElementById(`cardMsg${i}`).value;
-        }
 
         saveFormDataLocally(); 
 
