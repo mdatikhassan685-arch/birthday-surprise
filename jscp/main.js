@@ -230,6 +230,7 @@ function playMatrixAnimation() {
     });
 }
 
+// 🎯 Sequence Engine Controller
 window.playNextSequence = function() {
     if (!window.effectQueue || window.effectQueue.length === 0) return;
     
@@ -240,13 +241,16 @@ window.playNextSequence = function() {
     
     const mcScreen = document.getElementById('memory-card-screen');
     const innerMcScreen = document.getElementById('inner-memory-screen');
+    const noteScreen = document.getElementById('love-note-screen'); // 🎯 3rd Screen
     const matrixCanvas = document.getElementById('matrix-rain');
     const mainCanvas = document.querySelector('.canvas');
     const bookContainer = document.querySelector('.book-container');
     const contentDisplay = document.getElementById('contentDisplay');
 
+    // সমস্ত ক্যানভাস হাইড করে নিচ্ছি
     if (mcScreen) mcScreen.style.display = 'none';
     if (innerMcScreen) innerMcScreen.style.display = 'none';
+    if (noteScreen) noteScreen.style.display = 'none';
     if (matrixCanvas) matrixCanvas.style.display = 'none';
     if (mainCanvas) mainCanvas.style.display = 'none';
     if (bookContainer) {
@@ -300,12 +304,17 @@ window.playNextSequence = function() {
     }
 }
 
+// 🎯 Button Click Logic (Front -> Inner -> Love Note -> Sequence)
 document.addEventListener('DOMContentLoaded', () => {
     const mcBtn = document.getElementById('mcDisplayBtn');
     const inBtn = document.getElementById('inDisplayBtn');
+    const noteBtn = document.getElementById('noteDisplayBtn'); 
+
     const mcScreen = document.getElementById('memory-card-screen');
     const innerMcScreen = document.getElementById('inner-memory-screen');
+    const noteScreen = document.getElementById('love-note-screen');
 
+    // 1st Screen -> 2nd Screen
     if (mcBtn) {
         mcBtn.addEventListener('click', () => {
             if (mcScreen) mcScreen.style.display = 'none';
@@ -313,9 +322,18 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // 2nd Screen -> 3rd Screen (Love Note)
     if (inBtn) {
         inBtn.addEventListener('click', () => {
             if (innerMcScreen) innerMcScreen.style.display = 'none';
+            if (noteScreen) noteScreen.style.display = 'flex';
+        });
+    }
+
+    // 3rd Screen -> Main Sequence
+    if (noteBtn) {
+        noteBtn.addEventListener('click', () => {
+            if (noteScreen) noteScreen.style.display = 'none';
             window.playNextSequence(); 
         });
     }
@@ -329,13 +347,14 @@ S = {
         
         window.effectQueue = currentSettings.effectSequence ? [...currentSettings.effectSequence] : ['memory', 'matrix', 'book', 'hearts'];
 
+        // 🎯 1st Screen Data Load
         if (currentSettings.memoryCard) {
             const mcTitle = document.getElementById('mcDisplayTitle');
             const mcMsg = document.getElementById('mcDisplayMsg');
             const mcBtn = document.getElementById('mcDisplayBtn');
             const mcImg = document.getElementById('mcDisplayImg');
             
-            if (mcTitle) mcTitle.innerHTML = '';
+            if (mcTitle) window.mcTitleTextToType = currentSettings.memoryCard.title || 'Hyy Baby ❤️';
             if (mcMsg) mcMsg.textContent = currentSettings.memoryCard.message || '';
             if (mcBtn) mcBtn.textContent = currentSettings.memoryCard.btnText || 'Open Memories ✨';
             
@@ -349,6 +368,7 @@ S = {
             }
         }
 
+        // 🎯 2nd Screen (Inner 6 Photos) Data Load
         if (currentSettings.innerMemory) {
             const inTitle = document.getElementById('inDisplayTitle');
             const inMsg = document.getElementById('inDisplayMsg');
@@ -372,6 +392,19 @@ S = {
                     }
                 });
             }
+        }
+
+        // 🎯 3rd Screen (Love Note) Data Load
+        if (currentSettings.loveNote) {
+            const lLetter = document.getElementById('noteDisplayLetter');
+            const lTitle = document.getElementById('noteDisplayTitle');
+            const lSub = document.getElementById('noteDisplaySub');
+            const lBtn = document.getElementById('noteDisplayBtn');
+
+            if(lLetter) lLetter.textContent = currentSettings.loveNote.letter || '';
+            if(lTitle) lTitle.textContent = currentSettings.loveNote.title || '';
+            if(lSub) lSub.textContent = currentSettings.loveNote.subText || '';
+            if(lBtn) lBtn.textContent = currentSettings.loveNote.btnText || '';
         }
     }
 };
@@ -1592,7 +1625,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if(isMobile) requestAutoFullscreen();
 
-            // সরাসরি সিকোয়েন্স ইঞ্জিন চালু করা হলো
+            // 🎯 সরাসরি সিকোয়েন্স ইঞ্জিন চালু করা হলো
             const currentSettings = window.settings || {};
             window.effectQueue = currentSettings.effectSequence ? [...currentSettings.effectSequence] : ['memory', 'matrix', 'book', 'hearts'];
             S.init();
