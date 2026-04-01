@@ -48,6 +48,7 @@
 
         <div class="user-body">
             
+            <!-- Music & Text Settings -->
             <div class="settings-section">
                 <h3>🎵 Music Settings</h3>
                 <div class="form-group" style="display:flex; gap:10px;">
@@ -65,7 +66,7 @@
             </div>
 
             <div class="settings-section" style="background: #fff0f5; border: 2px dashed #ffb3c6;">
-                <h3 style="color: #d81b60;">🪄 Effect Sequence (কোনটার পর কোনটা আসবে?)</h3>
+                <h3 style="color: #d81b60;">🪄 Effect Sequence</h3>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                     <div><label style="font-weight: bold; color: #d81b60;">1st Effect:</label><select id="seq1" class="seq-select"></select></div>
                     <div><label style="font-weight: bold; color: #d81b60;">2nd Effect:</label><select id="seq2" class="seq-select"></select></div>
@@ -80,9 +81,7 @@
                 <div style="margin-bottom: 10px;"><label>Title:</label><input type="text" id="mcTitle" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></div>
                 <div style="margin-bottom: 10px;"><label>Message:</label><textarea id="mcMessage" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; min-height: 60px;"></textarea></div>
                 <div style="margin-bottom: 15px;"><label>Button Text:</label><input type="text" id="mcBtnText" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></div>
-                
                 <hr style="border: none; border-top: 1px dashed #ddd; margin-bottom: 15px;">
-
                 <div style="margin-bottom: 15px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
                         <label style="color: #4caf50; font-weight: bold; margin: 0;">Upload Photo:</label>
@@ -90,16 +89,13 @@
                     </div>
                     <input type="file" id="mcImageFile" accept="image/*" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
                     <div class="image-preview-box" id="mcPreviewBox">
-                        <div class="upload-status" id="mcUploadStatus"></div>
-                        <span style="color:#aaa; font-size: 12px;" id="mcNoImg">No Photo Uploaded</span>
+                        <div class="upload-status" id="mcUploadStatus"></div><span style="color:#aaa; font-size: 12px;" id="mcNoImg">No Photo Uploaded</span>
                     </div>
                 </div>
                 <div>
                     <label style="color: #ff1493; font-weight: bold;">Or Choose an Anime GIF:</label>
                     <select id="mcGifSelect" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
-                        <option value="./gif/anime1.gif">Anime GIF 1</option>
-                        <option value="./gif/anime2.gif">Anime GIF 2</option>
-                        <option value="./gif/anime3.gif">Anime GIF 3</option>
+                        <option value="./gif/anime1.gif">Anime GIF 1</option><option value="./gif/anime2.gif">Anime GIF 2</option><option value="./gif/anime3.gif">Anime GIF 3</option>
                     </select>
                 </div>
             </div>
@@ -110,7 +106,6 @@
                 <div style="margin-bottom: 10px;"><label>Inner Title:</label><input type="text" id="innerMcTitle" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></div>
                 <div style="margin-bottom: 10px;"><label>Inner Message:</label><textarea id="innerMcMessage" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; min-height: 60px;"></textarea></div>
                 <div style="margin-bottom: 15px;"><label>Button Text:</label><input type="text" id="innerMcBtnText" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></div>
-
                 <hr style="border: none; border-top: 1px dashed #ffb3c6; margin-bottom: 15px;">
                 <label style="font-weight: bold; color: #ff1493;">Upload 6 Photos for Collage:</label>
                 <div id="innerPhotosGrid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;"></div>
@@ -125,37 +120,27 @@
                 <div style="margin-bottom: 10px;"><label>Button Text:</label><input type="text" id="loveNoteBtn" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></div>
             </div>
 
-            <!-- 🎯 NEW: Screen 4: Mystery Cards -->
+            <!-- 🎯 NEW: Screen 4: Mystery Cards (Upload Photos) -->
             <div class="settings-section" style="background: #fff0f5; border: 2px dashed #d81b60;">
-                <h3 style="color: #c2185b;">❓ Screen 4: Mystery Cards (Game)</h3>
-                <p style="font-size: 12px; color: #666; margin-bottom: 15px;">Write 9 short reasons why they are special.</p>
+                <h3 style="color: #c2185b;">❓ Screen 4: Mystery Cards (Photos)</h3>
+                <p style="font-size: 12px; color: #666; margin-bottom: 15px;">Upload 9 photos. When the user clicks on a box, it will flip and reveal the photo!</p>
                 
                 <div style="margin-bottom: 10px;"><label>Header Title:</label><input type="text" id="mysteryTitle" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;" value="Why You're Special 🎂"></div>
-                <div style="margin-bottom: 15px;"><label>Header Subtitle:</label><input type="text" id="mysterySub" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;" value="Click on the cards to reveal why you're the best!"></div>
+                <div style="margin-bottom: 15px;"><label>Header Subtitle:</label><input type="text" id="mysterySub" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;" value="Click on the cards to reveal!"></div>
                 
-                <label style="font-weight: bold; color: #c2185b;">Enter 9 short messages for the cards:</label>
-                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 10px;">
-                    <textarea id="cardMsg0" style="padding: 8px; border: 1px solid #ddd; border-radius: 5px; font-size:12px; resize:none;" rows="3" placeholder="Card 1 msg"></textarea>
-                    <textarea id="cardMsg1" style="padding: 8px; border: 1px solid #ddd; border-radius: 5px; font-size:12px; resize:none;" rows="3" placeholder="Card 2 msg"></textarea>
-                    <textarea id="cardMsg2" style="padding: 8px; border: 1px solid #ddd; border-radius: 5px; font-size:12px; resize:none;" rows="3" placeholder="Card 3 msg"></textarea>
-                    <textarea id="cardMsg3" style="padding: 8px; border: 1px solid #ddd; border-radius: 5px; font-size:12px; resize:none;" rows="3" placeholder="Card 4 msg"></textarea>
-                    <textarea id="cardMsg4" style="padding: 8px; border: 1px solid #ddd; border-radius: 5px; font-size:12px; resize:none;" rows="3" placeholder="Card 5 msg"></textarea>
-                    <textarea id="cardMsg5" style="padding: 8px; border: 1px solid #ddd; border-radius: 5px; font-size:12px; resize:none;" rows="3" placeholder="Card 6 msg"></textarea>
-                    <textarea id="cardMsg6" style="padding: 8px; border: 1px solid #ddd; border-radius: 5px; font-size:12px; resize:none;" rows="3" placeholder="Card 7 msg"></textarea>
-                    <textarea id="cardMsg7" style="padding: 8px; border: 1px solid #ddd; border-radius: 5px; font-size:12px; resize:none;" rows="3" placeholder="Card 8 msg"></textarea>
-                    <textarea id="cardMsg8" style="padding: 8px; border: 1px solid #ddd; border-radius: 5px; font-size:12px; resize:none;" rows="3" placeholder="Card 9 msg"></textarea>
-                </div>
+                <label style="font-weight: bold; color: #c2185b;">Upload 9 Photos:</label>
+                <!-- JS will generate 9 upload boxes here -->
+                <div id="mysteryUploadGrid" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 10px;"></div>
                 
                 <div style="margin-top: 15px;"><label>Final Next Button:</label><input type="text" id="mysteryBtn" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;" value="Next ➔"></div>
             </div>
 
-            <!-- Book Pages Settings -->
+            <!-- Book Pages & Theme Settings -->
             <div class="settings-section" id="bookSettingsSection">
                 <h3>📖 Book Pages (Upload Photos)</h3>
                 <div id="pageConfigs"></div>
             </div>
 
-            <!-- Color Theme Settings -->
             <div class="settings-section">
                 <h3>🎨 Choose Color Theme</h3>
                 <div class="form-group">
