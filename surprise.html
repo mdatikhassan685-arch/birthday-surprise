@@ -10,45 +10,39 @@
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        /* 🎯 ইউনিভার্সাল টেক্সট র‍্যাপিং (যেকোনো বক্সের বাইরে লেখা যাওয়া বন্ধ করবে) */
-        * {
-            word-wrap: break-word !important;
-            overflow-wrap: break-word !important;
-            white-space: pre-wrap !important;
-        }
-
         #settingsButton, .settings-hint, #settingsModal { display: none !important; pointer-events: none !important; }
         .phone-icon img { width: 120px; height: auto; object-fit: contain; }
         @keyframes pulseBtn { 0% { transform: scale(1); box-shadow: 0 0 20px rgba(255, 105, 180, 0.5); } 50% { transform: scale(1.08); box-shadow: 0 0 35px rgba(255, 105, 180, 0.9); } 100% { transform: scale(1); box-shadow: 0 0 20px rgba(255, 105, 180, 0.5); } }
         
+        /* Shared Styles for Screens */
         .full-screen-layer { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle, #ffe6ea 0%, #ffb3c6 100%); z-index: 10005; justify-content: center; align-items: center; overflow-y: auto;}
         .memory-btn { background: linear-gradient(135deg, #ff69b4, #ff1493); color: white; border: none; padding: 12px 30px; font-size: 15px; font-weight: bold; border-radius: 30px; cursor: pointer; box-shadow: 0 5px 15px rgba(255, 105, 180, 0.4); transition: 0.3s; display: inline-block; }
         .memory-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(255, 105, 180, 0.6); }
         @keyframes popIn { 0% { opacity: 0; transform: scale(0.8) translateY(30px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
 
-        /* Screen 1: Front Card */
+        /* 💌 Screen 1: Front Card */
         .memory-layout { display: flex; align-items: center; justify-content: center; gap: 40px; max-width: 900px; width: 90%; animation: popIn 0.8s ease; }
         .memory-card { background: rgba(255, 255, 255, 0.95); border-radius: 20px; padding: 35px 30px; width: 400px; box-shadow: 0 15px 40px rgba(255, 105, 180, 0.2); text-align: left; }
-        .memory-text h2 { color: #ff1493; font-family: 'Pacifico', cursive; margin-bottom: 15px; font-size: 36px; display: inline-block; border-right: 2px solid #ff1493; white-space: nowrap !important; overflow: hidden; margin-top: 0; }
+        .memory-text h2 { color: #ff1493; font-family: 'Pacifico', cursive; margin-bottom: 15px; font-size: 36px; display: inline-block; border-right: 2px solid #ff1493; white-space: nowrap; overflow: hidden; margin-top: 0; }
         .memory-text p { color: #555; font-size: 15px; line-height: 1.6; margin-bottom: 25px; font-family: 'Arial', sans-serif; }
         .memory-image { width: 300px; height: 200px; border-radius: 15px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.15); animation: floatImage 4s ease-in-out infinite; }
         .memory-image img { width: 100%; height: 100%; object-fit: cover; }
         @keyframes floatImage { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
         
-        /* Screen 2: Inner Collage */
+        /* 🖼️ Screen 2: Inner Collage (6 Photos) */
         .inner-layout { display: flex; align-items: center; justify-content: center; gap: 30px; max-width: 1000px; width: 95%; animation: popIn 0.8s ease; }
         .photo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; width: 60%; perspective: 1000px; }
-        .polaroid { background: white; padding: 8px 8px 20px 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); border-radius: 4px; transition: all 0.4s ease; cursor: pointer; user-select: none; }
+        .polaroid { background: white; padding: 8px 8px 20px 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); border-radius: 4px; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; transform-origin: center center; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent;}
         .polaroid:nth-child(even) { transform: rotate(3deg); }
         .polaroid:nth-child(odd) { transform: rotate(-3deg); }
         .polaroid img { width: 100%; aspect-ratio: 1/1; object-fit: cover; pointer-events: none; }
         .polaroid:hover { transform: scale(1.05) rotate(0deg); z-index: 10; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
-        .polaroid.active-pop { transform: scale(1.3) rotate(-5deg) translateY(-10px) !important; z-index: 50 !important; box-shadow: 0 20px 50px rgba(0,0,0,0.5) !important; }
+        .polaroid:active { transform: scale(1.3) rotate(-5deg) translateY(-10px) !important; z-index: 50 !important; box-shadow: 0 20px 50px rgba(0,0,0,0.5) !important; }
         .inner-card { background: rgba(255, 255, 255, 0.95); border-radius: 20px; padding: 40px; width: 35%; box-shadow: 0 15px 40px rgba(255, 105, 180, 0.2); text-align: center; }
-        .inner-card h2 { color: #ff1493; font-family: 'Pacifico', cursive; margin-top: 0; margin-bottom: 20px; font-size: 32px; }
+        .inner-card h2 { color: #ff1493; font-family: 'Pacifico', cursive; margin-top: 0; margin-bottom: 20px; font-size: 32px; line-height: 1.3;}
         .inner-card p { color: #555; font-size: 16px; line-height: 1.6; margin-bottom: 30px; font-family: 'Arial', sans-serif; }
 
-        /* Screen 3: Love Note */
+        /* 💌 Screen 3: Love Note */
         #love-note-screen { z-index: 10007; }
         .note-layout { display: flex; align-items: stretch; justify-content: center; gap: 30px; max-width: 900px; width: 95%; animation: popIn 0.8s ease; height: 350px; }
         .note-paper { background: #fff8eb; width: 60%; padding: 30px 40px; border-radius: 5px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); background-image: repeating-linear-gradient(transparent, transparent 31px, #ffb3c6 31px, #ffb3c6 32px); line-height: 32px; font-family: 'Dancing Script', cursive; font-size: 24px; color: #555; position: relative; overflow-y: auto; }
@@ -57,11 +51,11 @@
         .note-sidebar h2 { font-family: 'Pacifico', cursive; color: #ff1493; font-size: 32px; margin: 0 0 10px 0; line-height: 1.2; }
         .note-sidebar p { font-family: 'Arial', sans-serif; color: #666; font-size: 13px; line-height: 1.5; margin-bottom: 20px;}
 
-        /* 🎯 Screen 4: Mystery Cards (Game) - Update for wider cards */
+        /* 🎯 Screen 4: Mystery Cards (Game) - Fixed Design for Images */
         #mystery-cards-screen { 
             z-index: 10008; 
             flex-direction: column; 
-            justify-content: center; 
+            justify-content: flex-start; /* যাতে বড় স্ক্রিনে উপরের অংশ না কাটে */
             align-items: center;
             padding: 40px 20px;
         }
@@ -74,6 +68,7 @@
             box-shadow: 0 10px 30px rgba(255, 105, 180, 0.2); 
             margin-bottom: 25px; 
             animation: popIn 0.8s ease; 
+            flex-shrink: 0;
         }
         .mystery-header h2 { color: #ff1493; font-family: 'Pacifico', cursive; font-size: 28px; margin: 0; }
         .mystery-header p { color: #666; font-family: 'Arial', sans-serif; font-size: 14px; margin: 5px 0 0 0; }
@@ -82,19 +77,18 @@
             display: grid; 
             grid-template-columns: repeat(3, 1fr); 
             gap: 15px; 
-            /* 🎯 ফিক্স: কার্ডগুলোকে চওড়া করার জন্য গ্রিডের ম্যাক্স-উইডথ বাড়ানো হলো */
-            max-width: 800px; 
-            width: 95%; 
+            max-width: 600px; 
+            width: 100%; 
             margin-bottom: 30px; 
             perspective: 1000px; 
             animation: popIn 1s ease; 
+            flex-shrink: 0;
         }
         
         .flip-card { 
             background-color: transparent; 
             width: 100%; 
-            /* 🎯 ফিক্স: কার্ডকে আরো চওড়া (Wide/Rectangle) করা হলো */
-            aspect-ratio: 2/1; 
+            aspect-ratio: 1/1; /* 🎯 ফিক্স: বাক্সগুলো একদম স্কয়ার (বর্গাকার) হবে */
             cursor: pointer; 
         }
         .flip-card-inner { 
@@ -118,34 +112,35 @@
             display: flex; 
             align-items: center; 
             justify-content: center; 
-            padding: 15px;
-            box-sizing: border-box;
-            overflow-y: auto; /* যদি খুব বেশি লেখা হয়, তবে স্ক্রল হবে কিন্তু বাইরে যাবে না */
+            overflow: hidden; /* 🎯 ফিক্স: ছবির বাড়তি অংশ বক্সের বাইরে যাবে না */
         }
         
+        /* Front of the card (Pink with ?) */
         .flip-card-front { 
             background: linear-gradient(135deg, #ffb3c6, #ff69b4); 
             color: white; 
             font-family: 'Pacifico', cursive; 
-            font-size: 35px; 
+            font-size: 40px; 
         }
         
+        /* 🎯 Back of the card (Image with object-fit) */
         .flip-card-back { 
             background: white; 
-            color: #ff1493; 
             transform: rotateY(180deg); 
-            font-family: 'Arial', sans-serif; 
-            font-size: 14px; 
-            font-weight: bold; 
             border: 2px solid #ffb3c6; 
-            line-height: 1.4; 
+        }
+        .flip-card-back img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* 🎯 ফিক্স: ছবি যতই বড় বা ছোট হোক, স্কয়ার বক্সের ভেতর সুন্দর করে ফিট হয়ে যাবে */
         }
 
         #mysteryNextBtn {
-            margin-top: 10px;
-            margin-bottom: 20px; 
+            flex-shrink: 0;
+            margin-bottom: 40px; 
         }
 
+        /* 📱 Responsive Styles (Mobile & Tablet) */
         @media (max-width: 768px) {
             .memory-layout { flex-direction: column-reverse; gap: 20px; padding: 20px 0;}
             .memory-card { width: 100%; text-align: center; padding: 25px 20px; }
@@ -153,19 +148,18 @@
             .inner-layout { flex-direction: column; gap: 20px; margin-top: 20px; padding: 20px 0;}
             .photo-grid { grid-template-columns: repeat(3, 1fr); width: 100%; gap: 10px; }
             .polaroid { padding: 4px 4px 15px 4px; }
-            .polaroid.active-pop { transform: scale(1.5) rotate(-5deg) translateY(-5px) !important; }
+            .polaroid:active { transform: scale(1.5) rotate(-5deg) translateY(-5px) !important; }
             .inner-card { width: 100%; padding: 20px; }
             .inner-card h2 { font-size: 26px; }
+            
             .note-layout { flex-direction: column; height: auto; gap: 15px; padding: 20px 0;}
             .note-paper { width: 100%; height: 250px; font-size: 20px; padding: 20px 20px 20px 40px; }
             .note-sidebar { width: 100%; padding: 20px; }
             .note-sidebar h2 { font-size: 26px; }
-            
-            /* Mystery Cards Mobile Fixes */
-            .mystery-grid { gap: 10px; max-width: 100%; }
-            .flip-card { aspect-ratio: 16/9; } /* মোবাইলেও চওড়া দেখাবে */
+
+            /* Mystery Cards Mobile */
+            .mystery-grid { gap: 8px; }
             .flip-card-front { font-size: 28px; }
-            .flip-card-back { font-size: 12px; padding: 8px; }
             .mystery-header h2 { font-size: 24px; }
         }
 
@@ -174,11 +168,11 @@
             #mystery-cards-screen { padding: 15px 10px; }
             .mystery-header { padding: 10px 20px; margin-bottom: 10px; }
             .mystery-header h2 { font-size: 20px; }
-            .mystery-grid { gap: 8px; max-width: 550px; margin-bottom: 10px; }
-            .flip-card { aspect-ratio: 5/2; } /* ল্যান্ডস্কেপে আরো বেশি চওড়া হবে */
-            .flip-card-front { font-size: 22px; }
-            .flip-card-back { font-size: 11px; padding: 5px; }
-            #mysteryNextBtn { padding: 8px 20px; font-size: 14px; margin-top: 5px; margin-bottom: 10px;}
+            .mystery-header p { display: none; } /* জায়গা বাঁচানোর জন্য সাবটাইটেল হাইড */
+            .mystery-grid { gap: 10px; max-width: 400px; margin-bottom: 15px; }
+            .flip-card { aspect-ratio: 4/3; } /* 🎯 কার্ডগুলো আরও চ্যাপ্টা হয়ে স্ক্রিনে ফিট হবে */
+            .flip-card-front { font-size: 24px; }
+            #mysteryNextBtn { padding: 8px 20px; font-size: 14px; margin-bottom: 20px;}
         }
     </style>
 </head>
@@ -233,7 +227,7 @@
         </div>
     </div>
 
-    <!-- 🎯 Screen 4: Mystery Cards Game -->
+    <!-- 🎯 Screen 4: Mystery Cards Game (9 Images) -->
     <div id="mystery-cards-screen" class="full-screen-layer">
         <div class="mystery-header">
             <h2 id="mysteryDisplayTitle"></h2>
@@ -266,18 +260,5 @@
     <script src="./jscp/settings_client.js"></script>
     <script src="./jscp/main.js"></script>
 
-    <script>
-        function setupPolaroidInteractions() {
-            const polaroids = document.querySelectorAll('.polaroid');
-            polaroids.forEach(p => {
-                p.addEventListener('mousedown', function() { this.classList.add('active-pop'); });
-                p.addEventListener('mouseup', function() { this.classList.remove('active-pop'); });
-                p.addEventListener('mouseleave', function() { this.classList.remove('active-pop'); });
-                p.addEventListener('touchstart', function(e) { e.preventDefault(); this.classList.add('active-pop'); });
-                p.addEventListener('touchend', function() { this.classList.remove('active-pop'); });
-                p.addEventListener('touchcancel', function() { this.classList.remove('active-pop'); });
-            });
-        }
-    </script>
 </body>
 </html>
