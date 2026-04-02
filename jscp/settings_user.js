@@ -90,11 +90,23 @@ function handleColorThemeChange(selectedTheme) {
     const activeButton = document.querySelector(`[data-theme="${selectedTheme}"]`);
     if (activeButton) activeButton.classList.add('active');
     
-    const theme = colorThemes[selectedTheme];
-    if (theme && matrixColor1Input && matrixColor2Input && sequenceColorInput) {
-        matrixColor1Input.value = theme.matrixColor1;
-        matrixColor2Input.value = theme.matrixColor2;
-        sequenceColorInput.value = theme.sequenceColor;
+    if (selectedTheme === 'custom') {
+        const customColorSection = document.getElementById('customColorSection');
+        const sequenceColorSection = document.getElementById('sequenceColorSection');
+        if (customColorSection) customColorSection.style.display = 'flex';
+        if (sequenceColorSection) sequenceColorSection.style.display = 'block';
+    } else {
+        const customColorSection = document.getElementById('customColorSection');
+        const sequenceColorSection = document.getElementById('sequenceColorSection');
+        if (customColorSection) customColorSection.style.display = 'none';
+        if (sequenceColorSection) sequenceColorSection.style.display = 'none';
+        
+        const theme = colorThemes[selectedTheme];
+        if (theme && matrixColor1Input && matrixColor2Input && sequenceColorInput) {
+            matrixColor1Input.value = theme.matrixColor1;
+            matrixColor2Input.value = theme.matrixColor2;
+            sequenceColorInput.value = theme.sequenceColor;
+        }
     }
 }
 
@@ -104,19 +116,19 @@ document.querySelectorAll('.color-theme-btn').forEach(button => {
     });
 });
 
-// 🎯 ডিফল্ট ডেটাগুলো স্ট্যান্ডার্ড করা হলো
+// 🎯 ডেটা লোড করার আপনার সঠিক লজিকটিই ব্যবহার করা হলো
 function loadSettingsForAdmin() {
     const savedSettings = localStorage.getItem(userStorageKey);
     if (savedSettings) {
         settings = JSON.parse(savedSettings);
-        if(settings.pages.length > 0 && settings.pages[0].isCover) settings.pages.shift(); 
-        if(settings.pages.length > 0 && settings.pages[settings.pages.length - 1].isCover) settings.pages.pop(); 
+        if(settings.pages && settings.pages.length > 0 && settings.pages[0].isCover) settings.pages.shift(); 
+        if(settings.pages && settings.pages.length > 0 && settings.pages[settings.pages.length - 1].isCover) settings.pages.pop(); 
     } else {
         settings = {
             music: './music/song1.mp3', 
             countdown: 3, 
             matrixText: 'HAPPYBIRTHDAY',
-            sequence: 'HAPPY|BIRTHDAY|TO|YOU|❤',
+            sequence: 'HAPPY|BIRTHDAY|TO|YOU|NAME|❤',
             effectSequence: ['memory', 'matrix', 'book', 'hearts'], 
             memoryCard: { 
                 title: 'Hello Dear ❤️', 
@@ -149,8 +161,12 @@ function loadSettingsForAdmin() {
 function populateAdminForm() {
     loadSettingsForAdmin();
 
-    document.getElementById('backgroundMusic').innerHTML = musicOptions.map(opt => `<option value="${opt.value}">${opt.label}</option>`).join('');
-    document.getElementById('backgroundMusic').value = settings.music || musicOptions[0].value;
+    const musicSelect = document.getElementById('backgroundMusic');
+    if (musicSelect) {
+        musicSelect.innerHTML = musicOptions.map(opt => `<option value="${opt.value}">${opt.label}</option>`).join('');
+        musicSelect.value = settings.music || musicOptions[0].value;
+    }
+    
     document.getElementById('matrixText').value = settings.matrixText || 'HAPPYBIRTHDAY';
     document.getElementById('sequenceText').value = settings.sequence || 'HAPPY|BIRTHDAY';
     document.getElementById('countdownTime').value = settings.countdown || 3;
@@ -159,8 +175,11 @@ function populateAdminForm() {
 
     const seqHtml = sequenceOptions.map(opt => `<option value="${opt.value}">${opt.label}</option>`).join('');
     ['seq1', 'seq2', 'seq3', 'seq4'].forEach((id, i) => {
-        document.getElementById(id).innerHTML = seqHtml;
-        document.getElementById(id).value = settings.effectSequence[i] || 'none';
+        const seqElem = document.getElementById(id);
+        if(seqElem) {
+            seqElem.innerHTML = seqHtml;
+            seqElem.value = settings.effectSequence[i] || 'none';
+        }
     });
 
     document.getElementById('mcTitle').value = settings.memoryCard?.title || '';
@@ -169,8 +188,10 @@ function populateAdminForm() {
     document.getElementById('mcGifSelect').value = settings.memoryCard?.defaultGif || './gif/anime1.gif';
 
     if(settings.memoryCard?.image && !settings.memoryCard.image.includes('.gif')) {
-        document.getElementById('mcPreviewBox').innerHTML = `<img src="${settings.memoryCard.image}" style="max-width:100%;max-height:100%;object-fit:cover;">`;
-        document.getElementById('mcRemoveImgBtn').style.display = 'block';
+        const previewBox = document.getElementById('mcPreviewBox');
+        if(previewBox) previewBox.innerHTML = `<img src="${settings.memoryCard.image}" style="max-width:100%;max-height:100%;object-fit:cover;">`;
+        const removeBtn = document.getElementById('mcRemoveImgBtn');
+        if(removeBtn) removeBtn.style.display = 'block';
     }
 
     document.getElementById('innerMcTitle').value = settings.innerMemory?.title || '';
@@ -183,6 +204,7 @@ function populateAdminForm() {
     document.getElementById('loveNoteSub').value = settings.loveNote?.subText || '';
     document.getElementById('loveNoteBtn').value = settings.loveNote?.btnText || '';
 
+    // 🎯 ফিক্স: এই লাইনটি কল না করার কারণেই বইয়ের পেজগুলো স্ক্রিনে আসছিল না!
     renderPagesForm();
 }
 
@@ -193,11 +215,13 @@ async function uploadToImgBB(file, targetKey, index = null) {
     } else if (targetKey === 'innerMemory') {
         statusText = document.getElementById(`inUploadStatus${index}`); previewBox = document.getElementById(`inPreviewBox${index}`); removeBtn = document.getElementById(`inRemoveBtn${index}`);
     } else {
-        statusText = document.getElementById(`uploadStatus${index}`); previewBox = document.getElementById(`previewBox${index}`);
+        statusText = document.getElementById(`uploadStatus${index}`); previewBox = document.getElementById(`previewBox${index}`); removeBtn = document.getElementById(`pageRemoveBtn${index}`);
     }
     
+    if(!statusText) return;
+    
     statusText.style.display = 'block'; 
-    statusText.textContent = currentLang === 'bn' ? 'আপলোড হচ্ছে... ⏳' : 'Uploading... ⏳';
+    statusText.textContent = 'Uploading... ⏳';
 
     const formData = new FormData(); formData.append('image', file);
 
@@ -213,32 +237,47 @@ async function uploadToImgBB(file, targetKey, index = null) {
                 if(removeBtn) removeBtn.style.display = 'block';
             } else {
                 settings.pages[index].image = data.data.url;
+                if(removeBtn) removeBtn.style.display = 'block';
             }
-            statusText.textContent = currentLang === 'bn' ? 'সফল! ✅' : 'Success! ✅';
+            statusText.textContent = 'Success! ✅';
             setTimeout(() => statusText.style.display = 'none', 2000);
-            previewBox.innerHTML = `<img src="${data.data.url}" style="max-width:100%;max-height:100%;object-fit:cover;">`;
+            if(previewBox) previewBox.innerHTML = `<img src="${data.data.url}" style="max-width:100%;max-height:100%;object-fit:cover;">`;
         }
-    } catch (error) { statusText.textContent = currentLang === 'bn' ? 'ত্রুটি! ❌' : 'Error! ❌'; }
+    } catch (error) { statusText.textContent = 'Error! ❌'; }
 }
 
-document.getElementById('mcRemoveImgBtn').addEventListener('click', () => {
-    settings.memoryCard.image = ''; document.getElementById('mcImageFile').value = '';
-    const noImgText = currentLang === 'bn' ? 'কোনো ছবি আপলোড করা হয়নি' : 'No Photo Uploaded';
-    document.getElementById('mcPreviewBox').innerHTML = `<span style="color:#aaa; font-size: 12px;" id="mcNoImg">${noImgText}</span>`;
-    document.getElementById('mcRemoveImgBtn').style.display = 'none';
-});
-document.getElementById('mcImageFile').addEventListener('change', e => {
-    if(e.target.files[0]) uploadToImgBB(e.target.files[0], 'memory');
-});
+const mcRemoveBtn = document.getElementById('mcRemoveImgBtn');
+if(mcRemoveBtn) {
+    mcRemoveBtn.addEventListener('click', () => {
+        settings.memoryCard.image = ''; 
+        const fileInput = document.getElementById('mcImageFile');
+        if(fileInput) fileInput.value = '';
+        const previewBox = document.getElementById('mcPreviewBox');
+        if(previewBox) previewBox.innerHTML = `<span style="color:#aaa; font-size: 12px;" id="mcNoImg">No Photo Uploaded</span>`;
+        mcRemoveBtn.style.display = 'none';
+    });
+}
+
+const mcImageFile = document.getElementById('mcImageFile');
+if(mcImageFile) {
+    mcImageFile.addEventListener('change', e => {
+        if(e.target.files[0]) uploadToImgBB(e.target.files[0], 'memory');
+    });
+}
 
 function renderInnerPhotosGrid() {
     const grid = document.getElementById('innerPhotosGrid');
+    if(!grid) return;
     grid.innerHTML = '';
+    
+    if(!settings.innerMemory || !settings.innerMemory.photos) {
+        settings.innerMemory = { photos: ['', '', '', '', '', ''] };
+    }
+
     for(let i = 0; i < 6; i++) {
         const url = settings.innerMemory.photos[i] || '';
         const div = document.createElement('div');
         div.style.cssText = "border: 1px solid #ddd; padding: 10px; border-radius: 8px; background: white; text-align: center;";
-        const emptyText = currentLang === 'bn' ? 'ফাঁকা' : 'Empty';
         
         div.innerHTML = `
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
@@ -246,9 +285,9 @@ function renderInnerPhotosGrid() {
                 <button type="button" id="inRemoveBtn${i}" style="display: ${url ? 'block' : 'none'}; background: #ff4444; color: white; border: none; padding: 2px 6px; border-radius: 4px; font-size: 10px; cursor: pointer;">X</button>
             </div>
             <input type="file" id="inFile${i}" accept="image/*" style="width: 100%; font-size: 10px; margin-bottom: 5px;">
-            <div class="image-preview-box" id="inPreviewBox${i}" style="height: 80px; border-radius: 4px;">
-                <div class="upload-status" id="inUploadStatus${i}"></div>
-                ${url ? `<img src="${url}" style="max-width:100%;max-height:100%;object-fit:cover;">` : `<span style="font-size:10px;color:#aaa;">${emptyText}</span>`}
+            <div class="image-preview-box" id="inPreviewBox${i}" style="height: 80px; border-radius: 4px; position:relative;">
+                <div class="upload-status" id="inUploadStatus${i}" style="position: absolute; background: rgba(0,0,0,0.7); color: white; padding: 5px 10px; border-radius: 4px; font-size: 12px; display: none;"></div>
+                ${url ? `<img src="${url}" style="max-width:100%;max-height:100%;object-fit:cover;">` : `<span style="font-size:10px;color:#aaa;">Empty</span>`}
             </div>
         `;
         grid.appendChild(div);
@@ -258,7 +297,7 @@ function renderInnerPhotosGrid() {
         });
         document.getElementById(`inRemoveBtn${i}`).addEventListener('click', () => {
             settings.innerMemory.photos[i] = ''; document.getElementById(`inFile${i}`).value = '';
-            document.getElementById(`inPreviewBox${i}`).innerHTML = `<span style="font-size:10px;color:#aaa;">${emptyText}</span>`;
+            document.getElementById(`inPreviewBox${i}`).innerHTML = `<span style="font-size:10px;color:#aaa;">Empty</span>`;
             document.getElementById(`inRemoveBtn${i}`).style.display = 'none';
         });
     }
@@ -270,46 +309,53 @@ function renderPagesForm() {
     pageConfigs.innerHTML = '';
     if(!settings.pages) settings.pages = [];
 
-    const removeBtnText = currentLang === 'bn' ? 'মুছুন' : 'Remove';
-    const noImgText = currentLang === 'bn' ? 'কোনো ছবি আপলোড করা হয়নি' : 'No Image';
-
     settings.pages.forEach((page, index) => {
         const pageDiv = document.createElement('div');
         pageDiv.style.cssText = "border:1px solid #ddd; padding:15px; margin-bottom:15px; border-radius:8px; background:#fff;";
         pageDiv.innerHTML = `
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                 <h4 style="margin: 0; color: #ff1493;">Page ${index + 1}</h4>
-                ${settings.pages.length > 1 ? `<button type="button" onclick="removePage(${index})" style="background: #ff4444; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">${removeBtnText}</button>` : ''}
+                ${settings.pages.length > 1 ? `<button type="button" onclick="removePage(${index})" style="background: #ff4444; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">Remove</button>` : ''}
             </div>
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
-                <button type="button" id="pageRemoveBtn${index}" style="display: ${page.image ? 'block' : 'none'}; background: #ff4444; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 12px; cursor: pointer;">${removeBtnText}</button>
+                <label style="font-weight: bold; margin: 0;">Upload Photo for Book Page:</label>
+                <button type="button" id="pageRemoveBtn${index}" style="display: ${page.image ? 'block' : 'none'}; background: #ff4444; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 12px; cursor: pointer;">Remove Photo</button>
             </div>
             <input type="file" id="pageFile${index}" accept="image/*" style="width: 100%; padding: 8px; margin-bottom: 5px;">
             <div class="image-preview-box" id="previewBox${index}" style="width: 100%; height: 150px; border: 2px dashed #ddd; border-radius: 8px; display: flex; justify-content: center; align-items: center; overflow: hidden; background: #f9f9f9; position: relative;">
                 <div class="upload-status" id="uploadStatus${index}" style="position: absolute; background: rgba(0,0,0,0.7); color: white; padding: 5px 10px; border-radius: 4px; font-size: 12px; display: none;"></div>
-                ${page.image ? `<img src="${page.image}" style="max-width: 100%; max-height: 100%; object-fit: cover;">` : `<span style="color:#aaa; font-size: 12px;">${noImgText}</span>`}
+                ${page.image ? `<img src="${page.image}" style="max-width: 100%; max-height: 100%; object-fit: cover;">` : `<span style="color:#aaa; font-size: 12px;">No Image</span>`}
             </div>
-            <textarea id="pageContent${index}" style="width: 100%; padding: 8px; margin-top: 10px; border: 1px solid #ddd; border-radius: 4px; min-height: 60px;">${page.content || ''}</textarea>
+            <label style="display: block; margin-top: 15px; margin-bottom: 5px; font-weight: bold;">Text Content (Optional):</label>
+            <textarea id="pageContent${index}" style="width: 100%; padding: 8px; margin-top: 10px; border: 1px solid #ddd; border-radius: 4px; min-height: 60px;" placeholder="Write a message...">${page.content || ''}</textarea>
         `;
         pageConfigs.appendChild(pageDiv);
         
-        document.getElementById(`pageRemoveBtn${index}`).addEventListener('click', () => {
-            settings.pages[index].image = ''; document.getElementById(`pageFile${index}`).value = '';
-            document.getElementById(`previewBox${index}`).innerHTML = `<span style="color:#aaa; font-size: 12px;">${noImgText}</span>`;
-            document.getElementById(`pageRemoveBtn${index}`).style.display = 'none';
-        });
+        const pageRemoveBtn = document.getElementById(`pageRemoveBtn${index}`);
+        if(pageRemoveBtn) {
+            pageRemoveBtn.addEventListener('click', () => {
+                settings.pages[index].image = ''; 
+                document.getElementById(`pageFile${index}`).value = '';
+                document.getElementById(`previewBox${index}`).innerHTML = `<span style="color:#aaa; font-size: 12px;">No Image</span>`;
+                pageRemoveBtn.style.display = 'none';
+            });
+        }
 
-        document.getElementById(`pageFile${index}`).addEventListener('change', e => {
-            if (e.target.files[0]) {
-                uploadToImgBB(e.target.files[0], 'page', index).then(() => { document.getElementById(`pageRemoveBtn${index}`).style.display = 'block'; });
-            }
-        });
+        const pageFile = document.getElementById(`pageFile${index}`);
+        if(pageFile) {
+            pageFile.addEventListener('change', e => {
+                if (e.target.files[0]) {
+                    uploadToImgBB(e.target.files[0], 'page', index);
+                }
+            });
+        }
     });
 
     if (settings.pages.length < 18) { 
-        const addBtnText = currentLang === 'bn' ? '+ নতুন পাতা যোগ করুন' : '+ Add New Page';
         const addBtn = document.createElement('button');
-        addBtn.type = "button"; addBtn.textContent = addBtnText; addBtn.onclick = addNewPage;
+        addBtn.type = "button"; 
+        addBtn.textContent = '+ Add New Page'; 
+        addBtn.onclick = addNewPage;
         addBtn.style.cssText = 'background: #4caf50; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer;';
         pageConfigs.appendChild(addBtn);
     }
@@ -319,6 +365,7 @@ function addNewPage() { saveFormDataLocally(); settings.pages.push({ image: '', 
 function removePage(index) { saveFormDataLocally(); settings.pages.splice(index, 1); renderPagesForm(); }
 
 function saveFormDataLocally() {
+    if(!settings.pages) return;
     settings.pages.forEach((page, index) => {
         const contentInput = document.getElementById(`pageContent${index}`);
         if (contentInput) settings.pages[index].content = contentInput.value;
@@ -337,7 +384,12 @@ if (applySettingsButton) {
         settings.matrixColor2 = document.getElementById('matrixColor2').value;
         settings.sequenceColor = document.getElementById('sequenceColor').value;
         
-        settings.effectSequence = [ document.getElementById('seq1').value, document.getElementById('seq2').value, document.getElementById('seq3').value, document.getElementById('seq4').value ];
+        settings.effectSequence = [
+            document.getElementById('seq1').value,
+            document.getElementById('seq2').value,
+            document.getElementById('seq3').value,
+            document.getElementById('seq4').value
+        ];
 
         if(!settings.memoryCard) settings.memoryCard = {};
         settings.memoryCard.title = document.getElementById('mcTitle').value;
@@ -351,10 +403,12 @@ if (applySettingsButton) {
             settings.memoryCard.finalImageToShow = settings.memoryCard.image;
         }
 
+        if(!settings.innerMemory) settings.innerMemory = { photos: ['', '', '', '', '', ''] };
         settings.innerMemory.title = document.getElementById('innerMcTitle').value;
         settings.innerMemory.message = document.getElementById('innerMcMessage').value;
         settings.innerMemory.btnText = document.getElementById('innerMcBtnText').value;
 
+        if(!settings.loveNote) settings.loveNote = {};
         settings.loveNote.letter = document.getElementById('loveNoteMessage').value;
         settings.loveNote.title = document.getElementById('loveNoteTitle').value;
         settings.loveNote.subText = document.getElementById('loveNoteSub').value;
@@ -372,7 +426,7 @@ if (applySettingsButton) {
 
         const magicLinkInput = document.getElementById('magicLinkInput');
         document.getElementById('magicLinkSection').style.display = 'block';
-        magicLinkInput.value = currentLang === 'bn' ? "ডাটাবেসে সেভ হচ্ছে... ⏳" : "Saving to Database... ⏳";
+        magicLinkInput.value = "Saving to Database... ⏳";
 
         try {
             const response = await fetch("https://api.jsonbin.io/v3/b", {
