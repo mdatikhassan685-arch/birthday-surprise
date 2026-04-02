@@ -10,9 +10,14 @@
         .user-container { max-width: 800px; margin: 0 auto 20px auto; background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; animation: slideUp 0.5s ease; }
         .user-header { background: linear-gradient(135deg, #ff69b4, #ff1493); color: white; padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; }
         .user-header h1 { margin: 0; font-size: 20px; }
-        .header-buttons { display: flex; gap: 10px; }
+        .header-buttons { display: flex; gap: 10px; align-items: center; }
         .header-buttons button { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.5); color: white; padding: 8px 12px; border-radius: 5px; cursor: pointer; transition: 0.3s; font-size: 14px; }
         .header-buttons button:hover { background: white; color: #ff1493; }
+        
+        /* 🎯 নতুন: Language Switch Button Style */
+        .lang-btn { background: #fff !important; color: #ff1493 !important; font-weight: bold; border: 2px solid #ff1493 !important; }
+        .lang-btn:hover { background: #ff1493 !important; color: #fff !important; }
+
         .user-body { padding: 20px; }
         .settings-section { background: #fff; border: 1px solid #eee; margin-bottom: 25px; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
         .apply-btn-container { text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; padding-bottom: 20px; }
@@ -35,12 +40,22 @@
         if (localStorage.getItem("isUserLoggedIn") !== "true") window.location.href = "index.html";
         function logout() { localStorage.removeItem("isUserLoggedIn"); window.location.href = "index.html"; }
         function viewSite() { window.open("surprise.html", "_blank"); }
+        
+        // 🎯 Language Toggle Function
+        function toggleLanguage() {
+            const currentLang = localStorage.getItem("userLang") || "en";
+            const newLang = currentLang === "en" ? "vi" : "en";
+            localStorage.setItem("userLang", newLang);
+            location.reload(); // রিলোড দিলে নতুন ভাষা সেট হবে (আপনার lang.js অনুযায়ী)
+        }
     </script>
 
     <div class="user-container">
         <div class="user-header">
             <h1>⚙️ Create Your Surprise</h1>
             <div class="header-buttons">
+                <!-- 🎯 Language Button Added Here -->
+                <button class="lang-btn" onclick="toggleLanguage()">🌐 EN / VI</button>
                 <button onclick="viewSite()">👁️ Preview</button>
                 <button onclick="logout()">🚪 Logout</button>
             </div>
@@ -74,7 +89,7 @@
                 </div>
             </div>
 
-            <!-- 🎯 Step 1: Memory Card Front Settings -->
+            <!-- Memory Card Front -->
             <div class="settings-section">
                 <h3 style="color: #ff1493;">💌 Screen 1: Memory Card (Front Screen)</h3>
                 <div style="margin-bottom: 10px;"><label>Title (e.g., Hyy Baby ❤️):</label><input type="text" id="mcTitle" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></div>
@@ -88,7 +103,6 @@
                         <label style="color: #4caf50; font-weight: bold; margin: 0;">Upload Photo:</label>
                         <button type="button" id="mcRemoveImgBtn" style="display: none; background: #ff4444; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 12px; cursor: pointer;">Remove Photo</button>
                     </div>
-                    <p style="font-size: 12px; color: #777; margin-top: 0;">If you upload a photo, the GIF will not be shown.</p>
                     <input type="file" id="mcImageFile" accept="image/*" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
                     <div class="image-preview-box" id="mcPreviewBox">
                         <div class="upload-status" id="mcUploadStatus"></div>
@@ -106,7 +120,7 @@
                 </div>
             </div>
 
-            <!-- 🎯 Step 2: Inner Memory Collage (6 Photos) -->
+            <!-- Inner Memory Collage -->
             <div class="settings-section" style="background: #fffafa; border: 2px dashed #ff69b4;">
                 <h3 style="color: #ff1493;">🖼️ Screen 2: Inner Memory (6 Photos)</h3>
                 
@@ -117,40 +131,23 @@
                 <hr style="border: none; border-top: 1px dashed #ffb3c6; margin-bottom: 15px;">
                 <label style="font-weight: bold; color: #ff1493;">Upload 6 Photos for Collage:</label>
                 <div id="innerPhotosGrid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
-                    <!-- JS will populate 6 boxes here -->
                 </div>
             </div>
 
-            <!-- 🎯 Step 3: NEW Love Note Screen -->
+            <!-- Love Note Screen -->
             <div class="settings-section" style="background: #fff5f8; border: 2px solid #ff1493;">
                 <h3 style="color: #d81b60;">💌 Screen 3: A Love Note</h3>
-                <p style="font-size: 12px; color: #666; margin-bottom: 15px;">This beautiful letter will appear after the photo collage.</p>
-                
-                <div style="margin-bottom: 10px;">
-                    <label>Write your Love Letter:</label>
-                    <textarea id="loveNoteMessage" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; min-height: 120px;" placeholder="My Dearest..."></textarea>
-                </div>
-                
-                <div style="margin-bottom: 10px;">
-                    <label>Right Card Title (e.g., A Love Note):</label>
-                    <input type="text" id="loveNoteTitle" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
-                </div>
-                
-                <div style="margin-bottom: 10px;">
-                    <label>Right Card Subtext:</label>
-                    <input type="text" id="loveNoteSub" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
-                </div>
-                
-                <div style="margin-bottom: 10px;">
-                    <label>Final Button Text (e.g., Let's Play a Game!):</label>
-                    <input type="text" id="loveNoteBtn" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
-                </div>
+                <div style="margin-bottom: 10px;"><label>Write your Love Letter:</label><textarea id="loveNoteMessage" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; min-height: 120px;"></textarea></div>
+                <div style="margin-bottom: 10px;"><label>Right Card Title (e.g., A Love Note):</label><input type="text" id="loveNoteTitle" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></div>
+                <div style="margin-bottom: 10px;"><label>Right Card Subtext:</label><input type="text" id="loveNoteSub" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></div>
+                <div style="margin-bottom: 10px;"><label>Final Button Text (e.g., Let's Play a Game!):</label><input type="text" id="loveNoteBtn" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></div>
             </div>
 
-            <!-- Book Pages Settings -->
+            <!-- 🎯 ফিক্স: Book Pages Settings -->
             <div class="settings-section" id="bookSettingsSection">
                 <h3>📖 Book Pages (Upload Photos)</h3>
-                <div id="pageConfigs"></div>
+                <p style="font-size: 12px; color: #666; margin-bottom: 15px;">Add photos and messages to create a beautiful 3D flipping book.</p>
+                <div id="pageConfigs"></div> <!-- 🎯 জাভাস্ক্রিপ্ট এই ডিভের ভেতর পেজগুলো বানাবে -->
             </div>
 
             <!-- Color Theme Settings -->
@@ -184,6 +181,8 @@
         </div>
     </div>
 
+    <!-- 🎯 Language script যোগ করা হলো -->
+    <script src="./lang.js"></script>
     <script src="./jscp/settings_user.js"></script>
     <script>
         function copyMagicLink() {
