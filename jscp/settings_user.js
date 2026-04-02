@@ -15,10 +15,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // 🎯 গানের নামগুলো স্ট্যান্ডার্ড করা হলো
 const musicOptions = [
-    { value: './music/song1.mp3', label: 'Happy Birthday 1' },
-    { value: './music/song2.mp3', label: 'Happy Birthday 2' },
-    { value: './music/song3.mp3', label: 'Happy Birthday 3' },
-    { value: './music/song4.mp3', label: 'Happy Birthday 4' }
+    { value: './music/song1.mp3', label: 'Happy Birthday (Acoustic)' },
+    { value: './music/song2.mp3', label: 'Happy Birthday (Pop Version)' },
+    { value: './music/song3.mp3', label: 'Romantic Piano Theme' },
+    { value: './music/song4.mp3', label: 'Perfect - Ed Sheeran (Cover)' }
 ];
 
 const sequenceOptions = [
@@ -83,8 +83,6 @@ function handleColorThemeChange(selectedTheme) {
     const matrixColor1Input = document.getElementById('matrixColor1');
     const matrixColor2Input = document.getElementById('matrixColor2');
     const sequenceColorInput = document.getElementById('sequenceColor');
-    const customColorSection = document.getElementById('customColorSection');
-    const sequenceColorSection = document.getElementById('sequenceColorSection');
     
     settings.colorTheme = selectedTheme;
     document.querySelectorAll('.color-theme-btn').forEach(btn => btn.classList.remove('active'));
@@ -92,19 +90,11 @@ function handleColorThemeChange(selectedTheme) {
     const activeButton = document.querySelector(`[data-theme="${selectedTheme}"]`);
     if (activeButton) activeButton.classList.add('active');
     
-    if (selectedTheme === 'custom') {
-        if (customColorSection) customColorSection.style.display = 'flex';
-        if (sequenceColorSection) sequenceColorSection.style.display = 'block';
-    } else {
-        if (customColorSection) customColorSection.style.display = 'none';
-        if (sequenceColorSection) sequenceColorSection.style.display = 'none';
-        
-        const theme = colorThemes[selectedTheme];
-        if (theme && matrixColor1Input && matrixColor2Input && sequenceColorInput) {
-            matrixColor1Input.value = theme.matrixColor1;
-            matrixColor2Input.value = theme.matrixColor2;
-            sequenceColorInput.value = theme.sequenceColor;
-        }
+    const theme = colorThemes[selectedTheme];
+    if (theme && matrixColor1Input && matrixColor2Input && sequenceColorInput) {
+        matrixColor1Input.value = theme.matrixColor1;
+        matrixColor2Input.value = theme.matrixColor2;
+        sequenceColorInput.value = theme.sequenceColor;
     }
 }
 
@@ -119,14 +109,14 @@ function loadSettingsForAdmin() {
     const savedSettings = localStorage.getItem(userStorageKey);
     if (savedSettings) {
         settings = JSON.parse(savedSettings);
-        if(settings.pages && settings.pages.length > 0 && settings.pages[0].isCover) settings.pages.shift(); 
-        if(settings.pages && settings.pages.length > 0 && settings.pages[settings.pages.length - 1].isCover) settings.pages.pop(); 
+        if(settings.pages.length > 0 && settings.pages[0].isCover) settings.pages.shift(); 
+        if(settings.pages.length > 0 && settings.pages[settings.pages.length - 1].isCover) settings.pages.pop(); 
     } else {
         settings = {
             music: './music/song1.mp3', 
             countdown: 3, 
             matrixText: 'HAPPYBIRTHDAY',
-            sequence: 'HAPPY|BIRTHDAY|TO|YOU|NAME|❤',
+            sequence: 'HAPPY|BIRTHDAY|TO|YOU|❤',
             effectSequence: ['memory', 'matrix', 'book', 'hearts'], 
             memoryCard: { 
                 title: 'Hello Dear ❤️', 
@@ -156,9 +146,6 @@ function loadSettingsForAdmin() {
     }
 }
 
-// 🎯 ফিক্স: ভাষা চেক করার লজিক (যাতে currentLang ডিফাইন করা না থাকলে এরর না দেয়)
-const currentLang = localStorage.getItem("userLang") || "en";
-
 function populateAdminForm() {
     loadSettingsForAdmin();
 
@@ -184,8 +171,6 @@ function populateAdminForm() {
     if(settings.memoryCard?.image && !settings.memoryCard.image.includes('.gif')) {
         document.getElementById('mcPreviewBox').innerHTML = `<img src="${settings.memoryCard.image}" style="max-width:100%;max-height:100%;object-fit:cover;">`;
         document.getElementById('mcRemoveImgBtn').style.display = 'block';
-    } else {
-        document.getElementById('mcRemoveImgBtn').style.display = 'none';
     }
 
     document.getElementById('innerMcTitle').value = settings.innerMemory?.title || '';
@@ -198,7 +183,6 @@ function populateAdminForm() {
     document.getElementById('loveNoteSub').value = settings.loveNote?.subText || '';
     document.getElementById('loveNoteBtn').value = settings.loveNote?.btnText || '';
 
-    // 🎯 ফিক্স: Book Pages রেন্ডার করার ফাংশনটি কল করা হয়েছে
     renderPagesForm();
 }
 
@@ -209,7 +193,7 @@ async function uploadToImgBB(file, targetKey, index = null) {
     } else if (targetKey === 'innerMemory') {
         statusText = document.getElementById(`inUploadStatus${index}`); previewBox = document.getElementById(`inPreviewBox${index}`); removeBtn = document.getElementById(`inRemoveBtn${index}`);
     } else {
-        statusText = document.getElementById(`uploadStatus${index}`); previewBox = document.getElementById(`previewBox${index}`); removeBtn = document.getElementById(`pageRemoveBtn${index}`);
+        statusText = document.getElementById(`uploadStatus${index}`); previewBox = document.getElementById(`previewBox${index}`);
     }
     
     statusText.style.display = 'block'; 
@@ -229,7 +213,6 @@ async function uploadToImgBB(file, targetKey, index = null) {
                 if(removeBtn) removeBtn.style.display = 'block';
             } else {
                 settings.pages[index].image = data.data.url;
-                if(removeBtn) removeBtn.style.display = 'block';
             }
             statusText.textContent = currentLang === 'bn' ? 'সফল! ✅' : 'Success! ✅';
             setTimeout(() => statusText.style.display = 'none', 2000);
@@ -250,8 +233,6 @@ document.getElementById('mcImageFile').addEventListener('change', e => {
 
 function renderInnerPhotosGrid() {
     const grid = document.getElementById('innerPhotosGrid');
-    if(!grid) return;
-    
     grid.innerHTML = '';
     for(let i = 0; i < 6; i++) {
         const url = settings.innerMemory.photos[i] || '';
@@ -265,8 +246,8 @@ function renderInnerPhotosGrid() {
                 <button type="button" id="inRemoveBtn${i}" style="display: ${url ? 'block' : 'none'}; background: #ff4444; color: white; border: none; padding: 2px 6px; border-radius: 4px; font-size: 10px; cursor: pointer;">X</button>
             </div>
             <input type="file" id="inFile${i}" accept="image/*" style="width: 100%; font-size: 10px; margin-bottom: 5px;">
-            <div class="image-preview-box" id="inPreviewBox${i}" style="height: 80px; border-radius: 4px; display: flex; justify-content: center; align-items: center; overflow: hidden; background: #f9f9f9; position: relative;">
-                <div class="upload-status" id="inUploadStatus${i}" style="position: absolute; background: rgba(0,0,0,0.7); color: white; padding: 5px 10px; border-radius: 4px; font-size: 12px; display: none;"></div>
+            <div class="image-preview-box" id="inPreviewBox${i}" style="height: 80px; border-radius: 4px;">
+                <div class="upload-status" id="inUploadStatus${i}"></div>
                 ${url ? `<img src="${url}" style="max-width:100%;max-height:100%;object-fit:cover;">` : `<span style="font-size:10px;color:#aaa;">${emptyText}</span>`}
             </div>
         `;
@@ -283,7 +264,6 @@ function renderInnerPhotosGrid() {
     }
 }
 
-// 🎯 ফিক্স: Book Pages রেন্ডার করা
 function renderPagesForm() {
     const pageConfigs = document.getElementById('pageConfigs');
     if (!pageConfigs) return;
@@ -302,7 +282,6 @@ function renderPagesForm() {
                 ${settings.pages.length > 1 ? `<button type="button" onclick="removePage(${index})" style="background: #ff4444; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">${removeBtnText}</button>` : ''}
             </div>
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
-                <label style="font-weight: bold; margin: 0;">Upload Photo for Book Page:</label>
                 <button type="button" id="pageRemoveBtn${index}" style="display: ${page.image ? 'block' : 'none'}; background: #ff4444; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 12px; cursor: pointer;">${removeBtnText}</button>
             </div>
             <input type="file" id="pageFile${index}" accept="image/*" style="width: 100%; padding: 8px; margin-bottom: 5px;">
@@ -310,8 +289,7 @@ function renderPagesForm() {
                 <div class="upload-status" id="uploadStatus${index}" style="position: absolute; background: rgba(0,0,0,0.7); color: white; padding: 5px 10px; border-radius: 4px; font-size: 12px; display: none;"></div>
                 ${page.image ? `<img src="${page.image}" style="max-width: 100%; max-height: 100%; object-fit: cover;">` : `<span style="color:#aaa; font-size: 12px;">${noImgText}</span>`}
             </div>
-            <label style="display: block; margin-top: 15px; margin-bottom: 5px; font-weight: bold;">Text Content (Optional):</label>
-            <textarea id="pageContent${index}" style="width: 100%; padding: 8px; margin-top: 10px; border: 1px solid #ddd; border-radius: 4px; min-height: 60px;" placeholder="Write a message...">${page.content || ''}</textarea>
+            <textarea id="pageContent${index}" style="width: 100%; padding: 8px; margin-top: 10px; border: 1px solid #ddd; border-radius: 4px; min-height: 60px;">${page.content || ''}</textarea>
         `;
         pageConfigs.appendChild(pageDiv);
         
@@ -323,7 +301,7 @@ function renderPagesForm() {
 
         document.getElementById(`pageFile${index}`).addEventListener('change', e => {
             if (e.target.files[0]) {
-                uploadToImgBB(e.target.files[0], 'page', index);
+                uploadToImgBB(e.target.files[0], 'page', index).then(() => { document.getElementById(`pageRemoveBtn${index}`).style.display = 'block'; });
             }
         });
     });
@@ -390,7 +368,7 @@ if (applySettingsButton) {
         finalSettings.pages.push({ image: './image/Birthday!/cover.jpg', content: '', isCover: true });
 
         localStorage.setItem(userStorageKey, JSON.stringify(finalSettings));
-        localStorage.setItem("userSurpriseSettings", JSON.stringify(finalSettings)); 
+        localStorage.setItem("userSurpriseSettings", JSON.stringify(finalSettings)); // 🎯 কমন প্রিভিউর জন্য
 
         const magicLinkInput = document.getElementById('magicLinkInput');
         document.getElementById('magicLinkSection').style.display = 'block';
