@@ -11,13 +11,33 @@
         .user-header { background: linear-gradient(135deg, #ff69b4, #ff1493); color: white; padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; }
         .user-header h1 { margin: 0; font-size: 20px; }
         .header-buttons { display: flex; gap: 10px; align-items: center; }
-        .header-buttons button { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.5); color: white; padding: 8px 12px; border-radius: 5px; cursor: pointer; transition: 0.3s; font-size: 14px; }
-        .header-buttons button:hover { background: white; color: #ff1493; }
         
-        /* 🎯 নতুন: Language Switch Button Style */
-        .lang-btn { background: #fff !important; color: #ff1493 !important; font-weight: bold; border: 2px solid #ff1493 !important; }
-        .lang-btn:hover { background: #ff1493 !important; color: #fff !important; }
+        /* 🎯 নতুন ভাষার বাটন ডিজাইন */
+        #langSwitchBtn {
+            background: linear-gradient(135deg, #ffffff, #ffe4e1);
+            border: 2px solid #ff1493;
+            color: #ff1493;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(255, 20, 147, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        #langSwitchBtn:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(135deg, #ff1493, #ff69b4);
+            color: white;
+            box-shadow: 0 6px 15px rgba(255, 20, 147, 0.4);
+        }
 
+        .header-buttons button.action-btn { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.5); color: white; padding: 8px 12px; border-radius: 5px; cursor: pointer; transition: 0.3s; font-size: 14px; }
+        .header-buttons button.action-btn:hover { background: white; color: #ff1493; }
+        
         .user-body { padding: 20px; }
         .settings-section { background: #fff; border: 1px solid #eee; margin-bottom: 25px; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
         .apply-btn-container { text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; padding-bottom: 20px; }
@@ -40,31 +60,23 @@
         if (localStorage.getItem("isUserLoggedIn") !== "true") window.location.href = "index.html";
         function logout() { localStorage.removeItem("isUserLoggedIn"); window.location.href = "index.html"; }
         function viewSite() { window.open("surprise.html", "_blank"); }
-        
-        // 🎯 Language Toggle Function
-        function toggleLanguage() {
-            const currentLang = localStorage.getItem("userLang") || "en";
-            const newLang = currentLang === "en" ? "vi" : "en";
-            localStorage.setItem("userLang", newLang);
-            location.reload(); // রিলোড দিলে নতুন ভাষা সেট হবে (আপনার lang.js অনুযায়ী)
-        }
     </script>
 
     <div class="user-container">
         <div class="user-header">
-            <h1>⚙️ Create Your Surprise</h1>
+            <h1>⚙️ Hello!</h1>
             <div class="header-buttons">
-                <!-- 🎯 Language Button Added Here -->
-                <button class="lang-btn" onclick="toggleLanguage()">🌐 EN / VI</button>
-                <button onclick="viewSite()">👁️ Preview</button>
-                <button onclick="logout()">🚪 Logout</button>
+                <!-- 🎯 ভাষা পরিবর্তন বাটন -->
+                <button id="langSwitchBtn" onclick="toggleLanguage()">🌐 EN / BN</button>
+                <button class="action-btn" onclick="viewSite()">👁️ Preview</button>
+                <button class="action-btn" onclick="logout()">🚪 Logout</button>
             </div>
         </div>
 
         <div class="user-body">
             
             <div class="settings-section">
-                <h3>🎵 Music Settings</h3>
+                <h3 data-en="🎵 Music Settings" data-bn="🎵 মিউজিক সেটিংস">🎵 Music Settings</h3>
                 <div class="form-group" style="display:flex; gap:10px;">
                     <select id="backgroundMusic" style="flex:1; padding: 10px; border-radius: 5px; border: 1px solid #ddd;"></select>
                     <button id="musicPreviewButton" style="background: linear-gradient(135deg, #ff6b9d, #ff9270); color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer;">▶ Play</button>
@@ -73,34 +85,34 @@
             </div>
 
             <div class="settings-section">
-                <h3>📝 Text Settings</h3>
-                <div style="margin-bottom: 15px;"><label>Main Animation Text (Use | to separate words):</label><input type="text" id="sequenceText" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></div>
-                <div style="margin-bottom: 15px;"><label>Background Matrix Text:</label><input type="text" id="matrixText" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></div>
-                <div><label>Countdown Time (seconds):</label><input type="number" id="countdownTime" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></div>
+                <h3 data-en="📝 Text Settings" data-bn="📝 লেখা সেটিংস">📝 Text Settings</h3>
+                <div style="margin-bottom: 15px;"><label data-en="Main Animation Text (Use | to separate words):" data-bn="প্রধান লেখা (শব্দ আলাদা করতে | ব্যবহার করুন):">Main Animation Text (Use | to separate words):</label><input type="text" id="sequenceText" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></div>
+                <div style="margin-bottom: 15px;"><label data-en="Background Matrix Text:" data-bn="ব্যাকগ্রাউন্ড ম্যাট্রিক্স লেখা:">Background Matrix Text:</label><input type="text" id="matrixText" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></div>
+                <div><label data-en="Countdown Time (seconds):" data-bn="কাউন্টডাউন সময় (সেকেন্ড):">Countdown Time (seconds):</label><input type="number" id="countdownTime" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></div>
             </div>
 
             <div class="settings-section" style="background: #fff0f5; border: 2px dashed #ffb3c6;">
-                <h3 style="color: #d81b60;">🪄 Effect Sequence (কোনটার পর কোনটা আসবে?)</h3>
+                <h3 style="color: #d81b60;" data-en="🪄 Effect Sequence" data-bn="🪄 ইফেক্ট সিরিয়াল">🪄 Effect Sequence</h3>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                    <div><label style="font-weight: bold; color: #d81b60;">1st Effect:</label><select id="seq1" class="seq-select"></select></div>
-                    <div><label style="font-weight: bold; color: #d81b60;">2nd Effect:</label><select id="seq2" class="seq-select"></select></div>
-                    <div><label style="font-weight: bold; color: #d81b60;">3rd Effect:</label><select id="seq3" class="seq-select"></select></div>
-                    <div><label style="font-weight: bold; color: #d81b60;">4th Effect:</label><select id="seq4" class="seq-select"></select></div>
+                    <div><label style="font-weight: bold; color: #d81b60;" data-en="1st Effect:" data-bn="১ম ইফেক্ট:">1st Effect:</label><select id="seq1" class="seq-select"></select></div>
+                    <div><label style="font-weight: bold; color: #d81b60;" data-en="2nd Effect:" data-bn="২য় ইফেক্ট:">2nd Effect:</label><select id="seq2" class="seq-select"></select></div>
+                    <div><label style="font-weight: bold; color: #d81b60;" data-en="3rd Effect:" data-bn="৩য় ইফেক্ট:">3rd Effect:</label><select id="seq3" class="seq-select"></select></div>
+                    <div><label style="font-weight: bold; color: #d81b60;" data-en="4th Effect:" data-bn="৪র্থ ইফেক্ট:">4th Effect:</label><select id="seq4" class="seq-select"></select></div>
                 </div>
             </div>
 
-            <!-- Memory Card Front -->
+            <!-- Memory Card Settings -->
             <div class="settings-section">
-                <h3 style="color: #ff1493;">💌 Screen 1: Memory Card (Front Screen)</h3>
-                <div style="margin-bottom: 10px;"><label>Title (e.g., Hyy Baby ❤️):</label><input type="text" id="mcTitle" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></div>
-                <div style="margin-bottom: 10px;"><label>Message:</label><textarea id="mcMessage" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; min-height: 80px;"></textarea></div>
-                <div style="margin-bottom: 15px;"><label>Button Text:</label><input type="text" id="mcBtnText" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></div>
+                <h3 style="color: #ff1493;" data-en="💌 Screen 1: Memory Card (Front Screen)" data-bn="💌 স্ক্রিন ১: মেমোরি কার্ড">💌 Screen 1: Memory Card (Front Screen)</h3>
+                <div style="margin-bottom: 10px;"><label data-en="Title:" data-bn="শিরোনাম:">Title:</label><input type="text" id="mcTitle" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></div>
+                <div style="margin-bottom: 10px;"><label data-en="Message:" data-bn="আপনার বার্তা:">Message:</label><textarea id="mcMessage" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; min-height: 80px;"></textarea></div>
+                <div style="margin-bottom: 15px;"><label data-en="Button Text:" data-bn="বাটনের লেখা:">Button Text:</label><input type="text" id="mcBtnText" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></div>
                 
                 <hr style="border: none; border-top: 1px dashed #ddd; margin-bottom: 15px;">
 
                 <div style="margin-bottom: 15px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
-                        <label style="color: #4caf50; font-weight: bold; margin: 0;">Upload Photo:</label>
+                        <label style="color: #4caf50; font-weight: bold; margin: 0;" data-en="Upload Photo:" data-bn="ছবি আপলোড করুন:">Upload Photo:</label>
                         <button type="button" id="mcRemoveImgBtn" style="display: none; background: #ff4444; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 12px; cursor: pointer;">Remove Photo</button>
                     </div>
                     <input type="file" id="mcImageFile" accept="image/*" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
@@ -111,7 +123,7 @@
                 </div>
 
                 <div>
-                    <label style="color: #ff1493; font-weight: bold;">Or Choose an Anime GIF:</label>
+                    <label style="color: #ff1493; font-weight: bold;" data-en="Or Choose an Anime GIF:" data-bn="অথবা একটি অ্যানিমে জিফ বেছে নিন:">Or Choose an Anime GIF:</label>
                     <select id="mcGifSelect" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
                         <option value="./gif/anime1.gif">Anime GIF 1</option>
                         <option value="./gif/anime2.gif">Anime GIF 2</option>
@@ -120,39 +132,42 @@
                 </div>
             </div>
 
-            <!-- Inner Memory Collage -->
+            <!-- Inner Memory Collage (6 Photos) -->
             <div class="settings-section" style="background: #fffafa; border: 2px dashed #ff69b4;">
-                <h3 style="color: #ff1493;">🖼️ Screen 2: Inner Memory (6 Photos)</h3>
+                <h3 style="color: #ff1493;" data-en="🖼️ Screen 2: Inner Memory (6 Photos)" data-bn="🖼️ স্ক্রিন ২: ইনার মেমোরি (৬টি ছবি)">🖼️ Screen 2: Inner Memory (6 Photos)</h3>
                 
-                <div style="margin-bottom: 10px;"><label>Inner Title:</label><input type="text" id="innerMcTitle" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></div>
-                <div style="margin-bottom: 10px;"><label>Inner Message:</label><textarea id="innerMcMessage" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; min-height: 80px;"></textarea></div>
-                <div style="margin-bottom: 15px;"><label>Final Button Text:</label><input type="text" id="innerMcBtnText" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></div>
+                <div style="margin-bottom: 10px;"><label data-en="Inner Title:" data-bn="ভেতরের শিরোনাম:">Inner Title:</label><input type="text" id="innerMcTitle" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></div>
+                <div style="margin-bottom: 10px;"><label data-en="Inner Message:" data-bn="ভেতরের বার্তা:">Inner Message:</label><textarea id="innerMcMessage" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; min-height: 80px;"></textarea></div>
+                <div style="margin-bottom: 15px;"><label data-en="Final Button Text:" data-bn="বাটনের লেখা:">Final Button Text:</label><input type="text" id="innerMcBtnText" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></div>
 
                 <hr style="border: none; border-top: 1px dashed #ffb3c6; margin-bottom: 15px;">
-                <label style="font-weight: bold; color: #ff1493;">Upload 6 Photos for Collage:</label>
-                <div id="innerPhotosGrid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
-                </div>
+                <label style="font-weight: bold; color: #ff1493;" data-en="Upload 6 Photos for Collage:" data-bn="কোলাজের জন্য ৬টি ছবি আপলোড করুন:">Upload 6 Photos for Collage:</label>
+                <div id="innerPhotosGrid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;"></div>
             </div>
 
             <!-- Love Note Screen -->
             <div class="settings-section" style="background: #fff5f8; border: 2px solid #ff1493;">
-                <h3 style="color: #d81b60;">💌 Screen 3: A Love Note</h3>
-                <div style="margin-bottom: 10px;"><label>Write your Love Letter:</label><textarea id="loveNoteMessage" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; min-height: 120px;"></textarea></div>
-                <div style="margin-bottom: 10px;"><label>Right Card Title (e.g., A Love Note):</label><input type="text" id="loveNoteTitle" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></div>
-                <div style="margin-bottom: 10px;"><label>Right Card Subtext:</label><input type="text" id="loveNoteSub" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></div>
-                <div style="margin-bottom: 10px;"><label>Final Button Text (e.g., Let's Play a Game!):</label><input type="text" id="loveNoteBtn" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></div>
+                <h3 style="color: #d81b60;" data-en="💌 Screen 3: A Love Note" data-bn="💌 স্ক্রিন ৩: লাভ নোট">💌 Screen 3: A Love Note</h3>
+                
+                <div style="margin-bottom: 10px;">
+                    <label data-en="Write your Love Letter:" data-bn="আপনার চিঠিটি লিখুন:">Write your Love Letter:</label>
+                    <textarea id="loveNoteMessage" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; min-height: 120px;" placeholder="My Dearest..."></textarea>
+                </div>
+                
+                <div style="margin-bottom: 10px;"><label data-en="Right Card Title:" data-bn="ডান পাশের কার্ডের শিরোনাম:">Right Card Title:</label><input type="text" id="loveNoteTitle" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></div>
+                <div style="margin-bottom: 10px;"><label data-en="Right Card Subtext:" data-bn="ডান পাশের কার্ডের ছোট লেখা:">Right Card Subtext:</label><input type="text" id="loveNoteSub" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></div>
+                <div style="margin-bottom: 10px;"><label data-en="Final Button Text:" data-bn="বাটনের লেখা:">Final Button Text:</label><input type="text" id="loveNoteBtn" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></div>
             </div>
 
-            <!-- 🎯 ফিক্স: Book Pages Settings -->
+            <!-- Book Pages Settings -->
             <div class="settings-section" id="bookSettingsSection">
-                <h3>📖 Book Pages (Upload Photos)</h3>
-                <p style="font-size: 12px; color: #666; margin-bottom: 15px;">Add photos and messages to create a beautiful 3D flipping book.</p>
-                <div id="pageConfigs"></div> <!-- 🎯 জাভাস্ক্রিপ্ট এই ডিভের ভেতর পেজগুলো বানাবে -->
+                <h3 data-en="📖 Book Pages (Upload Photos)" data-bn="📖 বইয়ের পাতা (ছবি আপলোড করুন)">📖 Book Pages (Upload Photos)</h3>
+                <div id="pageConfigs"></div>
             </div>
 
             <!-- Color Theme Settings -->
             <div class="settings-section">
-                <h3>🎨 Choose Color Theme</h3>
+                <h3 data-en="🎨 Choose Color Theme" data-bn="🎨 রঙের থিম বেছে নিন">🎨 Choose Color Theme</h3>
                 <div class="form-group">
                     <div class="color-theme-buttons">
                         <button type="button" class="color-theme-btn active" data-theme="pink"><div class="color-preview pink-preview"></div><span>Sweet Pink</span></button>
@@ -169,26 +184,24 @@
             </div>
 
             <div class="apply-btn-container">
-                <button id="applySettings" class="save-btn">🪄 Generate Magic Link</button>
+                <button id="applySettings" class="save-btn" data-en="🪄 Generate Magic Link" data-bn="🪄 ম্যাজিক লিংক তৈরি করুন">🪄 Generate Magic Link</button>
             </div>
 
             <div class="magic-link-section" id="magicLinkSection">
-                <h3>🎉 Your Surprise Link is Ready!</h3>
+                <h3 data-en="🎉 Your Surprise Link is Ready!" data-bn="🎉 আপনার সারপ্রাইজ লিংক তৈরি হয়েছে!">🎉 Your Surprise Link is Ready!</h3>
                 <input type="text" class="magic-link-input" id="magicLinkInput" readonly>
-                <button class="copy-btn" onclick="copyMagicLink()">📋 Copy Link</button>
+                <button class="copy-btn" onclick="copyMagicLink()" data-en="📋 Copy Link" data-bn="📋 লিংক কপি করুন">📋 Copy Link</button>
             </div>
             
         </div>
     </div>
 
-    <!-- 🎯 Language script যোগ করা হলো -->
-    <script src="./lang.js"></script>
     <script src="./jscp/settings_user.js"></script>
     <script>
         function copyMagicLink() {
             document.getElementById('magicLinkInput').select();
             document.execCommand('copy');
-            alert('✅ Link copied to clipboard!');
+            alert(currentLang === 'en' ? '✅ Link copied to clipboard!' : '✅ লিংক কপি করা হয়েছে!');
         }
     </script>
 </body>
