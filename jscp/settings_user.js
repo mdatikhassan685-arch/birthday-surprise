@@ -5,20 +5,20 @@ const applySettingsButton = document.getElementById('applySettings');
 let settings = {};
 
 const currentUserName = localStorage.getItem("currentUserName") || "guest";
+// 🎯 স্টোরেজ কী এর নাম স্ট্যান্ডার্ড করা হলো
 const userStorageKey = `userSurpriseSettings_${currentUserName}`;
-
-const currentLang = 'en'; 
 
 document.addEventListener('DOMContentLoaded', () => {
     const headerTitle = document.querySelector('.user-header h1');
     if (headerTitle && currentUserName !== "guest") headerTitle.innerHTML = `⚙️ Hello, ${currentUserName}!`;
 });
 
+// 🎯 গানের নামগুলো স্ট্যান্ডার্ড করা হলো
 const musicOptions = [
-    { value: './music/song1.mp3', label: 'Happy Birthday 1' },
-    { value: './music/song2.mp3', label: 'Happy Birthday 2' },
-    { value: './music/song3.mp3', label: 'Happy Birthday 3' },
-    { value: './music/song4.mp3', label: 'Happy Birthday 4' }
+    { value: './music/song1.mp3', label: 'Happy Birthday (Acoustic)' },
+    { value: './music/song2.mp3', label: 'Happy Birthday (Pop Version)' },
+    { value: './music/song3.mp3', label: 'Romantic Piano Theme' },
+    { value: './music/song4.mp3', label: 'Perfect - Ed Sheeran (Cover)' }
 ];
 
 const sequenceOptions = [
@@ -71,6 +71,7 @@ function handleMusicPreview() {
 if (musicPreviewButton) musicPreviewButton.addEventListener('click', handleMusicPreview);
 musicPreviewAudio.addEventListener('ended', () => stopMusicPreview());
 
+// Theme Handling
 const colorThemes = {
     pink: { matrixColor1: '#ff69b4', matrixColor2: '#ff1493', sequenceColor: '#ff69b4' },
     blue: { matrixColor1: '#87ceeb', matrixColor2: '#4169e1', sequenceColor: '#1e90ff' },
@@ -103,78 +104,53 @@ document.querySelectorAll('.color-theme-btn').forEach(button => {
     });
 });
 
-// 🎯 ফিক্সড: ডেটা লোড করার সময় মিসিং ভ্যালু থাকলে ক্র্যাশ করবে না
+// 🎯 ডিফল্ট ডেটাগুলো স্ট্যান্ডার্ড করা হলো
 function loadSettingsForAdmin() {
     const savedSettings = localStorage.getItem(userStorageKey);
-    let parsedSettings = null;
-
     if (savedSettings) {
-        try {
-            parsedSettings = JSON.parse(savedSettings);
-        } catch (e) {
-            console.error("Local storage parse error:", e);
-        }
-    }
-
-    const defaultData = {
-        music: './music/song1.mp3', 
-        countdown: 3, 
-        matrixText: 'HAPPYBIRTHDAY',
-        sequence: 'HAPPY|BIRTHDAY|TO|YOU|NAME|❤',
-        effectSequence: ['memory', 'matrix', 'book', 'hearts'], 
-        memoryCard: { 
-            title: 'Hello Dear ❤️', 
-            message: 'Today is a very special day! I made this just for you.', 
-            image: '', 
-            defaultGif: './gif/anime1.gif', 
-            btnText: 'Open Memories ✨' 
-        },
-        innerMemory: { 
-            title: 'Beautiful Memories', 
-            message: 'These are the moments that make my life so special.', 
-            btnText: 'Read My Letter 💌', 
-            photos: ['', '', '', '', '', ''] 
-        },
-        loveNote: { 
-            letter: 'My Dearest,\n\nOn this beautiful day, I just want to tell you how amazing you are...', 
-            title: 'A Love Note', 
-            subText: 'A few words from the bottom of my heart.', 
-            btnText: "Let's Play a Game!" 
-        },
-        pages: [ 
-            { image: '', content: 'Wishing you all the happiness in the world! 💕' }, 
-            { image: '', content: 'May all your dreams come true! 🎉' } 
-        ],
-        colorTheme: 'pink'
-    };
-
-    if (parsedSettings) {
-        settings = { ...defaultData, ...parsedSettings };
-        
-        // Ensure nested objects exist
-        if (!settings.memoryCard) settings.memoryCard = defaultData.memoryCard;
-        if (!settings.innerMemory) settings.innerMemory = defaultData.innerMemory;
-        if (!settings.loveNote) settings.loveNote = defaultData.loveNote;
-        if (!settings.effectSequence) settings.effectSequence = defaultData.effectSequence;
-
-        if (settings.pages && settings.pages.length > 0) {
-            if (settings.pages[0].isCover) settings.pages.shift(); 
-            if (settings.pages.length > 0 && settings.pages[settings.pages.length - 1].isCover) settings.pages.pop(); 
-        }
+        settings = JSON.parse(savedSettings);
+        if(settings.pages.length > 0 && settings.pages[0].isCover) settings.pages.shift(); 
+        if(settings.pages.length > 0 && settings.pages[settings.pages.length - 1].isCover) settings.pages.pop(); 
     } else {
-        settings = defaultData;
+        settings = {
+            music: './music/song1.mp3', 
+            countdown: 3, 
+            matrixText: 'HAPPYBIRTHDAY',
+            sequence: 'HAPPY|BIRTHDAY|TO|YOU|❤',
+            effectSequence: ['memory', 'matrix', 'book', 'hearts'], 
+            memoryCard: { 
+                title: 'Hello Dear ❤️', 
+                message: 'Today is a very special day! I made this just for you.', 
+                image: '', 
+                defaultGif: './gif/anime1.gif', 
+                btnText: 'Open Memories ✨' 
+            },
+            innerMemory: { 
+                title: 'Beautiful Memories', 
+                message: 'These are the moments that make my life so special.', 
+                btnText: 'Read My Letter 💌', 
+                photos: ['', '', '', '', '', ''] 
+            },
+            loveNote: { 
+                letter: 'My Dearest,\n\nOn this beautiful day, I just want to tell you how amazing you are...', 
+                title: 'A Love Note', 
+                subText: 'A few words from the bottom of my heart.', 
+                btnText: "Let's Play a Game!" 
+            },
+            pages: [ 
+                { image: '', content: 'Wishing you all the happiness in the world! 💕' }, 
+                { image: '', content: 'May all your dreams come true! 🎉' } 
+            ],
+            colorTheme: 'pink'
+        };
     }
 }
 
 function populateAdminForm() {
     loadSettingsForAdmin();
 
-    const musicSelect = document.getElementById('backgroundMusic');
-    if (musicSelect) {
-        musicSelect.innerHTML = musicOptions.map(opt => `<option value="${opt.value}">${opt.label}</option>`).join('');
-        musicSelect.value = settings.music || musicOptions[0].value;
-    }
-    
+    document.getElementById('backgroundMusic').innerHTML = musicOptions.map(opt => `<option value="${opt.value}">${opt.label}</option>`).join('');
+    document.getElementById('backgroundMusic').value = settings.music || musicOptions[0].value;
     document.getElementById('matrixText').value = settings.matrixText || 'HAPPYBIRTHDAY';
     document.getElementById('sequenceText').value = settings.sequence || 'HAPPY|BIRTHDAY';
     document.getElementById('countdownTime').value = settings.countdown || 3;
@@ -183,11 +159,8 @@ function populateAdminForm() {
 
     const seqHtml = sequenceOptions.map(opt => `<option value="${opt.value}">${opt.label}</option>`).join('');
     ['seq1', 'seq2', 'seq3', 'seq4'].forEach((id, i) => {
-        const seqElem = document.getElementById(id);
-        if(seqElem) {
-            seqElem.innerHTML = seqHtml;
-            seqElem.value = settings.effectSequence[i] || 'none';
-        }
+        document.getElementById(id).innerHTML = seqHtml;
+        document.getElementById(id).value = settings.effectSequence[i] || 'none';
     });
 
     document.getElementById('mcTitle').value = settings.memoryCard?.title || '';
@@ -196,10 +169,8 @@ function populateAdminForm() {
     document.getElementById('mcGifSelect').value = settings.memoryCard?.defaultGif || './gif/anime1.gif';
 
     if(settings.memoryCard?.image && !settings.memoryCard.image.includes('.gif')) {
-        const previewBox = document.getElementById('mcPreviewBox');
-        if(previewBox) previewBox.innerHTML = `<img src="${settings.memoryCard.image}" style="max-width:100%;max-height:100%;object-fit:cover;">`;
-        const removeBtn = document.getElementById('mcRemoveImgBtn');
-        if(removeBtn) removeBtn.style.display = 'block';
+        document.getElementById('mcPreviewBox').innerHTML = `<img src="${settings.memoryCard.image}" style="max-width:100%;max-height:100%;object-fit:cover;">`;
+        document.getElementById('mcRemoveImgBtn').style.display = 'block';
     }
 
     document.getElementById('innerMcTitle').value = settings.innerMemory?.title || '';
@@ -222,10 +193,8 @@ async function uploadToImgBB(file, targetKey, index = null) {
     } else if (targetKey === 'innerMemory') {
         statusText = document.getElementById(`inUploadStatus${index}`); previewBox = document.getElementById(`inPreviewBox${index}`); removeBtn = document.getElementById(`inRemoveBtn${index}`);
     } else {
-        statusText = document.getElementById(`uploadStatus${index}`); previewBox = document.getElementById(`previewBox${index}`); removeBtn = document.getElementById(`pageRemoveBtn${index}`);
+        statusText = document.getElementById(`uploadStatus${index}`); previewBox = document.getElementById(`previewBox${index}`);
     }
-    
-    if(!statusText) return;
     
     statusText.style.display = 'block'; 
     statusText.textContent = currentLang === 'bn' ? 'আপলোড হচ্ছে... ⏳' : 'Uploading... ⏳';
@@ -247,40 +216,24 @@ async function uploadToImgBB(file, targetKey, index = null) {
             }
             statusText.textContent = currentLang === 'bn' ? 'সফল! ✅' : 'Success! ✅';
             setTimeout(() => statusText.style.display = 'none', 2000);
-            if(previewBox) previewBox.innerHTML = `<img src="${data.data.url}" style="max-width:100%;max-height:100%;object-fit:cover;">`;
+            previewBox.innerHTML = `<img src="${data.data.url}" style="max-width:100%;max-height:100%;object-fit:cover;">`;
         }
     } catch (error) { statusText.textContent = currentLang === 'bn' ? 'ত্রুটি! ❌' : 'Error! ❌'; }
 }
 
-const mcRemoveBtn = document.getElementById('mcRemoveImgBtn');
-if(mcRemoveBtn) {
-    mcRemoveBtn.addEventListener('click', () => {
-        settings.memoryCard.image = ''; 
-        const fileInput = document.getElementById('mcImageFile');
-        if(fileInput) fileInput.value = '';
-        const noImgText = currentLang === 'bn' ? 'কোনো ছবি আপলোড করা হয়নি' : 'No Photo Uploaded';
-        const previewBox = document.getElementById('mcPreviewBox');
-        if(previewBox) previewBox.innerHTML = `<span style="color:#aaa; font-size: 12px;" id="mcNoImg">${noImgText}</span>`;
-        mcRemoveBtn.style.display = 'none';
-    });
-}
-
-const mcImageFile = document.getElementById('mcImageFile');
-if(mcImageFile) {
-    mcImageFile.addEventListener('change', e => {
-        if(e.target.files[0]) uploadToImgBB(e.target.files[0], 'memory');
-    });
-}
+document.getElementById('mcRemoveImgBtn').addEventListener('click', () => {
+    settings.memoryCard.image = ''; document.getElementById('mcImageFile').value = '';
+    const noImgText = currentLang === 'bn' ? 'কোনো ছবি আপলোড করা হয়নি' : 'No Photo Uploaded';
+    document.getElementById('mcPreviewBox').innerHTML = `<span style="color:#aaa; font-size: 12px;" id="mcNoImg">${noImgText}</span>`;
+    document.getElementById('mcRemoveImgBtn').style.display = 'none';
+});
+document.getElementById('mcImageFile').addEventListener('change', e => {
+    if(e.target.files[0]) uploadToImgBB(e.target.files[0], 'memory');
+});
 
 function renderInnerPhotosGrid() {
     const grid = document.getElementById('innerPhotosGrid');
-    if(!grid) return;
     grid.innerHTML = '';
-    
-    if(!settings.innerMemory || !settings.innerMemory.photos) {
-        settings.innerMemory = { photos: ['', '', '', '', '', ''] };
-    }
-
     for(let i = 0; i < 6; i++) {
         const url = settings.innerMemory.photos[i] || '';
         const div = document.createElement('div');
@@ -293,8 +246,8 @@ function renderInnerPhotosGrid() {
                 <button type="button" id="inRemoveBtn${i}" style="display: ${url ? 'block' : 'none'}; background: #ff4444; color: white; border: none; padding: 2px 6px; border-radius: 4px; font-size: 10px; cursor: pointer;">X</button>
             </div>
             <input type="file" id="inFile${i}" accept="image/*" style="width: 100%; font-size: 10px; margin-bottom: 5px;">
-            <div class="image-preview-box" id="inPreviewBox${i}" style="height: 80px; border-radius: 4px; position:relative;">
-                <div class="upload-status" id="inUploadStatus${i}" style="position: absolute; background: rgba(0,0,0,0.7); color: white; padding: 5px 10px; border-radius: 4px; font-size: 12px; display: none;"></div>
+            <div class="image-preview-box" id="inPreviewBox${i}" style="height: 80px; border-radius: 4px;">
+                <div class="upload-status" id="inUploadStatus${i}"></div>
                 ${url ? `<img src="${url}" style="max-width:100%;max-height:100%;object-fit:cover;">` : `<span style="font-size:10px;color:#aaa;">${emptyText}</span>`}
             </div>
         `;
@@ -340,27 +293,17 @@ function renderPagesForm() {
         `;
         pageConfigs.appendChild(pageDiv);
         
-        const pageRemoveBtn = document.getElementById(`pageRemoveBtn${index}`);
-        if(pageRemoveBtn) {
-            pageRemoveBtn.addEventListener('click', () => {
-                settings.pages[index].image = ''; 
-                document.getElementById(`pageFile${index}`).value = '';
-                document.getElementById(`previewBox${index}`).innerHTML = `<span style="color:#aaa; font-size: 12px;">${noImgText}</span>`;
-                pageRemoveBtn.style.display = 'none';
-            });
-        }
+        document.getElementById(`pageRemoveBtn${index}`).addEventListener('click', () => {
+            settings.pages[index].image = ''; document.getElementById(`pageFile${index}`).value = '';
+            document.getElementById(`previewBox${index}`).innerHTML = `<span style="color:#aaa; font-size: 12px;">${noImgText}</span>`;
+            document.getElementById(`pageRemoveBtn${index}`).style.display = 'none';
+        });
 
-        const pageFile = document.getElementById(`pageFile${index}`);
-        if(pageFile) {
-            pageFile.addEventListener('change', e => {
-                if (e.target.files[0]) {
-                    uploadToImgBB(e.target.files[0], 'page', index).then(() => { 
-                        const btn = document.getElementById(`pageRemoveBtn${index}`);
-                        if(btn) btn.style.display = 'block'; 
-                    });
-                }
-            });
-        }
+        document.getElementById(`pageFile${index}`).addEventListener('change', e => {
+            if (e.target.files[0]) {
+                uploadToImgBB(e.target.files[0], 'page', index).then(() => { document.getElementById(`pageRemoveBtn${index}`).style.display = 'block'; });
+            }
+        });
     });
 
     if (settings.pages.length < 18) { 
@@ -376,7 +319,6 @@ function addNewPage() { saveFormDataLocally(); settings.pages.push({ image: '', 
 function removePage(index) { saveFormDataLocally(); settings.pages.splice(index, 1); renderPagesForm(); }
 
 function saveFormDataLocally() {
-    if(!settings.pages) return;
     settings.pages.forEach((page, index) => {
         const contentInput = document.getElementById(`pageContent${index}`);
         if (contentInput) settings.pages[index].content = contentInput.value;
@@ -409,12 +351,10 @@ if (applySettingsButton) {
             settings.memoryCard.finalImageToShow = settings.memoryCard.image;
         }
 
-        if(!settings.innerMemory) settings.innerMemory = { photos: ['', '', '', '', '', ''] };
         settings.innerMemory.title = document.getElementById('innerMcTitle').value;
         settings.innerMemory.message = document.getElementById('innerMcMessage').value;
         settings.innerMemory.btnText = document.getElementById('innerMcBtnText').value;
 
-        if(!settings.loveNote) settings.loveNote = {};
         settings.loveNote.letter = document.getElementById('loveNoteMessage').value;
         settings.loveNote.title = document.getElementById('loveNoteTitle').value;
         settings.loveNote.subText = document.getElementById('loveNoteSub').value;
@@ -428,7 +368,7 @@ if (applySettingsButton) {
         finalSettings.pages.push({ image: './image/Birthday!/cover.jpg', content: '', isCover: true });
 
         localStorage.setItem(userStorageKey, JSON.stringify(finalSettings));
-        localStorage.setItem("userSurpriseSettings", JSON.stringify(finalSettings)); 
+        localStorage.setItem("userSurpriseSettings", JSON.stringify(finalSettings)); // 🎯 কমন প্রিভিউর জন্য
 
         const magicLinkInput = document.getElementById('magicLinkInput');
         document.getElementById('magicLinkSection').style.display = 'block';
