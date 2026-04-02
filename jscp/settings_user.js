@@ -8,17 +8,20 @@ const currentUserName = localStorage.getItem("currentUserName") || "guest";
 // 🎯 স্টোরেজ কী এর নাম স্ট্যান্ডার্ড করা হলো
 const userStorageKey = `userSurpriseSettings_${currentUserName}`;
 
+// 🌍 ল্যাঙ্গুয়েজ ডিটেকশন (যদি আপনার কোনো ল্যাঙ্গুয়েজ ভেরিয়েবল থাকে)
+const currentLang = 'en'; 
+
 document.addEventListener('DOMContentLoaded', () => {
     const headerTitle = document.querySelector('.user-header h1');
     if (headerTitle && currentUserName !== "guest") headerTitle.innerHTML = `⚙️ Hello, ${currentUserName}!`;
 });
 
-// 🎯 গানের নামগুলো স্ট্যান্ডার্ড করা হলো
+// 🎯 গানের নামগুলো স্ট্যান্ডার্ড করা হলো (আপনার আপডেট)
 const musicOptions = [
-    { value: './music/song1.mp3', label: 'Happy Birthday (Acoustic)' },
-    { value: './music/song2.mp3', label: 'Happy Birthday (Pop Version)' },
-    { value: './music/song3.mp3', label: 'Romantic Piano Theme' },
-    { value: './music/song4.mp3', label: 'Perfect - Ed Sheeran (Cover)' }
+    { value: './music/song1.mp3', label: 'Happy Birthday 1' },
+    { value: './music/song2.mp3', label: 'Happy Birthday 2' },
+    { value: './music/song3.mp3', label: 'Happy Birthday 3' },
+    { value: './music/song4.mp3', label: 'Happy Birthday 4' }
 ];
 
 const sequenceOptions = [
@@ -104,7 +107,7 @@ document.querySelectorAll('.color-theme-btn').forEach(button => {
     });
 });
 
-// 🎯 ডিফল্ট ডেটাগুলো স্ট্যান্ডার্ড করা হলো
+// 🎯 ডিফল্ট ডেটাগুলো স্ট্যান্ডার্ড করা হলো (আপনার আপডেট)
 function loadSettingsForAdmin() {
     const savedSettings = localStorage.getItem(userStorageKey);
     if (savedSettings) {
@@ -116,7 +119,7 @@ function loadSettingsForAdmin() {
             music: './music/song1.mp3', 
             countdown: 3, 
             matrixText: 'HAPPYBIRTHDAY',
-            sequence: 'HAPPY|BIRTHDAY|TO|YOU|❤',
+            sequence: 'HAPPY|BIRTHDAY|TO|YOU|NAME|❤',
             effectSequence: ['memory', 'matrix', 'book', 'hearts'], 
             memoryCard: { 
                 title: 'Hello Dear ❤️', 
@@ -149,8 +152,12 @@ function loadSettingsForAdmin() {
 function populateAdminForm() {
     loadSettingsForAdmin();
 
-    document.getElementById('backgroundMusic').innerHTML = musicOptions.map(opt => `<option value="${opt.value}">${opt.label}</option>`).join('');
-    document.getElementById('backgroundMusic').value = settings.music || musicOptions[0].value;
+    const musicSelect = document.getElementById('backgroundMusic');
+    if (musicSelect) {
+        musicSelect.innerHTML = musicOptions.map(opt => `<option value="${opt.value}">${opt.label}</option>`).join('');
+        musicSelect.value = settings.music || musicOptions[0].value;
+    }
+    
     document.getElementById('matrixText').value = settings.matrixText || 'HAPPYBIRTHDAY';
     document.getElementById('sequenceText').value = settings.sequence || 'HAPPY|BIRTHDAY';
     document.getElementById('countdownTime').value = settings.countdown || 3;
@@ -159,8 +166,11 @@ function populateAdminForm() {
 
     const seqHtml = sequenceOptions.map(opt => `<option value="${opt.value}">${opt.label}</option>`).join('');
     ['seq1', 'seq2', 'seq3', 'seq4'].forEach((id, i) => {
-        document.getElementById(id).innerHTML = seqHtml;
-        document.getElementById(id).value = settings.effectSequence[i] || 'none';
+        const seqElem = document.getElementById(id);
+        if(seqElem) {
+            seqElem.innerHTML = seqHtml;
+            seqElem.value = settings.effectSequence[i] || 'none';
+        }
     });
 
     document.getElementById('mcTitle').value = settings.memoryCard?.title || '';
@@ -169,8 +179,10 @@ function populateAdminForm() {
     document.getElementById('mcGifSelect').value = settings.memoryCard?.defaultGif || './gif/anime1.gif';
 
     if(settings.memoryCard?.image && !settings.memoryCard.image.includes('.gif')) {
-        document.getElementById('mcPreviewBox').innerHTML = `<img src="${settings.memoryCard.image}" style="max-width:100%;max-height:100%;object-fit:cover;">`;
-        document.getElementById('mcRemoveImgBtn').style.display = 'block';
+        const previewBox = document.getElementById('mcPreviewBox');
+        if(previewBox) previewBox.innerHTML = `<img src="${settings.memoryCard.image}" style="max-width:100%;max-height:100%;object-fit:cover;">`;
+        const removeBtn = document.getElementById('mcRemoveImgBtn');
+        if(removeBtn) removeBtn.style.display = 'block';
     }
 
     document.getElementById('innerMcTitle').value = settings.innerMemory?.title || '';
@@ -183,6 +195,7 @@ function populateAdminForm() {
     document.getElementById('loveNoteSub').value = settings.loveNote?.subText || '';
     document.getElementById('loveNoteBtn').value = settings.loveNote?.btnText || '';
 
+    // 🎯 ফিক্স: এই লাইনটি মিসিং ছিল, যার কারণে বইয়ের পেজগুলো স্ক্রিনে দেখাচ্ছিল না!
     renderPagesForm();
 }
 
@@ -193,7 +206,7 @@ async function uploadToImgBB(file, targetKey, index = null) {
     } else if (targetKey === 'innerMemory') {
         statusText = document.getElementById(`inUploadStatus${index}`); previewBox = document.getElementById(`inPreviewBox${index}`); removeBtn = document.getElementById(`inRemoveBtn${index}`);
     } else {
-        statusText = document.getElementById(`uploadStatus${index}`); previewBox = document.getElementById(`previewBox${index}`);
+        statusText = document.getElementById(`uploadStatus${index}`); previewBox = document.getElementById(`previewBox${index}`); removeBtn = document.getElementById(`pageRemoveBtn${index}`);
     }
     
     statusText.style.display = 'block'; 
@@ -207,13 +220,13 @@ async function uploadToImgBB(file, targetKey, index = null) {
         if (data.success) {
             if(targetKey === 'memory') {
                 settings.memoryCard.image = data.data.url;
-                if(removeBtn) removeBtn.style.display = 'block';
             } else if (targetKey === 'innerMemory') {
                 settings.innerMemory.photos[index] = data.data.url;
-                if(removeBtn) removeBtn.style.display = 'block';
             } else {
                 settings.pages[index].image = data.data.url;
             }
+            if(removeBtn) removeBtn.style.display = 'block';
+            
             statusText.textContent = currentLang === 'bn' ? 'সফল! ✅' : 'Success! ✅';
             setTimeout(() => statusText.style.display = 'none', 2000);
             previewBox.innerHTML = `<img src="${data.data.url}" style="max-width:100%;max-height:100%;object-fit:cover;">`;
@@ -221,18 +234,26 @@ async function uploadToImgBB(file, targetKey, index = null) {
     } catch (error) { statusText.textContent = currentLang === 'bn' ? 'ত্রুটি! ❌' : 'Error! ❌'; }
 }
 
-document.getElementById('mcRemoveImgBtn').addEventListener('click', () => {
-    settings.memoryCard.image = ''; document.getElementById('mcImageFile').value = '';
-    const noImgText = currentLang === 'bn' ? 'কোনো ছবি আপলোড করা হয়নি' : 'No Photo Uploaded';
-    document.getElementById('mcPreviewBox').innerHTML = `<span style="color:#aaa; font-size: 12px;" id="mcNoImg">${noImgText}</span>`;
-    document.getElementById('mcRemoveImgBtn').style.display = 'none';
-});
-document.getElementById('mcImageFile').addEventListener('change', e => {
-    if(e.target.files[0]) uploadToImgBB(e.target.files[0], 'memory');
-});
+const mcRemoveBtn = document.getElementById('mcRemoveImgBtn');
+if(mcRemoveBtn) {
+    mcRemoveBtn.addEventListener('click', () => {
+        settings.memoryCard.image = ''; document.getElementById('mcImageFile').value = '';
+        const noImgText = currentLang === 'bn' ? 'কোনো ছবি আপলোড করা হয়নি' : 'No Photo Uploaded';
+        document.getElementById('mcPreviewBox').innerHTML = `<span style="color:#aaa; font-size: 12px;" id="mcNoImg">${noImgText}</span>`;
+        document.getElementById('mcRemoveImgBtn').style.display = 'none';
+    });
+}
+
+const mcImageFile = document.getElementById('mcImageFile');
+if(mcImageFile) {
+    mcImageFile.addEventListener('change', e => {
+        if(e.target.files[0]) uploadToImgBB(e.target.files[0], 'memory');
+    });
+}
 
 function renderInnerPhotosGrid() {
     const grid = document.getElementById('innerPhotosGrid');
+    if(!grid) return;
     grid.innerHTML = '';
     for(let i = 0; i < 6; i++) {
         const url = settings.innerMemory.photos[i] || '';
@@ -246,8 +267,8 @@ function renderInnerPhotosGrid() {
                 <button type="button" id="inRemoveBtn${i}" style="display: ${url ? 'block' : 'none'}; background: #ff4444; color: white; border: none; padding: 2px 6px; border-radius: 4px; font-size: 10px; cursor: pointer;">X</button>
             </div>
             <input type="file" id="inFile${i}" accept="image/*" style="width: 100%; font-size: 10px; margin-bottom: 5px;">
-            <div class="image-preview-box" id="inPreviewBox${i}" style="height: 80px; border-radius: 4px;">
-                <div class="upload-status" id="inUploadStatus${i}"></div>
+            <div class="image-preview-box" id="inPreviewBox${i}" style="height: 80px; border-radius: 4px; position:relative;">
+                <div class="upload-status" id="inUploadStatus${i}" style="position: absolute; background: rgba(0,0,0,0.7); color: white; padding: 5px 10px; border-radius: 4px; font-size: 12px; display: none;"></div>
                 ${url ? `<img src="${url}" style="max-width:100%;max-height:100%;object-fit:cover;">` : `<span style="font-size:10px;color:#aaa;">${emptyText}</span>`}
             </div>
         `;
@@ -264,6 +285,7 @@ function renderInnerPhotosGrid() {
     }
 }
 
+// 🎯 ফিক্স: Book Pages Rendering System 
 function renderPagesForm() {
     const pageConfigs = document.getElementById('pageConfigs');
     if (!pageConfigs) return;
@@ -282,6 +304,7 @@ function renderPagesForm() {
                 ${settings.pages.length > 1 ? `<button type="button" onclick="removePage(${index})" style="background: #ff4444; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">${removeBtnText}</button>` : ''}
             </div>
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                <label style="font-weight: bold; margin: 0;">Upload Photo for Book Page:</label>
                 <button type="button" id="pageRemoveBtn${index}" style="display: ${page.image ? 'block' : 'none'}; background: #ff4444; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 12px; cursor: pointer;">${removeBtnText}</button>
             </div>
             <input type="file" id="pageFile${index}" accept="image/*" style="width: 100%; padding: 8px; margin-bottom: 5px;">
@@ -289,6 +312,7 @@ function renderPagesForm() {
                 <div class="upload-status" id="uploadStatus${index}" style="position: absolute; background: rgba(0,0,0,0.7); color: white; padding: 5px 10px; border-radius: 4px; font-size: 12px; display: none;"></div>
                 ${page.image ? `<img src="${page.image}" style="max-width: 100%; max-height: 100%; object-fit: cover;">` : `<span style="color:#aaa; font-size: 12px;">${noImgText}</span>`}
             </div>
+            <label style="display: block; margin-top: 15px; margin-bottom: 5px; font-weight: bold;">Text Content (Optional):</label>
             <textarea id="pageContent${index}" style="width: 100%; padding: 8px; margin-top: 10px; border: 1px solid #ddd; border-radius: 4px; min-height: 60px;">${page.content || ''}</textarea>
         `;
         pageConfigs.appendChild(pageDiv);
@@ -337,7 +361,12 @@ if (applySettingsButton) {
         settings.matrixColor2 = document.getElementById('matrixColor2').value;
         settings.sequenceColor = document.getElementById('sequenceColor').value;
         
-        settings.effectSequence = [ document.getElementById('seq1').value, document.getElementById('seq2').value, document.getElementById('seq3').value, document.getElementById('seq4').value ];
+        settings.effectSequence = [
+            document.getElementById('seq1').value,
+            document.getElementById('seq2').value,
+            document.getElementById('seq3').value,
+            document.getElementById('seq4').value
+        ];
 
         if(!settings.memoryCard) settings.memoryCard = {};
         settings.memoryCard.title = document.getElementById('mcTitle').value;
@@ -368,7 +397,7 @@ if (applySettingsButton) {
         finalSettings.pages.push({ image: './image/Birthday!/cover.jpg', content: '', isCover: true });
 
         localStorage.setItem(userStorageKey, JSON.stringify(finalSettings));
-        localStorage.setItem("userSurpriseSettings", JSON.stringify(finalSettings)); // 🎯 কমন প্রিভিউর জন্য
+        localStorage.setItem("userSurpriseSettings", JSON.stringify(finalSettings)); 
 
         const magicLinkInput = document.getElementById('magicLinkInput');
         document.getElementById('magicLinkSection').style.display = 'block';
