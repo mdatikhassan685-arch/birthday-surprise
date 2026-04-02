@@ -5,20 +5,34 @@ const applySettingsButton = document.getElementById('applySettings');
 let settings = {};
 
 const currentUserName = localStorage.getItem("currentUserName") || "guest";
-// 🎯 স্টোরেজ কী এর নাম স্ট্যান্ডার্ড করা হলো
 const userStorageKey = `userSurpriseSettings_${currentUserName}`;
+
+let currentLang = 'en'; // ডিফল্ট ভাষা ইংরেজি
+
+// 🌐 ভাষা পরিবর্তন করার ফাংশন
+function toggleLanguage() {
+    currentLang = currentLang === 'en' ? 'bn' : 'en';
+    const langBtn = document.getElementById('langSwitchBtn');
+    langBtn.innerHTML = currentLang === 'en' ? '🌐 EN / BN' : '🌐 বাংলা / EN';
+
+    document.querySelectorAll('[data-en]').forEach(el => {
+        el.textContent = el.getAttribute(`data-${currentLang}`);
+    });
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     const headerTitle = document.querySelector('.user-header h1');
-    if (headerTitle && currentUserName !== "guest") headerTitle.innerHTML = `⚙️ Hello, ${currentUserName}!`;
+    if (headerTitle && currentUserName !== "guest") {
+        headerTitle.innerHTML = `⚙️ Hello, ${currentUserName}!`;
+    }
 });
 
-// 🎯 গানের নামগুলো স্ট্যান্ডার্ড করা হলো
+// 🎯 গানের নামগুলো আপনার পছন্দ অনুযায়ী পরিবর্তন করা হলো
 const musicOptions = [
-    { value: './music/song1.mp3', label: 'Happy Birthday (Acoustic)' },
-    { value: './music/song2.mp3', label: 'Happy Birthday (Pop Version)' },
-    { value: './music/song3.mp3', label: 'Romantic Piano Theme' },
-    { value: './music/song4.mp3', label: 'Perfect - Ed Sheeran (Cover)' }
+    { value: './music/song1.mp3', label: 'Birthday 1' },
+    { value: './music/song2.mp3', label: 'Birthday 2' },
+    { value: './music/song3.mp3', label: 'Birthday 3' },
+    { value: './music/song4.mp3', label: 'Birthday 4' }
 ];
 
 const sequenceOptions = [
@@ -44,7 +58,7 @@ function stopMusicPreview(customMessage) {
     musicPreviewAudio.pause();
     musicPreviewAudio.currentTime = 0;
     currentPreviewTrack = '';
-    if (musicPreviewButton) musicPreviewButton.textContent = '▶ Play';
+    if (musicPreviewButton) musicPreviewButton.textContent = currentLang === 'en' ? '▶ Play' : '▶ শুনুন';
     if (musicPreviewStatus) musicPreviewStatus.textContent = customMessage || getSelectedMusicLabel();
 }
 
@@ -61,7 +75,7 @@ function handleMusicPreview() {
     musicPreviewAudio.pause();
     musicPreviewAudio.src = selectedSrc;
     musicPreviewAudio.play().then(() => {
-        if (musicPreviewButton) musicPreviewButton.textContent = '⏸ Stop';
+        if (musicPreviewButton) musicPreviewButton.textContent = currentLang === 'en' ? '⏸ Stop' : '⏸ থামান';
         if (musicPreviewStatus) musicPreviewStatus.textContent = `Playing: ${getSelectedMusicLabel()}`;
     }).catch(error => {
         stopMusicPreview('Error playing preview.');
@@ -71,7 +85,6 @@ function handleMusicPreview() {
 if (musicPreviewButton) musicPreviewButton.addEventListener('click', handleMusicPreview);
 musicPreviewAudio.addEventListener('ended', () => stopMusicPreview());
 
-// Theme Handling
 const colorThemes = {
     pink: { matrixColor1: '#ff69b4', matrixColor2: '#ff1493', sequenceColor: '#ff69b4' },
     blue: { matrixColor1: '#87ceeb', matrixColor2: '#4169e1', sequenceColor: '#1e90ff' },
@@ -116,46 +129,39 @@ document.querySelectorAll('.color-theme-btn').forEach(button => {
     });
 });
 
-// 🎯 ডেটা লোড করার আপনার সঠিক লজিকটিই ব্যবহার করা হলো
 function loadSettingsForAdmin() {
     const savedSettings = localStorage.getItem(userStorageKey);
+    let parsedSettings = null;
+
     if (savedSettings) {
-        settings = JSON.parse(savedSettings);
-        if(settings.pages && settings.pages.length > 0 && settings.pages[0].isCover) settings.pages.shift(); 
-        if(settings.pages && settings.pages.length > 0 && settings.pages[settings.pages.length - 1].isCover) settings.pages.pop(); 
-    } else {
-        settings = {
-            music: './music/song1.mp3', 
-            countdown: 3, 
-            matrixText: 'HAPPYBIRTHDAY',
-            sequence: 'HAPPY|BIRTHDAY|TO|YOU|NAME|❤',
-            effectSequence: ['memory', 'matrix', 'book', 'hearts'], 
-            memoryCard: { 
-                title: 'Hello Dear ❤️', 
-                message: 'Today is a very special day! I made this just for you.', 
-                image: '', 
-                defaultGif: './gif/anime1.gif', 
-                btnText: 'Open Memories ✨' 
-            },
-            innerMemory: { 
-                title: 'Beautiful Memories', 
-                message: 'These are the moments that make my life so special.', 
-                btnText: 'Read My Letter 💌', 
-                photos: ['', '', '', '', '', ''] 
-            },
-            loveNote: { 
-                letter: 'My Dearest,\n\nOn this beautiful day, I just want to tell you how amazing you are...', 
-                title: 'A Love Note', 
-                subText: 'A few words from the bottom of my heart.', 
-                btnText: "Let's Play a Game!" 
-            },
-            pages: [ 
-                { image: '', content: 'Wishing you all the happiness in the world! 💕' }, 
-                { image: '', content: 'May all your dreams come true! 🎉' } 
-            ],
-            colorTheme: 'pink'
-        };
+        try { parsedSettings = JSON.parse(savedSettings); } catch (e) {}
     }
+
+    const defaultData = {
+        music: './music/song1.mp3', 
+        countdown: 3, 
+        matrixText: 'HAPPYBIRTHDAY',
+        sequence: 'HAPPY|BIRTHDAY|TO|YOU|NAME|❤',
+        effectSequence: ['memory', 'matrix', 'book', 'hearts'], 
+        memoryCard: { title: 'Hello Dear ❤️', message: 'Today is a very special day! I made this just for you.', image: '', defaultGif: './gif/anime1.gif', btnText: 'Open Memories ✨' },
+        innerMemory: { title: 'Beautiful Memories', message: 'These are the moments that make my life so special.', btnText: 'Read My Letter 💌', photos: ['', '', '', '', '', ''] },
+        loveNote: { letter: 'My Dearest,\n\nOn this beautiful day, I just want to tell you how amazing you are...', title: 'A Love Note', subText: 'A few words from the bottom of my heart.', btnText: "Let's Play a Game!" },
+        pages: [ { image: '', content: 'Wishing you all the happiness in the world! 💕' }, { image: '', content: 'May all your dreams come true! 🎉' } ],
+        colorTheme: 'pink'
+    };
+
+    if (parsedSettings) {
+        settings = { ...defaultData, ...parsedSettings };
+        if (!settings.memoryCard) settings.memoryCard = defaultData.memoryCard;
+        if (!settings.innerMemory) settings.innerMemory = defaultData.innerMemory;
+        if (!settings.loveNote) settings.loveNote = defaultData.loveNote;
+        if (!settings.effectSequence) settings.effectSequence = defaultData.effectSequence;
+
+        if (settings.pages && settings.pages.length > 0) {
+            if (settings.pages[0].isCover) settings.pages.shift(); 
+            if (settings.pages.length > 0 && settings.pages[settings.pages.length - 1].isCover) settings.pages.pop(); 
+        }
+    } else { settings = defaultData; }
 }
 
 function populateAdminForm() {
@@ -176,10 +182,7 @@ function populateAdminForm() {
     const seqHtml = sequenceOptions.map(opt => `<option value="${opt.value}">${opt.label}</option>`).join('');
     ['seq1', 'seq2', 'seq3', 'seq4'].forEach((id, i) => {
         const seqElem = document.getElementById(id);
-        if(seqElem) {
-            seqElem.innerHTML = seqHtml;
-            seqElem.value = settings.effectSequence[i] || 'none';
-        }
+        if(seqElem) { seqElem.innerHTML = seqHtml; seqElem.value = settings.effectSequence[i] || 'none'; }
     });
 
     document.getElementById('mcTitle').value = settings.memoryCard?.title || '';
@@ -204,7 +207,6 @@ function populateAdminForm() {
     document.getElementById('loveNoteSub').value = settings.loveNote?.subText || '';
     document.getElementById('loveNoteBtn').value = settings.loveNote?.btnText || '';
 
-    // 🎯 ফিক্স: এই লাইনটি কল না করার কারণেই বইয়ের পেজগুলো স্ক্রিনে আসছিল না!
     renderPagesForm();
 }
 
@@ -219,9 +221,8 @@ async function uploadToImgBB(file, targetKey, index = null) {
     }
     
     if(!statusText) return;
-    
     statusText.style.display = 'block'; 
-    statusText.textContent = 'Uploading... ⏳';
+    statusText.textContent = currentLang === 'en' ? 'Uploading... ⏳' : 'আপলোড হচ্ছে... ⏳';
 
     const formData = new FormData(); formData.append('image', file);
 
@@ -229,21 +230,15 @@ async function uploadToImgBB(file, targetKey, index = null) {
         const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: 'POST', body: formData });
         const data = await response.json();
         if (data.success) {
-            if(targetKey === 'memory') {
-                settings.memoryCard.image = data.data.url;
-                if(removeBtn) removeBtn.style.display = 'block';
-            } else if (targetKey === 'innerMemory') {
-                settings.innerMemory.photos[index] = data.data.url;
-                if(removeBtn) removeBtn.style.display = 'block';
-            } else {
-                settings.pages[index].image = data.data.url;
-                if(removeBtn) removeBtn.style.display = 'block';
-            }
-            statusText.textContent = 'Success! ✅';
+            if(targetKey === 'memory') { settings.memoryCard.image = data.data.url; if(removeBtn) removeBtn.style.display = 'block'; } 
+            else if (targetKey === 'innerMemory') { settings.innerMemory.photos[index] = data.data.url; if(removeBtn) removeBtn.style.display = 'block'; } 
+            else { settings.pages[index].image = data.data.url; if(removeBtn) removeBtn.style.display = 'block'; }
+            
+            statusText.textContent = currentLang === 'en' ? 'Success! ✅' : 'সফল! ✅';
             setTimeout(() => statusText.style.display = 'none', 2000);
             if(previewBox) previewBox.innerHTML = `<img src="${data.data.url}" style="max-width:100%;max-height:100%;object-fit:cover;">`;
         }
-    } catch (error) { statusText.textContent = 'Error! ❌'; }
+    } catch (error) { statusText.textContent = currentLang === 'en' ? 'Error! ❌' : 'ত্রুটি! ❌'; }
 }
 
 const mcRemoveBtn = document.getElementById('mcRemoveImgBtn');
@@ -253,16 +248,14 @@ if(mcRemoveBtn) {
         const fileInput = document.getElementById('mcImageFile');
         if(fileInput) fileInput.value = '';
         const previewBox = document.getElementById('mcPreviewBox');
-        if(previewBox) previewBox.innerHTML = `<span style="color:#aaa; font-size: 12px;" id="mcNoImg">No Photo Uploaded</span>`;
+        if(previewBox) previewBox.innerHTML = `<span style="color:#aaa; font-size: 12px;" id="mcNoImg">${currentLang === 'en' ? 'No Photo Uploaded' : 'কোনো ছবি আপলোড করা হয়নি'}</span>`;
         mcRemoveBtn.style.display = 'none';
     });
 }
 
 const mcImageFile = document.getElementById('mcImageFile');
 if(mcImageFile) {
-    mcImageFile.addEventListener('change', e => {
-        if(e.target.files[0]) uploadToImgBB(e.target.files[0], 'memory');
-    });
+    mcImageFile.addEventListener('change', e => { if(e.target.files[0]) uploadToImgBB(e.target.files[0], 'memory'); });
 }
 
 function renderInnerPhotosGrid() {
@@ -270,14 +263,13 @@ function renderInnerPhotosGrid() {
     if(!grid) return;
     grid.innerHTML = '';
     
-    if(!settings.innerMemory || !settings.innerMemory.photos) {
-        settings.innerMemory = { photos: ['', '', '', '', '', ''] };
-    }
+    if(!settings.innerMemory || !settings.innerMemory.photos) settings.innerMemory = { photos: ['', '', '', '', '', ''] };
 
     for(let i = 0; i < 6; i++) {
         const url = settings.innerMemory.photos[i] || '';
         const div = document.createElement('div');
         div.style.cssText = "border: 1px solid #ddd; padding: 10px; border-radius: 8px; background: white; text-align: center;";
+        const emptyText = currentLang === 'en' ? 'Empty' : 'ফাঁকা';
         
         div.innerHTML = `
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
@@ -287,17 +279,15 @@ function renderInnerPhotosGrid() {
             <input type="file" id="inFile${i}" accept="image/*" style="width: 100%; font-size: 10px; margin-bottom: 5px;">
             <div class="image-preview-box" id="inPreviewBox${i}" style="height: 80px; border-radius: 4px; position:relative;">
                 <div class="upload-status" id="inUploadStatus${i}" style="position: absolute; background: rgba(0,0,0,0.7); color: white; padding: 5px 10px; border-radius: 4px; font-size: 12px; display: none;"></div>
-                ${url ? `<img src="${url}" style="max-width:100%;max-height:100%;object-fit:cover;">` : `<span style="font-size:10px;color:#aaa;">Empty</span>`}
+                ${url ? `<img src="${url}" style="max-width:100%;max-height:100%;object-fit:cover;">` : `<span style="font-size:10px;color:#aaa;">${emptyText}</span>`}
             </div>
         `;
         grid.appendChild(div);
 
-        document.getElementById(`inFile${i}`).addEventListener('change', e => {
-            if(e.target.files[0]) uploadToImgBB(e.target.files[0], 'innerMemory', i);
-        });
+        document.getElementById(`inFile${i}`).addEventListener('change', e => { if(e.target.files[0]) uploadToImgBB(e.target.files[0], 'innerMemory', i); });
         document.getElementById(`inRemoveBtn${i}`).addEventListener('click', () => {
             settings.innerMemory.photos[i] = ''; document.getElementById(`inFile${i}`).value = '';
-            document.getElementById(`inPreviewBox${i}`).innerHTML = `<span style="font-size:10px;color:#aaa;">Empty</span>`;
+            document.getElementById(`inPreviewBox${i}`).innerHTML = `<span style="font-size:10px;color:#aaa;">${currentLang === 'en' ? 'Empty' : 'ফাঁকা'}</span>`;
             document.getElementById(`inRemoveBtn${i}`).style.display = 'none';
         });
     }
@@ -309,24 +299,25 @@ function renderPagesForm() {
     pageConfigs.innerHTML = '';
     if(!settings.pages) settings.pages = [];
 
+    const removeBtnText = currentLang === 'en' ? 'Remove' : 'মুছুন';
+    const noImgText = currentLang === 'en' ? 'No Image' : 'কোনো ছবি আপলোড করা হয়নি';
+
     settings.pages.forEach((page, index) => {
         const pageDiv = document.createElement('div');
         pageDiv.style.cssText = "border:1px solid #ddd; padding:15px; margin-bottom:15px; border-radius:8px; background:#fff;";
         pageDiv.innerHTML = `
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                 <h4 style="margin: 0; color: #ff1493;">Page ${index + 1}</h4>
-                ${settings.pages.length > 1 ? `<button type="button" onclick="removePage(${index})" style="background: #ff4444; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">Remove</button>` : ''}
+                ${settings.pages.length > 1 ? `<button type="button" onclick="removePage(${index})" style="background: #ff4444; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">${removeBtnText}</button>` : ''}
             </div>
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
-                <label style="font-weight: bold; margin: 0;">Upload Photo for Book Page:</label>
-                <button type="button" id="pageRemoveBtn${index}" style="display: ${page.image ? 'block' : 'none'}; background: #ff4444; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 12px; cursor: pointer;">Remove Photo</button>
+                <button type="button" id="pageRemoveBtn${index}" style="display: ${page.image ? 'block' : 'none'}; background: #ff4444; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 12px; cursor: pointer;">${removeBtnText} Photo</button>
             </div>
             <input type="file" id="pageFile${index}" accept="image/*" style="width: 100%; padding: 8px; margin-bottom: 5px;">
             <div class="image-preview-box" id="previewBox${index}" style="width: 100%; height: 150px; border: 2px dashed #ddd; border-radius: 8px; display: flex; justify-content: center; align-items: center; overflow: hidden; background: #f9f9f9; position: relative;">
                 <div class="upload-status" id="uploadStatus${index}" style="position: absolute; background: rgba(0,0,0,0.7); color: white; padding: 5px 10px; border-radius: 4px; font-size: 12px; display: none;"></div>
-                ${page.image ? `<img src="${page.image}" style="max-width: 100%; max-height: 100%; object-fit: cover;">` : `<span style="color:#aaa; font-size: 12px;">No Image</span>`}
+                ${page.image ? `<img src="${page.image}" style="max-width: 100%; max-height: 100%; object-fit: cover;">` : `<span style="color:#aaa; font-size: 12px;">${noImgText}</span>`}
             </div>
-            <label style="display: block; margin-top: 15px; margin-bottom: 5px; font-weight: bold;">Text Content (Optional):</label>
             <textarea id="pageContent${index}" style="width: 100%; padding: 8px; margin-top: 10px; border: 1px solid #ddd; border-radius: 4px; min-height: 60px;" placeholder="Write a message...">${page.content || ''}</textarea>
         `;
         pageConfigs.appendChild(pageDiv);
@@ -336,7 +327,7 @@ function renderPagesForm() {
             pageRemoveBtn.addEventListener('click', () => {
                 settings.pages[index].image = ''; 
                 document.getElementById(`pageFile${index}`).value = '';
-                document.getElementById(`previewBox${index}`).innerHTML = `<span style="color:#aaa; font-size: 12px;">No Image</span>`;
+                document.getElementById(`previewBox${index}`).innerHTML = `<span style="color:#aaa; font-size: 12px;">${noImgText}</span>`;
                 pageRemoveBtn.style.display = 'none';
             });
         }
@@ -345,17 +336,19 @@ function renderPagesForm() {
         if(pageFile) {
             pageFile.addEventListener('change', e => {
                 if (e.target.files[0]) {
-                    uploadToImgBB(e.target.files[0], 'page', index);
+                    uploadToImgBB(e.target.files[0], 'page', index).then(() => { 
+                        const btn = document.getElementById(`pageRemoveBtn${index}`);
+                        if(btn) btn.style.display = 'block'; 
+                    });
                 }
             });
         }
     });
 
     if (settings.pages.length < 18) { 
+        const addBtnText = currentLang === 'en' ? '+ Add New Page' : '+ নতুন পাতা যোগ করুন';
         const addBtn = document.createElement('button');
-        addBtn.type = "button"; 
-        addBtn.textContent = '+ Add New Page'; 
-        addBtn.onclick = addNewPage;
+        addBtn.type = "button"; addBtn.textContent = addBtnText; addBtn.onclick = addNewPage;
         addBtn.style.cssText = 'background: #4caf50; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer;';
         pageConfigs.appendChild(addBtn);
     }
@@ -384,12 +377,7 @@ if (applySettingsButton) {
         settings.matrixColor2 = document.getElementById('matrixColor2').value;
         settings.sequenceColor = document.getElementById('sequenceColor').value;
         
-        settings.effectSequence = [
-            document.getElementById('seq1').value,
-            document.getElementById('seq2').value,
-            document.getElementById('seq3').value,
-            document.getElementById('seq4').value
-        ];
+        settings.effectSequence = [ document.getElementById('seq1').value, document.getElementById('seq2').value, document.getElementById('seq3').value, document.getElementById('seq4').value ];
 
         if(!settings.memoryCard) settings.memoryCard = {};
         settings.memoryCard.title = document.getElementById('mcTitle').value;
@@ -422,11 +410,11 @@ if (applySettingsButton) {
         finalSettings.pages.push({ image: './image/Birthday!/cover.jpg', content: '', isCover: true });
 
         localStorage.setItem(userStorageKey, JSON.stringify(finalSettings));
-        localStorage.setItem("userSurpriseSettings", JSON.stringify(finalSettings)); // 🎯 কমন প্রিভিউর জন্য
+        localStorage.setItem("userSurpriseSettings", JSON.stringify(finalSettings)); 
 
         const magicLinkInput = document.getElementById('magicLinkInput');
         document.getElementById('magicLinkSection').style.display = 'block';
-        magicLinkInput.value = "Saving to Database... ⏳";
+        magicLinkInput.value = currentLang === 'en' ? "Saving to Database... ⏳" : "ডাটাবেসে সেভ হচ্ছে... ⏳";
 
         try {
             const response = await fetch("https://api.jsonbin.io/v3/b", {
@@ -442,7 +430,7 @@ if (applySettingsButton) {
                 script.src = `https://is.gd/create.php?format=json&url=${encodeURIComponent(longLink)}&callback=handleShortUrl`;
                 document.body.appendChild(script);
             }
-        } catch (error) { magicLinkInput.value = "Error! ❌"; }
+        } catch (error) { magicLinkInput.value = currentLang === 'en' ? "Error! ❌" : "ত্রুটি! ❌"; }
     });
 }
 document.addEventListener('DOMContentLoaded', populateAdminForm);
