@@ -15,10 +15,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // 🎯 গানের নামগুলো স্ট্যান্ডার্ড করা হলো
 const musicOptions = [
-    { value: './music/song1.mp3', label: 'Happy Birthday (Acoustic)' },
-    { value: './music/song2.mp3', label: 'Happy Birthday (Pop Version)' },
-    { value: './music/song3.mp3', label: 'Romantic Piano Theme' },
-    { value: './music/song4.mp3', label: 'Perfect - Ed Sheeran (Cover)' }
+    { value: './music/song1.mp3', label: 'Happy Birthday 1' },
+    { value: './music/song2.mp3', label: 'Happy Birthday 2' },
+    { value: './music/song3.mp3', label: 'Happy Birthday 3' },
+    { value: './music/song4.mp3', label: 'Happy Birthday 4' }
 ];
 
 const sequenceOptions = [
@@ -116,7 +116,7 @@ function loadSettingsForAdmin() {
             music: './music/song1.mp3', 
             countdown: 3, 
             matrixText: 'HAPPYBIRTHDAY',
-            sequence: 'HAPPY|BIRTHDAY|TO|YOU|❤',
+            sequence: 'HAPPY|BIRTHDAY|TO|YOU|NAME|❤',
             effectSequence: ['memory', 'matrix', 'book', 'hearts'], 
             memoryCard: { 
                 title: 'Hello Dear ❤️', 
