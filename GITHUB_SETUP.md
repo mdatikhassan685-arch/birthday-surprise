@@ -73,3 +73,14 @@ git commit -m "Updated images and text"
 
 # 3. Push to GitHub (Your live site will update automatically in 1-2 minutes)
 git push
+
+⚠️ Important API Security Note
+Since this is a frontend-only (serverless) application, your IMGBB_API_KEY and JSONBIN_API_KEY in jscp/settings_user.js will be visible in the public GitHub repository.
+This is completely fine for personal use!
+However, if you notice strange images or high traffic on your databases, simply log into your ImgBB or JSONbin accounts, delete the old API keys, generate new ones, update your settings_user.js file, and push the changes to GitHub.
+
+📞 Need Help?
+GitHub Pages Official Guide
+Git Cheat Sheet
+
+Happy Surprising! 🎁
