@@ -60,3 +60,16 @@ Wait 1-2 minutes, then refresh the page.
 You will see a green banner saying: "Your site is live at https://YOUR-USERNAME.github.io/magic-birthday-generator/"
 🎉 Congratulations! Your site is now live on the internet!
 
+🛠️ Step 4: How to Make Updates in the Future
+Whenever you change a picture, modify text, or update an API key locally, you must push those changes to GitHub to update your live website.
+Run these 3 simple commands in your terminal:
+code
+
+# 1. Add all changed files
+git add .
+
+# 2. Commit the changes
+git commit -m "Updated images and text"
+
+# 3. Push to GitHub (Your live site will update automatically in 1-2 minutes)
+git push
