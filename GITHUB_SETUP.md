@@ -47,3 +47,16 @@ git branch -M main
 
 # Push your code to the GitHub repository
 git push -u origin main
+
+🌐 Step 3: Deploy to GitHub Pages (100% Free Hosting)
+Now that your code is on GitHub, you can make it a live website!
+Go to your repository on GitHub.
+Click the "Settings" tab (top right, near the gear icon).
+Scroll down and click on "Pages" in the left sidebar.
+Under the "Source" section, look for the "Branch" dropdown.
+Select main (or master) and keep the folder as / (root).
+Click "Save".
+Wait 1-2 minutes, then refresh the page.
+You will see a green banner saying: "Your site is live at https://YOUR-USERNAME.github.io/magic-birthday-generator/"
+🎉 Congratulations! Your site is now live on the internet!
+
