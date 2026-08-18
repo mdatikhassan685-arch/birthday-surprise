@@ -1,6 +1,4 @@
-// ==========================================
-// 🎈 CLIENT SETTINGS (For surprise.html)
-// ==========================================
+const JSONBIN_API_KEY = "$2a$10$WXbOxmvcjLQuVo5jnoQCAeAeSkcuDJlabKulj.TwfCN0CBKfpvFrq";
 
 const defaultSettings = {
     music: './music/song1.mp3',
@@ -15,7 +13,8 @@ const defaultSettings = {
     memoryCard: {
         title: 'Hello Dear ❤️',
         message: 'Today is a very special day! I made this just for you.',
-        image: './gif/anime1.gif',
+        image: '',
+        finalImageToShow: './gif/anime1.gif',
         btnText: 'Open Memories ✨'
     },
     
@@ -48,7 +47,14 @@ async function loadSettings() {
     if (dbId) {
         try {
             console.log("Fetching data from Database... ⏳");
-            const response = await fetch(`https://api.jsonbin.io/v3/b/${dbId}`);
+            const response = await fetch(`https://api.jsonbin.io/v3/b/${dbId}`, {
+                headers: {
+                    "X-Master-Key": JSONBIN_API_KEY
+                }
+            });
+
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            
             const data = await response.json();
             
             if (data.record) {
@@ -69,11 +75,14 @@ async function loadSettings() {
 }
 
 function fallbackToLocalOrDefaults() {
-    // 🎯 ফিক্স: লোকাল স্টোরেজ কী এর নাম স্ট্যান্ডার্ড করা হলো
     const savedSettings = localStorage.getItem("userSurpriseSettings");
     if (savedSettings) {
-        window.settings = JSON.parse(savedSettings);
-        console.log("✅ Local Storage Loaded (Preview Mode)");
+        try {
+            window.settings = JSON.parse(savedSettings);
+            console.log("✅ Local Storage Loaded (Preview Mode)");
+        } catch(e) {
+            window.settings = defaultSettings;
+        }
     } else {
         window.settings = defaultSettings;
         console.log("⚠️ No DB or Local Storage found. Loading defaults.");
@@ -82,19 +91,23 @@ function fallbackToLocalOrDefaults() {
 }
 
 function applyLoadedSettings() {
-    const settings = window.settings;
+    const settings = window.settings || defaultSettings;
     
     const birthdayAudio = document.getElementById('birthdayAudio');
-    if (birthdayAudio) birthdayAudio.src = settings.music;
+    if (birthdayAudio && settings.music) {
+        birthdayAudio.src = settings.music;
+    }
 
-    if (typeof matrixChars !== 'undefined') matrixChars = settings.matrixText.split('');
+    if (typeof matrixChars !== 'undefined' && settings.matrixText) {
+        matrixChars = settings.matrixText.split('');
+    }
 
     createPages();
     createInnerMemoryScreen();
 }
 
 function createInnerMemoryScreen() {
-    const currentSettings = window.settings || {};
+    const currentSettings = window.settings || defaultSettings;
     
     if (currentSettings.innerMemory) {
         const inTitle = document.getElementById('inDisplayTitle');
@@ -113,7 +126,6 @@ function createInnerMemoryScreen() {
                 if (url && url.trim() !== '') {
                     const polaroid = document.createElement('div');
                     polaroid.className = 'polaroid';
-                    polaroid.setAttribute('ontouchstart', ''); 
                     const rotation = index % 2 === 0 ? '3deg' : '-3deg';
                     polaroid.style.transform = `rotate(${rotation})`;
                     polaroid.innerHTML = `<img src="${url}" alt="Memory">`;
@@ -129,7 +141,7 @@ function createPages() {
     if(!book) return;
     
     book.innerHTML = '';
-    const pages = window.settings.pages || [];
+    const pages = (window.settings && window.settings.pages) ? [...window.settings.pages] : [];
     
     if (pages.length === 0) return;
 
@@ -216,12 +228,5 @@ document.addEventListener('DOMContentLoaded', async function () {
     if (bookContainer) bookContainer.style.display = 'none';
 
     await loadSettings();
-
     window.isWebsiteReady = true;
-
-    if (typeof tryStartWebsiteWhenLandscape === 'function') {
-        tryStartWebsiteWhenLandscape();
-    } else if (typeof startWebsite === 'function') {
-        startWebsite();
-    }
 });
